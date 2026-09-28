@@ -515,9 +515,9 @@ export function createApp({
       const data = db.getData(user.id);
       const day = localDay();
       if (p.endsWith('.json')) {
-        const body = JSON.stringify({ app: 'Monatsbudget', version: 2, exportedAt: new Date().toISOString(), user: user.username, ...data }, null, 2);
+        const body = JSON.stringify({ app: 'Quota', version: 2, exportedAt: new Date().toISOString(), user: user.username, ...data }, null, 2);
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store',
-          'Content-Disposition': `attachment; filename="monatsbudget-sicherung-${day}.json"` });
+          'Content-Disposition': `attachment; filename="quota-sicherung-${day}.json"` });
         return res.end(body);
       }
       const names = Object.fromEntries(userCategories(user.id).map(c => [c.id, c.n]));
@@ -527,7 +527,7 @@ export function createApp({
         .map(e => [e.date, e.title, names[e.cat] || names.sonst || 'Sonstiges', e.amt.toFixed(2), currency, e.rep ? 'ja' : 'nein'].map(csvCell).join(';'));
       const csv = '\ufeff' + ['Datum;Titel;Kategorie;Betrag;Währung;Monatlich', ...rows].join('\r\n') + '\r\n';
       res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Cache-Control': 'no-store',
-        'Content-Disposition': `attachment; filename="monatsbudget-ausgaben-${day}.csv"` });
+        'Content-Disposition': `attachment; filename="quota-ausgaben-${day}.csv"` });
       return res.end(csv);
     }
 

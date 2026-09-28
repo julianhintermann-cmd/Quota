@@ -1,4 +1,4 @@
-# Monatsbudget – Node-Server mit SQLite-Datenbank (keine weiteren Pakete nötig)
+# Quota – Node-Server mit SQLite-Datenbank (keine weiteren Pakete nötig)
 FROM node:22-alpine
 
 RUN apk add --no-cache su-exec

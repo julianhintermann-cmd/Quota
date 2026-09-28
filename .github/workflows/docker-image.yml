@@ -96,8 +96,8 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=sha,format=short
           labels: |
-            org.opencontainers.image.title=Monatsbudget
-            org.opencontainers.image.description=Monatsbudget – persönliche Budget-App mit Benutzerkonten und SQLite-Datenbank
+            org.opencontainers.image.title=Quota
+            org.opencontainers.image.description=Quota – persönliche Budget-App mit Benutzerkonten und SQLite-Datenbank
 
       - name: Bauen und pushen (amd64, arm64, arm/v7)
         uses: docker/build-push-action@v6

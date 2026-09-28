@@ -1,12 +1,12 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
-<title>Monatsbudget</title>
+<title>Quota</title>
 <script>try{var t=localStorage.getItem('mb.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <meta name="theme-color" content="#F2F2F0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0A0A0B" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Monatsbudget">
+<meta name="apple-mobile-web-app-title" content="Quota">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -642,6 +642,7 @@ a.list-row{color:inherit;text-decoration:none}
 .nw-item b{display:block;font-size:16px;font-weight:600;letter-spacing:-.01em;padding-top:1px}
 .nw-item p{margin:3px 0 0;font-size:14px;color:var(--text-2);line-height:1.4}
 .nw-old{padding:0 0 4px}
+#newsBody > .set-label{margin-top:6px}
 .nw-old .set-label{margin-top:12px}
 .nw-old .nw-item{animation:none}
 @keyframes nwIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -676,11 +677,13 @@ a.list-row{color:inherit;text-decoration:none}
   .nav-add{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px 0 12px;border-radius:18px}
   .nav-add svg.i{width:18px;height:18px;stroke-width:2.2}
   .fab{display:none}
-  #scroller{padding:88px var(--gut) 40px}
+  #scroller{padding:0}
+  #content{padding:88px var(--gut) 40px} /* Abstand hier statt am Scrollbereich: so rechnen alle Browser "sticky" gleich */
   #content{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,370px);gap:0 28px;align-items:start}
   .col{display:flex;flex-direction:column;gap:16px;min-width:0}
   .col-main{container-type:inline-size}
-  .col-side{position:sticky;top:0;max-height:calc(100vh - 116px);overflow-y:auto;overscroll-behavior:contain;margin:-6px -8px 0;padding:6px 8px 16px}
+  .col-main{position:sticky;top:88px}
+  .col-side{padding-bottom:16px}
   .top{display:grid;gap:14px}
   .duo{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px 20px;align-items:start}
   .blk{display:flex;flex-direction:column;gap:14px;min-width:0}
@@ -691,6 +694,8 @@ a.list-row{color:inherit;text-decoration:none}
   .toast{bottom:32px}
   .kbd-note{display:block}
   .col-side .footnote{margin:0}
+  .col-side #listHead{position:sticky;top:64px;z-index:3;background:var(--bg);margin:0 -8px;padding:12px 12px 8px;
+    box-shadow:0 8px 8px -8px var(--bg)}
   /* Dialoge in der Mitte statt Bottom-Sheets */
   .grab{display:none}
   .sheet-h{touch-action:auto}
@@ -720,6 +725,9 @@ a.list-row{color:inherit;text-decoration:none}
 @container (min-width:780px){
   .top{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
   .top .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  /* Kacheln neben der Übersicht: Betrag unten, damit sie nicht halb leer wirken */
+  .top .tile{padding:16px 16px 15px}
+  .top .tile-v{margin-top:auto;font-size:24px}
 }
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -787,7 +795,7 @@ a.list-row{color:inherit;text-decoration:none}
 
 <div id="screen">
   <header class="nav" id="nav">
-    <div class="nav-l"><div class="brand"><span class="brand-ic"><svg class="i"><use href="#i-wallet"/></svg></span>Monatsbudget</div><button class="pill-btn" id="navToday" type="button" hidden>Heute</button></div>
+    <div class="nav-l"><div class="brand"><span class="brand-ic"><svg class="i"><use href="#i-wallet"/></svg></span>Quota</div><button class="pill-btn" id="navToday" type="button" hidden>Heute</button></div>
     <div class="nav-title num" id="navTitle">Budget</div>
     <div class="nav-r"><button class="btn-ink nav-add" id="navAdd" type="button"><svg class="i"><use href="#i-plus"/></svg>Ausgabe erfassen</button><button class="icon-btn" id="btnStats" type="button" aria-label="Statistik"><svg class="i"><use href="#i-chart"/></svg></button><button class="icon-btn" id="btnSettings" type="button" aria-label="Einstellungen"><svg class="i"><use href="#i-more"/></svg></button></div>
   </header>
@@ -943,7 +951,7 @@ a.list-row{color:inherit;text-decoration:none}
     </div>
     <div class="set-group">
       <div class="set-label">App</div>
-      <button class="list-row lr-btn" id="btnNews" type="button"><div class="lr-main"><div class="lr-t">Neuigkeiten</div><div class="lr-s">Version 3.0 · Was ist neu?</div></div><svg class="i"><use href="#i-chev-r"/></svg></button>
+      <button class="list-row lr-btn" id="btnNews" type="button"><div class="lr-main"><div class="lr-t">Neuigkeiten</div><div class="lr-s" id="newsNote">Was ist neu?</div></div><svg class="i"><use href="#i-chev-r"/></svg></button>
     </div>
     <div class="set-group">
       <div class="set-label">So rechnet die App</div>
@@ -1694,11 +1702,17 @@ function updateList() {
   const clr = $('[data-act="qclear"]', content); if (clr) clr.hidden = !view.q;
   const chips = $('#qChips', content); if (chips) chips.innerHTML = qChipsHTML();
 }
+// Zur Überschrift der Ausgabenliste scrollen (unter der Navigationsleiste)
+function scrollToList(smooth) {
+  const h = $('#listHead', content); if (!h) return;
+  const top = scroller.scrollTop + h.getBoundingClientRect().top - scroller.getBoundingClientRect().top - (DESK.matches ? 84 : 56);
+  scroller.scrollTo({ top: Math.max(0, top), behavior: smooth && !RM.matches ? 'smooth' : 'auto' });
+}
 function openSearch(open) {
   view.qopen = open;
   if (!open) { view.q = ''; view.qcat = null; } else view.day = null;
   render();
-  if (open) { const q = $('#q', content); if (q) q.focus({ preventScroll: true }); if (DESK.matches) $('.col-side', content).scrollTo({ top: 0 }); }
+  if (open) { const q = $('#q', content); if (q) q.focus({ preventScroll: true }); if (DESK.matches) scrollToList(false); }
 }
 content.addEventListener('input', e => { if (e.target.id === 'q') { view.q = e.target.value; updateList(); } });
 content.addEventListener('keydown', e => {
@@ -1798,6 +1812,7 @@ function render(opts = {}) {
     content.innerHTML = html();
     if (sel) { const q = $('#q', content); if (q) { q.focus({ preventScroll: true }); try { q.setSelectionRange(sel[0], sel[1]); } catch (x) { /* egal */ } } }
     Scrollbars.scan();
+    fitMain();
     runTweens(anim !== 'intro');
     runBars();
     justAdded.clear();
@@ -1810,6 +1825,12 @@ function render(opts = {}) {
   renderNav();
 }
 
+function fitMain() {
+  const m = $('.col-main', content);
+  if (!m) return;
+  m.style.top = DESK.matches ? Math.min(88, scroller.clientHeight - m.offsetHeight - 24) + 'px' : '';
+}
+addEventListener('resize', fitMain);
 function renderNav() {
   const [y, m] = kParts(view.key);
   $('#navTitle').textContent = `${MONTHS[m]} ${y}`;
@@ -3216,7 +3237,7 @@ $('#pkAdd').addEventListener('click', async () => {
   try {
     const o = await api('POST', '/api/passkeys/options');
     const cred = await navigator.credentials.create({ publicKey: {
-      challenge: unb64u(o.challenge), rp: { id: o.rpId, name: 'Monatsbudget' },
+      challenge: unb64u(o.challenge), rp: { id: o.rpId, name: 'Quota' },
       user: { id: unb64u(o.userId), name: o.username, displayName: o.username },
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -8 }, { type: 'public-key', alg: -257 }],
       authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'required' },
@@ -3253,8 +3274,12 @@ $('#pkList').addEventListener('click', async e => {
 
 /* ---------- Neuigkeiten ----------
    Öffnet sich beim ersten Start nach einem Update von selbst (gemerkt pro Gerät), danach über die Einstellungen. */
-const APP_VERSION = '3.0';
+const APP_VERSION = '3.1';
 const CHANGELOG = [
+  { v: '3.1', title: 'Aus Monatsbudget wird Quota', sub: 'Neuer Name, gleiche App. Dazu eine aufgeräumte Ansicht am Computer.', items: [
+    ['i-wallet', 'Neuer Name: Quota', 'Deine Daten, Konten und Passkeys bleiben, wie sie sind. Auf dem Home-Bildschirm erscheint der neue Name, wenn du die App neu hinzufügst.'],
+    ['i-chart', 'Übersichtlicher am Computer', 'Nur noch ein Scrollbalken. Die Übersicht bleibt stehen, während du durch die Ausgaben scrollst, und der Kopf der Liste bleibt sichtbar.'],
+  ] },
   { v: '3.0', title: 'Das ist neu', sub: 'Zehn neue Funktionen für dein Budget, auf dem Handy und am Computer.', items: [
     ['i-search', 'Suche und Filter', 'Finde jede Ausgabe über alle Monate, nach Text, Betrag oder Kategorie. Am Computer mit der Taste /.'],
     ['i-chart', 'Statistik', 'Deine Ausgaben der letzten 6 oder 12 Monate, der Vergleich mit dem Vormonat und was dabei auffällt.'],
@@ -3271,22 +3296,32 @@ const CHANGELOG = [
   { v: '2.2', items: [['i-wallet', 'Ansicht für den Computer', 'Übersicht und Ausgabenliste nebeneinander, dazu Tastaturkürzel.']] },
   { v: '2.1', items: [['i-spark', 'Eigenes App-Symbol', 'Auf dem Home-Bildschirm mit eigenem Symbol statt einem Buchstaben.']] },
   { v: '2.0', items: [['i-user', 'Konten und Datenbank', 'Anmeldung, Daten auf deinem NAS, tägliche Sicherung und Abgleich zwischen Geräten.']] },
-  { v: '1.0', items: [['i-target', 'Monatsbudget auf dem NAS', 'Die App läuft auf deinem eigenen Server.']] },
+  { v: '1.0', items: [['i-target', 'Erste Version auf dem NAS', 'Die App läuft auf deinem eigenen Server.']] },
 ];
 const shNews = $('#shNews'), newsBody = $('#newsBody');
 let newsWait = false;
 const itemHTML = ([icon, t, d], i) => `<div class="nw-item" style="--i:${i}"><span class="nw-ic">${ic(icon)}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></div>`;
-function renderNews() {
-  const [cur, ...old] = CHANGELOG;
+// "3.10" ist neuer als "3.9": Versionen Teil für Teil als Zahlen vergleichen
+function verGt(a, b) {
+  const x = a.split('.').map(Number), y = String(b).split('.').map(Number);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d > 0; }
+  return false;
+}
+// Alles seit dem zuletzt gesehenen Stand steht offen da, Älteres unter "Frühere Versionen"
+function renderNews(prev) {
+  const [cur] = CHANGELOG, since = prev || '2.3';
+  const open = CHANGELOG.filter((v, i) => i === 0 || (since !== APP_VERSION && verGt(v.v, since)));
+  const old = CHANGELOG.filter(v => !open.includes(v));
+  const block = (v, i) => (i ? `<div class="set-label">Version ${v.v}</div>` : '') + `<div class="nw-list">${v.items.map(itemHTML).join('')}</div>`;
   newsBody.innerHTML = `<div class="nw-hero"><span class="nw-badge">Version ${cur.v}</span><div class="nw-t">${esc(cur.title)}</div><div class="nw-s">${esc(cur.sub)}</div></div>
-    <div class="nw-list">${cur.items.map(itemHTML).join('')}</div>
-    <details class="im-map nw-old"><summary>Frühere Versionen</summary>${old.map(v => `<div class="set-label">Version ${v.v}</div><div class="nw-list">${v.items.map(itemHTML).join('')}</div>`).join('')}</details>
+    ${open.map(block).join('')}
+    ${old.length ? `<details class="im-map nw-old"><summary>Frühere Versionen</summary>${old.map(v => block(v, 1)).join('')}</details>` : ''}
     <button class="btn-primary" type="button" data-news-ok>Weiter</button>`;
 }
 const seenNews = () => { try { return localStorage.getItem('mb.seen'); } catch (e) { return APP_VERSION; } };
 function markNewsSeen() { try { localStorage.setItem('mb.seen', APP_VERSION); } catch (e) { /* egal */ } }
 function openNews(fromSettings) {
-  renderNews();
+  renderNews(seenNews());
   showSheet(shNews);
   $('.sheet-body', shNews).scrollTop = 0;
   markNewsSeen();
@@ -3306,6 +3341,7 @@ function maybeShowNews() {
 function newsAfterSheet() { if (newsWait && !openSheet) { newsWait = false; setTimeout(maybeShowNews, 400); } }
 newsBody.addEventListener('click', e => { if (e.target.closest('[data-news-ok]')) { haptic(); hideSheet(shNews); } });
 $('#btnNews').addEventListener('click', () => { haptic(); openNews(true); });
+$('#newsNote').textContent = `Version ${APP_VERSION} · Was ist neu?`;
 
 /* ---------- Konto & Benutzerverwaltung ---------- */
 const grpAcc = $('#grpAcc'), grpUsers = $('#grpUsers'), pwForm = $('#pwForm'), btnPw = $('#btnPw'), btnLogout = $('#btnLogout');
@@ -3477,12 +3513,7 @@ content.addEventListener('click', e => {
     case 'next': go(1); break;
     case 'year': haptic(); openYear(); break;
     case 'income': case 'budget': if (S.sample) exitSample(); openAmount(act); break;
-    case 'spent': {
-      const h = $('#listHead', content);
-      if (DESK.matches) $('.col-side', content).scrollTo({ top: 0, behavior: 'smooth' });
-      else if (h) scroller.scrollTo({ top: h.offsetTop - 56, behavior: 'smooth' });
-      break;
-    }
+    case 'spent': scrollToList(true); break;
     case 'sample-start': haptic(); exitSample(true); openAmount('income'); break;
     case 'carry': carryOver(b.dataset.from); break;
     case 'day': view.day = view.day === b.dataset.d ? null : b.dataset.d; haptic(); render(); break;
@@ -3602,13 +3633,20 @@ const Scrollbars = (() => {
     const b = { el, thumb, top, bottom, t: 0, raf: 0, drag: null };
     bars.set(el, b);
     thumb.addEventListener('pointerdown', e => startDrag(b, e));
+    // Mausrad über dem Balken scrollt den zugehörigen Bereich (sonst ginge es ins Leere)
+    thumb.addEventListener('wheel', e => {
+      e.preventDefault();
+      const k = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? b.el.clientHeight : 1;
+      b.el.scrollBy({ top: e.deltaY * k, behavior: 'instant' });
+    }, { passive: false });
   }
   function geom(b) {
     const { el } = b, r = el.getBoundingClientRect();
     const top = typeof b.top === 'function' ? b.top(r) : b.top;
     const trackTop = r.top + top + 3, trackH = r.height - top - b.bottom - 6;
     const max = el.scrollHeight - el.clientHeight;
-    if (max < 2 || trackH < 40 || !r.width) return null;
+    // Nur Bereiche, die man sieht und in denen es wirklich etwas zu scrollen gibt
+    if (max < 24 || trackH < 40 || !r.width || (el.closest('.sheet') && !el.closest('.sheet.open'))) return null;
     return { r, trackTop, trackH, max, h: Math.max(32, trackH * el.clientHeight / el.scrollHeight) };
   }
   function place(b) {
@@ -3666,7 +3704,6 @@ const Scrollbars = (() => {
   // Nach jedem Neuaufbau: verschwundene Bereiche entfernen, neue anmelden
   function scan() {
     for (const [el, b] of bars) if (!document.contains(el)) { b.thumb.remove(); bars.delete(el); }
-    add($('.col-side', content), { top: 6, bottom: 16 });
   }
   return { add, scan };
 })();

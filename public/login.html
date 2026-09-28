@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Monatsbudget</title>
+<title>Quota</title>
 <meta name="theme-color" content="#F2F2F0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0A0A0B" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Monatsbudget">
+<meta name="apple-mobile-web-app-title" content="Quota">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.ico" sizes="32x32">
@@ -116,7 +116,7 @@ h1{margin:0;font-family:var(--fd);font-size:34px;font-weight:700;letter-spacing:
   <div class="brand">
     <div class="logo" aria-hidden="true"><svg class="i"><use href="#i-wallet"/></svg></div>
     <div>
-      <h1 id="title">Monatsbudget</h1>
+      <h1 id="title">Quota</h1>
       <p class="sub" id="sub">Melde dich an, um dein Budget zu sehen.</p>
     </div>
   </div>
@@ -145,7 +145,7 @@ const form = $('#form'), user = $('#user'), pw = $('#pw'), pw2 = $('#pw2'), err 
 let mode = 'login', registration = false;
 
 const TEXT = {
-  login: { title: 'Monatsbudget', sub: 'Melde dich an, um dein Budget zu sehen.', btn: 'Anmelden', url: '/api/auth/login' },
+  login: { title: 'Quota', sub: 'Melde dich an, um dein Budget zu sehen.', btn: 'Anmelden', url: '/api/auth/login' },
   register: { title: 'Konto erstellen', sub: 'Wähle einen Benutzernamen und ein Passwort mit mindestens 8 Zeichen.', btn: 'Konto erstellen', url: '/api/auth/register' },
   setup: { title: 'Willkommen', sub: 'Lege das erste Konto an. Es verwaltet später auch weitere Benutzer.', btn: 'Konto erstellen', url: '/api/auth/setup' },
 };

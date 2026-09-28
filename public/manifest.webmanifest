@@ -1,6 +1,6 @@
 {
-  "name": "Monatsbudget",
-  "short_name": "Monatsbudget",
+  "name": "Quota",
+  "short_name": "Quota",
   "description": "Einkommen, Budget und Ausgaben von Lohn zu Lohn im Blick.",
   "lang": "de",
   "start_url": "/",

@@ -65,7 +65,7 @@ test('Seiten: ohne Anmeldung zum Login, mit Anmeldung die App mit Benutzer', asy
   assert.equal(r.headers.get('location'), '/login');
   r = await client()('GET', '/login');
   assert.equal(r.status, 200);
-  assert.match(r.data, /<title>Monatsbudget<\/title>/);
+  assert.match(r.data, /<title>Quota<\/title>/);
   r = await admin('GET', '/');
   assert.equal(r.status, 200);
   assert.match(r.data, /<script id="me" type="application\/json">\{"id":1,"username":"julian","admin":true\}<\/script>/);
@@ -312,7 +312,7 @@ test('Home-Bildschirm: Icons und Manifest sind ohne Anmeldung abrufbar', async (
   r = await fetch(base + '/manifest.webmanifest');
   assert.equal(r.status, 200);
   const m = await r.json();
-  assert.equal(m.name, 'Monatsbudget');
+  assert.equal(m.name, 'Quota');
   assert.equal(m.display, 'standalone');
   for (const icon of m.icons) assert.equal((await fetch(base + icon.src)).status, 200, icon.src);
   r = await fetch(base + '/icons/../server/app.js');

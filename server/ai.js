@@ -48,7 +48,7 @@ export async function analyzeReceipt({ apiKey, model, image, mime, categories, b
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://github.com/julianhintermann-cmd/Quota',
-        'X-Title': 'Monatsbudget',
+        'X-Title': 'Quota',
       },
       body: JSON.stringify({
         model: model || DEFAULT_MODEL,

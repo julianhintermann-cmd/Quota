@@ -1,6 +1,6 @@
 // Service Worker: zeigt eine eigene Seite, wenn der Server nicht erreichbar ist.
 // Funktioniert nur über HTTPS (oder localhost) – so verlangen es die Browser.
-const CACHE = 'monatsbudget-offline-v1';
+const CACHE = 'quota-offline-v2';
 const OFFLINE = '/offline';
 
 self.addEventListener('install', event => {

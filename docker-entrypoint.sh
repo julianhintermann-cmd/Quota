@@ -13,7 +13,7 @@ DATA_DIR="${DATA_DIR:-/data}"
 [ "$(id -u)" = "0" ] || exec "$@"
 
 PROBE='f="$1/.schreibtest.$$"; touch "$f" && rm -f "$f"'
-say() { echo "Monatsbudget: $*"; }
+say() { echo "Quota: $*"; }
 details() {
   echo "        Ordner: $(stat -c '%A %u:%g' "$DATA_DIR" 2>/dev/null), Mount: $(awk -v d="$DATA_DIR" '$2 == d { print $3, $4 }' /proc/mounts)" >&2
 }

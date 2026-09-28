@@ -1,4 +1,4 @@
-# Monatsbudget auf dem NAS
+# Quota auf dem NAS
 # Danach im Browser: http://<NAS-IP>:8090 – beim ersten Aufruf legst du das Admin-Konto an.
 services:
   monatsbudget:

@@ -239,14 +239,14 @@ test('Belege: verknüpfte bleiben, verwaiste werden aufgeräumt', async () => {
 test('Export: CSV für Excel und JSON-Sicherung', async () => {
   let r = await admin('GET', '/api/export.csv');
   assert.equal(r.status, 200);
-  assert.match(r.headers.get('content-disposition'), /attachment; filename="monatsbudget-ausgaben-\d{4}-\d\d-\d\d\.csv"/);
+  assert.match(r.headers.get('content-disposition'), /attachment; filename="quota-ausgaben-\d{4}-\d\d-\d\d\.csv"/);
   const text = r.buf.toString('utf8');
   assert.equal(text.charCodeAt(0), 0xfeff, 'BOM für Excel');
   const lines = text.slice(1).trim().split('\r\n');
   assert.equal(lines[0], 'Datum;Titel;Kategorie;Betrag;Währung;Monatlich');
   assert.ok(lines.includes('2026-09-27;Mit Beleg;Essen;12.00;CHF;nein'), lines.join('\n'));
   r = await admin('GET', '/api/export.json');
-  assert.equal(r.data.app, 'Monatsbudget');
+  assert.equal(r.data.app, 'Quota');
   assert.equal(r.data.months['2026-09'].income, 5000);
   assert.deepEqual(r.data.goals.map(g => g.id), ['velo']);
   assert.equal((await client()('GET', '/api/export.csv')).status, 401);

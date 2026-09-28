@@ -1,4 +1,6 @@
-# Monatsbudget
+# Quota
+
+*(früher „Monatsbudget“ – der Docker-Image-Name bleibt `quota` bzw. `monatsbudget` auf Docker Hub)*
 
 Persönliche Budget-App (Einkommen, Budget, Ausgaben pro Lohnperiode) mit Benutzerkonten.
 Jede Person meldet sich an und sieht nur ihre eigenen Zahlen. Alles wird in einer
@@ -31,6 +33,13 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
 - Eigenes App-Icon und Web-App-Manifest: *Teilen → Zum Home-Bildschirm* (iPhone) bzw.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
+
+### Neu in Version 3.1
+
+- Neuer Name: **Quota**. Daten, Konten und Passkeys bleiben unverändert. Wer die App auf dem Home-Bildschirm hat,
+  sieht den neuen Namen, nachdem er sie dort neu hinzugefügt hat.
+- Übersichtlichere Desktop-Ansicht: nur noch ein Scrollbalken; die Übersicht bleibt stehen, während die
+  Ausgabenliste mit der Seite scrollt; der Kopf der Liste (Summe, Suche) bleibt oben sichtbar.
 
 ### Neu in Version 3.0
 

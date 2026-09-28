@@ -35,7 +35,7 @@ app.server.on('error', e => {
   log.error(e.code === 'EADDRINUSE' ? `Port ${port} ist bereits belegt.` : `Serverfehler: ${e.message}`);
   process.exit(1);
 });
-app.server.listen(port, () => log.info(`Monatsbudget läuft auf Port ${port}, Datenbank: ${app.db.file}`));
+app.server.listen(port, () => log.info(`Quota läuft auf Port ${port}, Datenbank: ${app.db.file}`));
 
 let stopping = false;
 for (const sig of ['SIGTERM', 'SIGINT']) {
