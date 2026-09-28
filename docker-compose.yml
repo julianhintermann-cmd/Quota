@@ -11,7 +11,7 @@ services:
     ports:
       - "8090:8080"   # links = Port am NAS (frei wählbar), rechts = Port im Container
     volumes:
-      - ./data:/data  # Datenbank + tägliche Backups. Auf Synology z.B. /volume1/docker/monatsbudget/data
+      - ./data:/data  # Datenbank, Belegfotos + tägliche Backups. Auf Synology z.B. /volume1/docker/monatsbudget/data
     environment:
       TZ: Europe/Zurich
       BACKUP_KEEP: "14"        # so viele Tages-Backups aufbewahren (0 = keine Backups)
@@ -19,6 +19,9 @@ services:
       # PGID: "100"
       # TRUST_PROXY: "true"    # nur hinter einem Reverse Proxy (z.B. für HTTPS von aussen)
       # COOKIE_SECURE: "true"  # nur wenn die App ausschliesslich über HTTPS erreichbar ist
+      # APP_URL: "https://budget.dein-nas.ch"   # optional: feste HTTPS-Adresse (für Face ID/Passkeys hinter einem Proxy)
+      # OPENROUTER_API_KEY: ""  # optional: Schlüssel für die KI-Belegerkennung (sonst in der App unter Einstellungen eintragen)
+      # OPENROUTER_MODEL: ""    # optional: anderes Modell, Standard google/gemini-2.5-flash
     # Härtung: Dateisystem schreibgeschützt (ausser /data), keine unnötigen Rechte
     read_only: true
     tmpfs:

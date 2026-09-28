@@ -42,6 +42,12 @@ save_and_load
 $SUDO test -f "$DIR/monatsbudget.db"
 [ "$($SUDO stat -c %u "$DIR/monatsbudget.db")" = 1000 ]
 grep -q '^monatsbudget-.*\.db$' <<<"$($SUDO ls "$DIR/backups")"
+# Belegfoto speichern (Ordner receipts/ muss beschreibbar sein) und wieder abrufen
+PNG="$(mktemp)"; printf '\x89PNG\r\n\x1a\n0000smoke' >"$PNG"
+RC="$(curl -fsS -b "$JAR" -H 'X-Requested-With: monatsbudget' -H 'Content-Type: image/png' --data-binary @"$PNG" "$B/api/receipts" | sed -E 's/.*"id":"([a-f0-9]+)".*/\1/')"
+[ "$(curl -s -b "$JAR" -o /dev/null -w '%{http_code}' "$B/api/receipts/$RC")" = 200 ]
+$SUDO test -f "$DIR/receipts/$RC.png"
+rm -f "$PNG"
 [ "$(app_uid)" = 1000 ]
 grep -q node <<<"$(docker exec "$NAME" cat /proc/1/cmdline | tr '\0' ' ')"
 [ "$(docker exec -u 1000 "$NAME" sh -c 'grep CapEff /proc/1/status' | awk '{print $2}')" = 0000000000000000 ]

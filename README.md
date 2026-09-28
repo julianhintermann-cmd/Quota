@@ -32,6 +32,50 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
 
+### Neu in Version 3.0
+
+- **Suche und Filter** über alle Monate (Text, Betrag, Monat, Kategorie); am Desktop mit der Taste `/`
+- **Hell/Dunkel** von Hand wählen oder dem System folgen (Einstellungen → Darstellung, pro Gerät)
+- **Eigene Kategorien** mit Symbol anlegen, umbenennen, löschen (Ausgaben gelöschter Kategorien zählen als „Sonstiges“)
+- **Export** aller Ausgaben als CSV (Excel/Numbers) und vollständige **Sicherung** als JSON
+- **Bankauszug importieren** (CSV): erkennt UBS, PostFinance, Raiffeisen, ZKB, Migros Bank, Revolut, Neon,
+  Yuh, Wise und beliebige andere Exporte. Gutschriften werden ignoriert, bereits Erfasstes erkannt,
+  Kategorien vorgeschlagen; Spalten lassen sich von Hand zuordnen. Die Datei verlässt dabei das Gerät nicht.
+- **Statistik**: Ausgaben der letzten 6 oder 12 Monate mit Budget-Linie (auch als Tabelle),
+  Kategorien im Vergleich zum Vormonat und Auffälligkeiten
+- **Sparziele** mit Zielbetrag, optionalem Termin, nötiger Monatsrate, Ein- und Auszahlungen
+- **Belegfotos mit KI**: Foto zur Ausgabe hinzufügen; über [OpenRouter](https://openrouter.ai) liest eine KI
+  Betrag, Händler, Datum und Kategorie aus. Personen ohne Admin-Rechte haben 3 Analysen pro Tag
+  (einstellbar), Admins unbegrenzt.
+- **Offline-Hinweis**: Ist der Server nicht erreichbar, zeigt die App „Der Server scheint nicht erreichbar zu sein“
+  und verbindet sich von selbst wieder (braucht HTTPS, siehe unten)
+- **Face ID / Touch ID / Windows Hello** (Passkeys): in den Einstellungen einrichten, danach ohne Passwort anmelden –
+  auf iPhone, iPad, Mac, Windows und Android (braucht HTTPS, siehe unten)
+- **Neuigkeiten**: öffnen sich nach einem Update einmal von selbst, danach unter Einstellungen → App
+
+### KI-Belegerkennung einrichten
+
+1. Auf [openrouter.ai](https://openrouter.ai) ein Konto anlegen, etwas Guthaben laden und unter *Keys* einen Schlüssel erstellen.
+2. In der App als Admin: *Einstellungen → KI-Belegerkennung* → Schlüssel einfügen → *Einrichten*.
+   Optional ein anderes Modell wählen („Verfügbare Modelle mit Bilderkennung laden“) und das Tageslimit anpassen.
+3. Fertig: Beim Erfassen einer Ausgabe oben rechts auf die Kamera tippen.
+
+Der Schlüssel bleibt in der Datenbank auf deinem NAS und wird nie an den Browser geschickt (nur die letzten
+4 Zeichen werden angezeigt). Alternativ lässt er sich per Umgebungsvariable `OPENROUTER_API_KEY` setzen.
+Belegfotos werden verkleinert (max. 1600 px) im Datenordner unter `receipts/` gespeichert und nur zum Auslesen
+an OpenRouter geschickt. Ein Beleg kostet mit dem Standardmodell Bruchteile eines Rappens.
+
+### Face ID und Offline-Seite: nur über HTTPS
+
+Browser erlauben Passkeys und die Offline-Seite (Service Worker) nur über **HTTPS mit einem Hostnamen** –
+über `http://192.168.x.x:8090` geht beides nicht (die App zeigt dann einen Hinweis). Der einfachste Weg auf dem NAS:
+
+- **Synology:** *Systemsteuerung → Anmeldeportal → Erweitert → Reverse Proxy*: Quelle `HTTPS`, Hostname
+  z. B. `budget.dein-nas.synology.me`, Port `443` → Ziel `HTTP`, `localhost`, Port `8090`.
+  Zertifikat unter *Sicherheit → Zertifikat* (Let's Encrypt).
+- **QNAP:** *Netzwerk & Dateidienste → Reverse Proxy* analog.
+- Danach in der YAML `TRUST_PROXY: "true"` setzen und die App über die HTTPS-Adresse öffnen.
+
 ## Auf dem NAS starten
 
 `docker-compose.yml` aus diesem Repo verwenden:
@@ -58,7 +102,10 @@ Die Datenbank im Datenordner bleibt dabei erhalten.
 | `PUID` / `PGID` | automatisch | Unter diesem Benutzer läuft die App; der Datenordner wird ihm übergeben (siehe unten) |
 | `TRUST_PROXY` | `false` | `true`, wenn ein Reverse Proxy davor läuft (echte Client-IP, HTTPS-Erkennung) |
 | `COOKIE_SECURE` | `auto` | `true` erzwingt Cookies nur über HTTPS |
-| `TZ` | – | Zeitzone, bestimmt das Datum im Backup-Dateinamen |
+| `TZ` | – | Zeitzone, bestimmt das Datum im Backup-Dateinamen und das Tageslimit der KI |
+| `APP_URL` | – | Optional: feste Adresse der App (z. B. `https://budget.dein-nas.ch`), falls Passkeys hinter einem Proxy nicht klappen |
+| `OPENROUTER_API_KEY` | – | Optional: OpenRouter-Schlüssel (sonst in der App eintragen) |
+| `OPENROUTER_MODEL` | `google/gemini-2.5-flash` | Optional: Modell für die Belegerkennung (muss Bilder verstehen) |
 
 ### Rechte des Datenordners
 
@@ -82,13 +129,18 @@ mit Let's-Encrypt-Zertifikat) und dann `TRUST_PROXY: "true"` setzen.
 ```
 data/
 ├── monatsbudget.db          # Datenbank (SQLite)
+├── receipts/                # Belegfotos
 └── backups/
     ├── monatsbudget-2026-09-27.db
     └── monatsbudget-2026-09-28.db
 ```
 
-- Tabellen: `users`, `sessions`, `settings`, `months` (Einkommen/Budget pro Monat) und
-  `expenses` (jede Ausgabe als eigene Zeile). Beträge werden in Rappen/Cent gespeichert.
+- Tabellen: `users`, `sessions`, `settings`, `months` (Einkommen/Budget pro Monat),
+  `expenses` (jede Ausgabe als eigene Zeile), `goals` und `goal_entries` (Sparziele), `receipts`
+  (Belegfotos), `ai_usage` (Tageszähler der KI) und `passkeys`. Beträge werden in Rappen/Cent gespeichert.
+- Ältere Datenbanken werden beim Start automatisch auf den neuen Stand gebracht.
+- Belegfotos, die zu keiner Ausgabe mehr gehören, werden nach drei Tagen gelöscht.
+  Die Backups enthalten die Datenbank, nicht die Fotos.
 - Backups entstehen beim Start und danach stündlich, sofern sich etwas geändert hat –
   eine Datei pro Tag, die ältesten werden nach `BACKUP_KEEP` Tagen gelöscht.
 - **Wiederherstellen:** Container stoppen, `monatsbudget.db` durch die gewünschte Backup-Datei
@@ -133,7 +185,7 @@ Voraussetzung: Node.js 22.13 oder neuer.
 
 ```
 npm start          # Server auf http://localhost:8080, Daten in ./data
-npm test           # API-Tests
+npm test           # API-Tests, Bank-Import-Parser, Passkeys, KI (mit nachgebautem OpenRouter)
 ```
 
 Container lokal bauen und testen:

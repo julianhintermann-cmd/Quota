@@ -381,6 +381,7 @@ button.tile:active{transform:scale(.965)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0s!important}
   body.sheet-open #screen{transform:none;border-radius:0}
+  .nw-item{animation:none}
 }
 .row-mid{min-width:0;display:flex;flex-direction:column}
 .hero-foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
@@ -452,7 +453,7 @@ button.tile:active{transform:scale(.965)}
 .file-in{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 label.icon-btn,label.btn-primary{cursor:pointer;user-select:none;-webkit-user-select:none}
 .file-btn{display:grid;place-items:center}
-.opts .grow{flex:1;height:44px;font-size:16px}
+.opts .grow{flex:1;height:44px;font-size:16px;display:flex;align-items:center;justify-content:center;padding:0}
 .txt-btn.left{align-self:flex-start;text-align:left;font-size:15px;color:var(--text);font-weight:600;padding:4px}
 .lr-btn > svg.i{width:17px;height:17px;color:var(--text-3);flex:none}
 a.list-row{color:inherit;text-decoration:none}
@@ -472,11 +473,18 @@ a.list-row{color:inherit;text-decoration:none}
 .rc-main{flex:1;min-width:0}
 .rc-t{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rc-s{font-size:13px;color:var(--text-2);margin-top:2px;line-height:1.35}
-.rc-s.warn{color:var(--danger)}
+.rc-s.warn,.lr-s.warn{color:var(--danger)}
 .rc-strip .pill-btn{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08);flex:none}
 .rc-x{width:32px;height:32px;background:var(--surface);flex:none}
 .rc-x svg.i{width:15px;height:15px}
 .row-s .clip{width:12px;height:12px}
+.model-list{display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:var(--fill);border-radius:14px;padding:4px}
+.model-list button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:9px 10px;border-radius:10px;min-width:0}
+.model-list button b{font-size:15px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.model-list button span{font-size:12px;color:var(--text-2);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.model-list button.on{background:var(--ink);color:var(--on-ink)}
+.model-list button.on span{color:inherit;opacity:.7}
+@media (hover:hover){.model-list button:not(.on):hover{background:var(--fill-2)}}
 .viewer{position:fixed;inset:0;z-index:70;background:rgba(6,6,7,.94);display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 56px) 16px calc(env(safe-area-inset-bottom,0px) + 24px)}
 .viewer img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
 .viewer .icon-btn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;background:rgba(255,255,255,.14);color:#fff}
@@ -507,6 +515,15 @@ a.list-row{color:inherit;text-decoration:none}
 .goal-track i{display:block;height:100%;width:100%;background:var(--text);border-radius:3px;transform-origin:0 50%;transform:scaleX(0);transition:transform .8s var(--ease)}
 .goal-s{font-size:13px;color:var(--text-2);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .goal-empty{display:flex;align-items:center;gap:14px;padding:16px;text-align:left;width:100%}
+.goal-main,.goal-track,.goal-s,.goal-empty .b-t,.goal-empty .b-s{display:block}
+.goal-main{min-width:0;flex:1}
+.mp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:4px 2px}
+.mp-grid button{height:40px;border-radius:12px;background:var(--surface);font-size:15px;font-weight:500;transition:transform .3s var(--spring)}
+.mp-grid button:active{transform:scale(.94)}
+.mp-grid button.on{background:var(--ink);color:var(--on-ink);font-weight:600}
+.mp-grid button:disabled{opacity:.35}
+#glPicker .txt-btn{align-self:center;font-size:15px;padding:6px 10px}
+.opt.on svg.i{color:inherit}
 .goal-empty .b-ic{width:40px;height:40px;border-radius:12px;background:var(--fill);display:grid;place-items:center;flex:none}
 .goal-empty .b-t{font-size:15px;font-weight:600}
 .goal-empty .b-s{font-size:13px;color:var(--text-2);margin-top:2px;line-height:1.35}
@@ -545,19 +562,24 @@ a.list-row{color:inherit;text-decoration:none}
 .chart svg{display:block;width:100%;overflow:visible}
 .chart .grid{stroke:var(--hair-2);stroke-width:1}
 .chart .tick{fill:var(--text-3);font-size:10px;font-family:var(--f)}
-.chart .col{fill:var(--text)}
-.chart .col.over{fill:var(--danger)}
-.chart .col.cur{fill:var(--text)}
+.chart .cbar{fill:var(--text)}
+.chart .cbar.over{fill:var(--danger)}
 .chart .budget{stroke:var(--text-2);stroke-width:2;stroke-linecap:round}
+.chart .cbar,.chart .budget,.chart .grid,.chart text{pointer-events:none}
+.tip .t-over{font-weight:700}
+.st-facts b .num{font-weight:600}
+#stRange{margin-bottom:2px}
+.st-empty b{color:var(--text);font-size:17px}
 .chart .hit{fill:transparent;cursor:pointer;outline:none}
-.chart .hit:hover + .col,.chart .hit:focus-visible + .col{opacity:.7}
+.chart .hit:hover + .cbar,.chart .hit:focus-visible + .cbar{opacity:.7}
 .chart .xl{fill:var(--text-2);font-size:11px;font-family:var(--f);text-anchor:middle}
 .chart .xl.cur{fill:var(--text);font-weight:700}
 .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--on-ink);border-radius:12px;padding:8px 10px;font-size:12px;line-height:1.4;
-  white-space:nowrap;transform:translate(-50%,calc(-100% - 8px));box-shadow:var(--shadow-fab);opacity:0;transition:opacity .12s;z-index:2}
+  white-space:nowrap;box-shadow:var(--shadow-fab);opacity:0;transition:opacity .12s;z-index:2}
 .tip.on{opacity:1}
 .tip b{font-size:14px;font-weight:700;display:block}
 .st-table{width:100%;border-collapse:collapse;font-size:13px}
+.st-table caption{caption-side:top;text-align:left;font-size:12px;color:var(--text-2);padding:0 4px 4px}
 .st-table th{font-weight:600;color:var(--text-2);text-align:right;padding:6px 4px;font-size:12px}
 .st-table th:first-child,.st-table td:first-child{text-align:left}
 .st-table td{padding:7px 4px;text-align:right;border-top:1px solid var(--hair);white-space:nowrap}
@@ -607,6 +629,22 @@ a.list-row{color:inherit;text-decoration:none}
 .im-map[open] summary::after{content:" ⌄"}
 .map-f{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .map-f .set-label{padding:0 4px}
+
+/* ---------- Neuigkeiten ---------- */
+.nw-hero{padding:4px 4px 2px}
+.nw-badge{display:inline-block;padding:4px 10px;border-radius:9px;background:var(--fill);font-size:13px;font-weight:600;color:var(--text-2)}
+.nw-t{font-family:var(--fd);font-size:30px;font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-top:12px}
+.nw-s{font-size:15px;color:var(--text-2);margin-top:6px;line-height:1.4}
+.nw-list{display:flex;flex-direction:column;gap:16px;padding:6px 4px}
+.nw-item{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;align-items:start;animation:nwIn .5s var(--ease) both;animation-delay:calc(var(--i) * 45ms)}
+.nw-ic{width:40px;height:40px;border-radius:12px;background:var(--fill);display:grid;place-items:center}
+.nw-ic svg.i{width:20px;height:20px}
+.nw-item b{display:block;font-size:16px;font-weight:600;letter-spacing:-.01em;padding-top:1px}
+.nw-item p{margin:3px 0 0;font-size:14px;color:var(--text-2);line-height:1.4}
+.nw-old{padding:0 0 4px}
+.nw-old .set-label{margin-top:12px}
+.nw-old .nw-item{animation:none}
+@keyframes nwIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ---------- Kategorien ---------- */
 .cat-ic svg.i{width:17px;height:17px}
@@ -710,6 +748,8 @@ a.list-row{color:inherit;text-decoration:none}
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19.5h14"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15.5V4.5M7.5 9 12 4.5 16.5 9M5 19.5h14"/></symbol>
     <symbol id="i-clip" viewBox="0 0 24 24"><path d="m16.5 9-6.8 6.8a2 2 0 0 1-2.8-2.8l7.4-7.4a3.5 3.5 0 0 1 5 5L11.5 18.4a5 5 0 0 1-7-7L11 5"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A8 8 0 1 1 9.4 4.5a6.5 6.5 0 0 0 10.1 10.1z"/></symbol>
+    <symbol id="i-offline" viewBox="0 0 24 24"><path d="M8.5 18.5H17a4 4 0 0 0 1.9-7.5M15.3 7.1A6 6 0 0 0 6.2 10 4.3 4.3 0 0 0 5 18.2"/><path d="M4 4l16 16"/></symbol>
     <symbol id="i-face" viewBox="0 0 24 24"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16M9 9.5v1.5M15 9.5v1.5M12 9.5v3.5h-1M9.5 15.5c1.4 1.2 3.6 1.2 5 0"/></symbol>
     <symbol id="c-geschenk" viewBox="0 0 24 24"><rect x="3.5" y="8.5" width="17" height="4" rx="1.4"/><path d="M5 12.5h14V19a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19zM12 8.5v12M12 8.5c-1.3-2.7-5-3.5-5.2-1.2-.1 1.6 2.8 1.2 5.2 1.2zm0 0c1.3-2.7 5-3.5 5.2-1.2.1 1.6-2.8 1.2-5.2 1.2z"/></symbol>
     <symbol id="c-reisen" viewBox="0 0 24 24"><path d="M20.5 14.5 13 10.2V5.5a1.5 1.5 0 0 0-3 0v4.7l-7 4.3V16l7-2v4l-2 1.4v1.1l3.5-.9 3.5.9v-1.1L13 18v-4l7.5 2z"/></symbol>
@@ -902,6 +942,10 @@ a.list-row{color:inherit;text-decoration:none}
       </div>
     </div>
     <div class="set-group">
+      <div class="set-label">App</div>
+      <button class="list-row lr-btn" id="btnNews" type="button"><div class="lr-main"><div class="lr-t">Neuigkeiten</div><div class="lr-s">Version 3.0 · Was ist neu?</div></div><svg class="i"><use href="#i-chev-r"/></svg></button>
+    </div>
+    <div class="set-group">
       <div class="set-label">So rechnet die App</div>
       <p class="set-note"><b>Verbleibend</b> ist dein Budget minus Ausgaben. <b>Frei verfügbar</b> ist, was vom Einkommen nach dem Budget übrig bleibt. Ohne Budget gilt das Einkommen als Grenze. Ein Monat läuft von Lohntag zu Lohntag, Ausgaben zählen nach ihrem Datum.</p>
     </div>
@@ -975,6 +1019,13 @@ a.list-row{color:inherit;text-decoration:none}
     <button class="btn-primary" id="glSave" type="button">Sparziel anlegen</button>
     <button class="btn-danger" id="glDelete" type="button" hidden>Sparziel löschen</button>
   </div>
+</section>
+
+<!-- Neuigkeiten -->
+<section class="sheet" id="shNews" role="dialog" aria-modal="true" aria-labelledby="shNewsT">
+  <div class="grab"></div>
+  <div class="sheet-h"><span class="l"></span><h3 id="shNewsT">Neuigkeiten</h3><button class="txt-btn r strong" type="button" data-close>Fertig</button></div>
+  <div class="sheet-body" id="newsBody"></div>
 </section>
 
 <!-- Belegansicht -->
@@ -1147,7 +1198,7 @@ function calc(key) {
   const pace = dayIdx / days;
   // Fixkosten gelten ab Beginn als fällig, der Rest verteilt sich gleichmässig über die Tage
   const expected = limit ? Math.min(limit, fixed + Math.max(0, limit - fixed) * pace) : 0;
-  return { m, exps, y, mo, start, end, spent, fixed, income, budget, limit, limitIs, remaining, free, days, phase, dayIdx, daysLeft, pace, expected,
+  return { key, m, exps, y, mo, start, end, spent, fixed, income, budget, limit, limitIs, remaining, free, days, phase, dayIdx, daysLeft, pace, expected,
     ratio: limit ? spent / limit : 0, count: exps.length };
 }
 
@@ -1319,6 +1370,7 @@ const Store = {
     const imported = this.imported;
     if (imported) Object.keys(local).forEach(k => { if (!server[k] && !isEmptyM(local[k])) { merged[k] = local[k]; upload.add(k); } });
     this.mode = 'server'; this.loaded = true;
+    S.goals = Array.isArray(d.goals) ? d.goals : [];
     if (Object.keys(merged).length) { S.sample = false; S.months = merged; }
     else if (!S.sample) S.months = merged;
     const st = d.settings;
@@ -1335,6 +1387,7 @@ const Store = {
     this.settled = true;
     updateStoreInfo();
     render({ anim: 'swap' });
+    maybeShowNews();
   },
   // Späterer Abgleich (Neuverbindung, App wieder im Vordergrund)
   apply(d) {
@@ -1351,6 +1404,7 @@ const Store = {
       if (sig(server[k]) !== sig(getM(k))) { S.months[k] = server[k]; touched = true; }
     });
     if (this.applySettings(d.settings)) touched = true;
+    if (Array.isArray(d.goals) && JSON.stringify(d.goals) !== JSON.stringify(S.goals)) { S.goals = d.goals; touched = true; refreshGoalSheet(); }
     if (touched) { this.writeLocal(); updateStoreInfo(); render({ anim: 'none' }); }
   },
   applySettings(st) {
@@ -1364,8 +1418,9 @@ const Store = {
   },
   change(ev) {
     if (!ev || ev.origin === CID || !this.loaded) return;
-    if (S.sample) { this.sync(); return; }
+    if (S.sample && ev.kind !== 'goals') { this.sync(); return; }
     let touched = false;
+    if (ev.kind === 'goals' && Array.isArray(ev.data)) { S.goals = ev.data; this.writeLocal(); render({ anim: 'none' }); refreshGoalSheet(); return; }
     if (ev.kind === 'settings') touched = this.applySettings(ev.data);
     else if (ev.kind === 'month' && /^\d{4}-\d\d$/.test(ev.key) && !this.busy(ev.key)) {
       const k = ev.key;
@@ -1387,6 +1442,7 @@ const Store = {
     this.settled = true;
     if (!hasData() && !S.sample) { S.sample = true; S.months = sampleData(); render({ anim: 'swap' }); }
     updateStoreInfo();
+    maybeShowNews();
   },
 };
 
@@ -1394,7 +1450,7 @@ const Store = {
 const content = $('#content'), scroller = $('#scroller'), nav = $('#nav');
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const ic = (id, cls = 'i') => `<svg class="${cls}"><use href="#${id}"/></svg>`;
-const last = { vals: {}, bar: 0, cats: {} };
+const last = { vals: {}, bar: 0, cats: {}, goals: {} };
 const justAdded = new Set();
 
 function prevWithData(key) {
@@ -1662,9 +1718,9 @@ function footHTML() {
 
 // Handy: alles untereinander (die Container sind dort unsichtbar). Desktop: Hauptspalte + Ausgabenliste rechts.
 function html() {
-  const c = calc(view.key), cats = catsHTML(c);
+  const c = calc(view.key), cats = catsHTML(c), goals = goalsHTML();
   return `<div class="col col-main">${titleHTML(c)}${bannerHTML(c)}<div class="top">${heroHTML(c)}${tilesHTML(c)}</div>`
-    + `<div class="duo"><div class="blk">${calHTML(c)}</div>${cats ? `<div class="blk">${cats}</div>` : ''}</div></div>`
+    + `<div class="duo"><div class="blk">${calHTML(c)}</div>${cats || goals ? `<div class="blk">${cats}${goals}</div>` : ''}</div></div>`
     + `<div class="col col-side">${listHTML(c)}${footHTML()}</div>`;
 }
 
@@ -1709,6 +1765,12 @@ function runBars() {
   cats.forEach(i => { i.style.transition = ''; next[i.dataset.cat] = parseFloat(i.dataset.scale); });
   requestAnimationFrame(() => cats.forEach(i => { i.style.transform = `scaleX(${i.dataset.scale})`; }));
   last.cats = next;
+  const gl = $$('.goal-track i', content), gnext = {};
+  gl.forEach(i => { i.style.transition = 'none'; i.style.transform = `scaleX(${last.goals[i.dataset.goal] || 0})`; });
+  if (gl.length) content.offsetWidth;
+  gl.forEach(i => { i.style.transition = ''; gnext[i.dataset.goal] = parseFloat(i.dataset.scale); });
+  requestAnimationFrame(() => gl.forEach(i => { i.style.transform = `scaleX(${i.dataset.scale})`; }));
+  last.goals = gnext;
 }
 
 let slideAnim = null;
@@ -1800,6 +1862,7 @@ function hideSheet(el = openSheet, instant) {
   el.style.removeProperty('--kb');
   if (!instant && lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
   if (el._back) { const back = el._back; el._back = null; if (!instant) setTimeout(back, 60); }
+  else if (!instant) newsAfterSheet();
 }
 scrim.addEventListener('click', () => hideSheet());
 $$('[data-close]').forEach(b => b.addEventListener('click', () => hideSheet()));
@@ -1905,7 +1968,7 @@ function guessCat(title) {
 
 const shExp = $('#shExp'), exAmt = $('#exAmt'), exTitle = $('#exTitle'), exCats = $('#exCats'), exPad = $('#exPad');
 const exDateOpt = $('#exDateOpt'), exDateLbl = $('#exDateLbl'), exRepeat = $('#exRepeat'), exSave = $('#exSave'), exDelete = $('#exDelete');
-const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, date: null, rep: false };
+const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, rep: false, rc: null };
 
 function buildCatChips() {
   exCats.innerHTML = CATS.map(c => `<button type="button" class="chip" role="radio" aria-checked="false" data-cat="${c.id}">${ic('c-' + c.ic)}${esc(c.n)}</button>`).join('');
@@ -1960,7 +2023,7 @@ function openPicker(open) {
   if (open) requestAnimationFrame(() => exPicker.scrollIntoView({ block: 'nearest', behavior: RM.matches ? 'auto' : 'smooth' }));
 }
 function pickDate(ds, close) {
-  ex.date = ds; haptic(); paintDate();
+  ex.date = ds; ex.manualDate = true; haptic(); paintDate();
   if (close) openPicker(false);
 }
 exDateOpt.addEventListener('click', () => { haptic(); if (document.activeElement === exTitle) exTitle.blur(); openPicker(!pk.open); });
@@ -2027,8 +2090,10 @@ function findExpense(id) {
 }
 function openExpense(id) {
   const f = id ? findExpense(id) : null;
-  Object.assign(ex, f ? { id, origKey: f.key, buf: bufOf(f.e.amt), cat: f.e.cat, manualCat: true, date: f.e.date, rep: f.e.rep }
-    : { id: null, origKey: null, buf: '', cat: null, manualCat: false, date: defaultDate(), rep: false });
+  Object.assign(ex, f ? { id, origKey: f.key, buf: bufOf(f.e.amt), cat: f.e.cat, manualCat: true, manualDate: true, date: f.e.date, rep: f.e.rep }
+    : { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: defaultDate(), rep: false });
+  resetRc(f ? f.e.rc : null);
+  if (ME && !f) loadAi().then(() => { if (openSheet === shExp && rc.state === 'ready') paintRc('ready', readyText()); });
   exTitle.value = f ? f.e.title : '';
   $('#shExpT').textContent = f ? 'Ausgabe' : 'Neue Ausgabe';
   exSave.textContent = f ? 'Sichern' : 'Hinzufügen';
@@ -2053,6 +2118,13 @@ function saveExpense() {
     if (f) { f.m.expenses.splice(f.i, 1); rec = { ...f.e, amt, title, cat, date: ex.date, rep: ex.rep }; if (f.key !== key) Store.touch(f.key); }
   }
   if (!rec) { rec = { id: uid(), amt, title, cat, date: ex.date, rep: ex.rep, ts: Date.now() }; justAdded.add(rec.id); }
+  if (ex.rc) rec.rc = ex.rc; else delete rec.rc;
+  // Foto lädt noch: sobald es oben ist, an die gespeicherte Ausgabe hängen
+  if (!ex.rc && rc.pending) {
+    const recId = rec.id;
+    rc.pending.then(id => { const f = findExpense(recId); if (f && id && !f.e.rc) { f.e.rc = id; Store.touch(f.key); render(); } }).catch(() => {});
+    rc.tok++;
+  }
   ensureM(key).expenses.push(rec);
   Store.touch(key);
   hideSheet(shExp, true);
@@ -2079,6 +2151,141 @@ function deleteExpense(id) {
   } else done();
   toast('Ausgabe gelöscht', 'Rückgängig', () => { ensureM(f.key).expenses.push(rec); justAdded.add(rec.id); Store.touch(f.key); render(); });
 }
+
+/* ---------- Belegfotos und KI-Auslesen ---------- */
+const exRc = $('#exRc'), exRcFile = $('#exRcFile'), exRcImg = $('#exRcImg'), exRcT = $('#exRcT'), exRcS = $('#exRcS'), exRcAi = $('#exRcAi');
+const AI = { enabled: false, limit: 3, used: 0, remaining: 3 };
+const rc = { tok: 0, url: null, state: null, pending: null };
+async function loadAi() {
+  if (!ME) return;
+  try { Object.assign(AI, await api('GET', '/api/ai')); } catch (e) { /* später nochmals */ }
+}
+const aiLeft = () => (AI.remaining == null ? 'KI-Auslesen ohne Tageslimit' : AI.remaining === 1 ? 'Noch 1 KI-Analyse heute' : `Noch ${AI.remaining} KI-Analysen heute`);
+function setRcPreview(url) {
+  if (rc.url && rc.url.startsWith('blob:') && rc.url !== url) URL.revokeObjectURL(rc.url);
+  rc.url = url; exRcImg.src = url || '';
+}
+function paintRc(state, msg, title) {
+  rc.state = state;
+  exRc.hidden = !state;
+  if (!state) return;
+  exRcT.textContent = title || 'Beleg';
+  exRcS.classList.toggle('warn', state === 'error');
+  const spin = state === 'upload' || state === 'analyze';
+  exRcS.innerHTML = (spin ? '<span class="spin"></span>' : '') + esc(msg || '');
+  const canAi = AI.enabled && ex.rc && AI.remaining !== 0 && (state === 'ready' || state === 'error');
+  exRcAi.hidden = !canAi;
+}
+function readyText() {
+  if (!AI.enabled) return ME && ME.admin ? 'Wird gespeichert · KI-Auslesen in den Einstellungen einrichten' : 'Wird mit der Ausgabe gespeichert';
+  if (AI.remaining === 0) return `Heute keine KI-Analysen mehr übrig (${AI.limit} pro Tag)`;
+  return aiLeft();
+}
+// Foto verkleinern (max. 1600 px, JPEG): schneller hochgeladen und günstiger für die KI
+async function shrinkImage(file) {
+  const MAX = 1600;
+  let src = null, url = null;
+  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+  catch (e) {
+    url = URL.createObjectURL(file);
+    src = await new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = url; });
+  }
+  const w = src.width, h = src.height, k = Math.min(1, MAX / Math.max(w, h));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.drawImage(src, 0, 0, c.width, c.height);
+  if (src.close) src.close();
+  if (url) URL.revokeObjectURL(url);
+  const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.82));
+  if (!blob) throw new Error('Bild konnte nicht verarbeitet werden.');
+  return blob;
+}
+async function uploadReceipt(blob) {
+  let res;
+  try {
+    res = await fetch('/api/receipts', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
+      headers: { 'X-Requested-With': 'monatsbudget', 'X-Client-Id': CID, 'Content-Type': blob.type || 'image/jpeg' }, body: blob });
+  } catch (e) { throw new ApiError(0, 'Keine Verbindung zum Server.'); }
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new ApiError(res.status, (data && data.error) || 'Hochladen fehlgeschlagen.');
+  return data.id;
+}
+async function pickReceipt(file) {
+  if (!file) return;
+  const tok = ++rc.tok;
+  ex.rc = null;
+  setRcPreview(URL.createObjectURL(file));
+  paintRc('upload', 'Beleg wird hochgeladen …');
+  haptic();
+  let blob = file;
+  try { blob = await shrinkImage(file); }
+  catch (e) { if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { if (tok === rc.tok) paintRc('error', 'Dieses Bildformat wird nicht unterstützt. Bitte ein Foto (JPEG oder PNG) wählen.'); return; } }
+  if (tok !== rc.tok) return;
+  setRcPreview(URL.createObjectURL(blob));
+  const up = rc.pending = uploadReceipt(blob);
+  let id;
+  try { id = await up; }
+  catch (e) {
+    if (rc.pending === up) rc.pending = null;
+    if (e.status === 401) return toLogin();
+    if (tok === rc.tok) paintRc('error', e.message);
+    return;
+  }
+  if (rc.pending === up) rc.pending = null;
+  if (tok !== rc.tok) return;
+  ex.rc = id;
+  paintRc('ready', readyText());
+  // Neue Ausgabe ohne Betrag: gleich auslesen lassen
+  if (AI.enabled && AI.remaining !== 0 && !ex.id && !ex.buf) analyzeReceipt(tok);
+}
+async function analyzeReceipt(tok = rc.tok) {
+  if (!ex.rc) return;
+  paintRc('analyze', 'KI liest den Beleg …');
+  let r;
+  try { r = await api('POST', `/api/receipts/${ex.rc}/analyze`); }
+  catch (e) {
+    if (e.status === 401) return toLogin();
+    if (e.status === 429 && /keine KI-Analysen/.test(e.message)) AI.remaining = 0;
+    if (e.status === 409) AI.enabled = false;
+    if (tok === rc.tok) { paintRc('error', e.message); haptic('heavy'); }
+    return;
+  }
+  Object.assign(AI, { enabled: r.enabled, limit: r.limit, used: r.used, remaining: r.remaining });
+  if (tok !== rc.tok) return;
+  const a = r.result || {}, got = [];
+  if (a.amount && !ex.buf) { ex.buf = bufOf(a.amount); paintExAmount(); got.push('Betrag'); }
+  if (a.merchant && !exTitle.value.trim()) { exTitle.value = a.merchant.slice(0, 40); got.push('Händler'); }
+  if (a.date && !ex.manualDate && !ex.id) {
+    const d = parseD(a.date), diff = (today() - d) / 864e5;
+    if (diff >= -1 && diff <= 400 && a.date !== ex.date) { ex.date = a.date; paintDate(); got.push('Datum'); }
+  }
+  const cat = a.category && CAT[a.category] ? a.category : a.merchant ? guessCat(a.merchant) : null;
+  if (cat && !ex.manualCat) { ex.cat = cat; paintCats(); scrollChip(cat, true); got.push('Kategorie'); }
+  let msg = got.length ? `Ausgefüllt: ${got.join(', ')}` : (a.amount || a.merchant ? 'Schon ausgefüllt, nichts überschrieben' : 'Auf dem Foto war kein Beleg zu erkennen');
+  if (a.currency && a.currency !== S.currency) msg += ` · Beleg in ${a.currency}`;
+  if (AI.remaining != null) msg += ` · ${AI.remaining === 1 ? 'noch 1 Analyse' : `noch ${AI.remaining} Analysen`} heute`;
+  paintRc('done', msg, a.merchant || 'Beleg');
+  haptic(got.length ? 'success' : 'heavy');
+}
+exRcFile.addEventListener('change', () => { const f = exRcFile.files[0]; exRcFile.value = ''; pickReceipt(f); });
+exRcAi.addEventListener('click', () => { haptic(); analyzeReceipt(); });
+$('#exRcDel').addEventListener('click', () => { rc.tok++; rc.pending = null; ex.rc = null; setRcPreview(null); paintRc(null); haptic(); });
+$('#exRcThumb').addEventListener('click', () => { if (rc.url) openViewer(rc.url); });
+function resetRc(id) {
+  rc.tok++; rc.pending = null;
+  $('#exRcBtn').hidden = !ME;
+  if (id) { ex.rc = id; setRcPreview(`/api/receipts/${id}`); paintRc('ready', AI.enabled && AI.remaining !== 0 ? `Beleg gespeichert · ${aiLeft()}` : 'Beleg gespeichert', 'Beleg'); }
+  else { ex.rc = null; setRcPreview(null); paintRc(null); }
+}
+
+/* Vollbild-Ansicht */
+const viewer = $('#viewer');
+function openViewer(url) { $('#viewerImg').src = url; viewer.hidden = false; haptic(); $('#viewerX').focus(); }
+function closeViewer() { viewer.hidden = true; $('#viewerImg').removeAttribute('src'); const t = $('#exRcThumb'); if (openSheet && t) t.focus({ preventScroll: true }); }
+viewer.addEventListener('click', e => { if (e.target === viewer || e.target.closest('#viewerX')) closeViewer(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !viewer.hidden) { e.preventDefault(); e.stopImmediatePropagation(); closeViewer(); } }, true);
 
 /* ---------- Einkommen / Budget ---------- */
 const shAmt = $('#shAmt'), amAmt = $('#amAmt'), amHint = $('#amHint'), amChips = $('#amChips'), amSave = $('#amSave'), amClear = $('#amClear');
@@ -2501,6 +2708,605 @@ document.addEventListener('keydown', e => {
   if (l && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); document.getElementById(l.htmlFor).click(); }
 }, true);
 
+/* ---------- Statistik ---------- */
+const shStats = $('#shStats'), stBody = $('#stBody');
+const MON_3 = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const st = { n: 6, table: false, ro: null };
+const numR = v => nf0.format(Math.round(v)).replace(/'/g, '’');
+function niceStep(max) {
+  const raw = max / 3, mag = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+  return [1, 2, 2.5, 5, 10].map(s => s * mag).find(s => s >= raw) || mag * 10;
+}
+function statsData() {
+  const keys = [];
+  for (let i = st.n - 1; i >= 0; i--) keys.push(addM(view.key, -i));
+  return keys.map(k => { const c = calc(k); return { key: k, c, spent: c.spent, limit: c.limit, over: c.limit != null && c.spent > c.limit }; });
+}
+function chartSVG(data, W) {
+  const H = 196, padL = 44, padR = 6, padT = 12, padB = 26, n = data.length;
+  const top = Math.max(1, ...data.map(d => Math.max(d.spent, d.limit || 0)));
+  const step = niceStep(top), max = Math.ceil(top / step) * step;
+  const y = v => padT + (H - padT - padB) * (1 - v / max);
+  const slot = (W - padL - padR) / n, cw = Math.min(24, slot * 0.56), ck = curKey();
+  let s = '';
+  for (let v = 0; v <= max + 1e-9; v += step) s += `<line class="grid" x1="${padL}" x2="${W - padR}" y1="${y(v)}" y2="${y(v)}"/><text class="tick" x="${padL - 8}" y="${y(v) + 3.5}" text-anchor="end">${numR(v)}</text>`;
+  data.forEach((d, i) => {
+    const cx = padL + slot * (i + 0.5), x0 = cx - cw / 2, x1 = cx + cw / 2, yt = y(d.spent), yb = y(0);
+    const r = Math.min(4, cw / 2, yb - yt);
+    const [yy, mm] = kParts(d.key);
+    const label = `${MONTHS[mm]} ${yy}: ${money(d.spent)} ausgegeben${d.limit != null ? `, ${d.over ? money(d.spent - d.limit) + ' über' : money(d.limit - d.spent) + ' unter'} ${d.c.limitIs === 'budget' ? 'Budget' : 'Einkommen'}` : ''}`;
+    s += `<rect class="hit" x="${padL + slot * i}" y="${padT}" width="${slot}" height="${H - padT}" tabindex="0" role="img" aria-label="${esc(label)}" data-i="${i}"/>`;
+    s += d.spent > 0 ? `<path class="cbar${d.over ? ' over' : ''}" d="M${x0},${yb}V${yt + r}Q${x0},${yt} ${x0 + r},${yt}H${x1 - r}Q${x1},${yt} ${x1},${yt + r}V${yb}Z"/>` : '<g></g>';
+    if (d.limit != null && d.limit > 0) s += `<line class="budget" x1="${cx - Math.min(slot * 0.4, 18)}" x2="${cx + Math.min(slot * 0.4, 18)}" y1="${y(d.limit)}" y2="${y(d.limit)}"/>`;
+    const lbl = n > 8 ? MON_3[mm] : MON_S[mm];
+    s += `<text class="xl${d.key === ck ? ' cur' : ''}" x="${cx}" y="${H - 8}">${lbl}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" height="${H}" aria-hidden="false">${s}</svg><div class="tip" id="stTip" role="status"></div>`;
+}
+function drawChart() {
+  const box = $('#stChart', stBody); if (!box) return;
+  const W = Math.round(box.clientWidth);
+  if (!W || box._w === W) return;
+  box._w = W;
+  box.innerHTML = chartSVG(st.data, W);
+}
+function showTip(i) {
+  const box = $('#stChart', stBody), tip = $('#stTip', stBody), d = st.data[i];
+  if (!box || !tip || !d) return;
+  const [yy, mm] = kParts(d.key);
+  const lim = d.limit != null ? `<br>${d.c.limitIs === 'budget' ? 'Budget' : 'Einkommen'} ${money(d.limit)} · ${d.over ? `<span class="t-over">${money(d.spent - d.limit)} darüber</span>` : `${money(d.limit - d.spent)} übrig`}` : '';
+  tip.innerHTML = `${MONTHS[mm]} ${yy}<b class="num">${money(d.spent)}</b>${d.c.count === 1 ? '1 Ausgabe' : d.c.count + ' Ausgaben'}${lim}`;
+  const hit = $(`.hit[data-i="${i}"]`, box), col = hit.nextElementSibling;
+  const bw = box.clientWidth, hr = hit.getBoundingClientRect(), br = box.getBoundingClientRect();
+  const cx = hr.left - br.left + hr.width / 2;
+  const top = col && col.getBBox ? Math.min(col.getBBox().height ? col.getBBox().y : 150, 150) : 150;
+  tip.classList.add('on');
+  const tw = tip.offsetWidth;
+  tip.style.left = Math.max(0, Math.min(bw - tw, cx - tw / 2)) + 'px';
+  tip.style.top = Math.max(0, top - tip.offsetHeight - 8) + 'px';
+}
+const hideTip = () => { const t = $('#stTip', stBody); if (t) t.classList.remove('on'); };
+
+function catCompare(cur, prev) {
+  const agg = list => { const o = {}; list.forEach(e => { const k = catKey(e.cat); o[k] = (o[k] || 0) + e.amt; }); return o; };
+  const a = agg(cur.exps), b = agg(prev.exps);
+  return [...new Set([...Object.keys(a), ...Object.keys(b)])].map(id => ({ id, now: r2(a[id] || 0), before: r2(b[id] || 0) }))
+    .sort((x, y) => y.now - x.now || y.before - x.before);
+}
+function insights(data, cur, prev, rows) {
+  const out = [], mn = k => MONTHS[kParts(k)[1]];
+  const top = rows[0];
+  if (top && cur.spent > 0 && top.now > 0) out.push(['c-' + catOf(top.id).ic, `<b>${esc(catOf(top.id).n)}</b> macht ${Math.round(top.now / cur.spent * 100)} % deiner Ausgaben im ${mn(cur.key)} aus.`]);
+  const up = rows.filter(r => r.before > 0).sort((x, y) => (y.now - y.before) - (x.now - x.before))[0];
+  if (up && up.now - up.before >= 10 && cur.phase !== 'now') out.push(['c-' + catOf(up.id).ic, `Für <b>${esc(catOf(up.id).n)}</b> hast du ${money(up.now - up.before)} mehr ausgegeben als im ${mn(prev.key)}.`]);
+  const cnt = {};
+  data.forEach(d => d.c.exps.forEach(e => { if (e.rep || !e.title) return; const t = e.title.trim(); const k = t.toLowerCase(); (cnt[k] || (cnt[k] = { t, n: 0, sum: 0, cat: e.cat })).n++; cnt[k].sum += e.amt; }));
+  const fav = Object.values(cnt).sort((x, y) => y.n - x.n || y.sum - x.sum)[0];
+  if (fav && fav.n >= 3) out.push(['c-' + catOf(fav.cat).ic, `Am häufigsten: <b>${esc(fav.t)}</b>, ${fav.n}× in ${st.n} Monaten für zusammen ${money(fav.sum)}.`]);
+  const done = data.filter(d => d.c.phase === 'past' && d.c.income != null);
+  if (done.length >= 2) {
+    const saved = done.reduce((a, d) => a + d.c.income - d.spent, 0) / done.length, inc = done.reduce((a, d) => a + d.c.income, 0) / done.length;
+    out.push(['c-sparen', saved >= 0 ? `Im Schnitt bleiben dir <b>${money(saved)}</b> pro Monat übrig, das sind ${Math.round(saved / inc * 100)} % vom Einkommen.`
+      : `Im Schnitt gibst du <b>${money(-saved)}</b> pro Monat mehr aus, als du verdienst.`]);
+  }
+  if (cur.fixed > 0 && cur.limit) out.push(['i-repeat', `Fixkosten im ${mn(cur.key)}: <b>${money(cur.fixed)}</b>, also ${Math.round(cur.fixed / cur.limit * 100)} % ${cur.limitIs === 'budget' ? 'des Budgets' : 'des Einkommens'}.`]);
+  const overN = data.filter(d => d.over && d.c.phase !== 'future').length;
+  if (overN) out.push(['i-target', `${overN === 1 ? 'In einem Monat' : `In ${overN} Monaten`} lagst du über ${data.some(d => d.c.limitIs === 'budget') ? 'dem Budget' : 'dem Einkommen'}.`]);
+  return out.slice(0, 5);
+}
+function renderStats() {
+  const data = st.data = statsData();
+  const cur = data[data.length - 1].c, prev = calc(addM(view.key, -1));
+  const any = data.some(d => d.spent > 0);
+  const [ey, em] = kParts(view.key);
+  let h = `<div class="seg" id="stRange"><span class="thumb"></span><button type="button" data-v="6">6 Monate</button><button type="button" data-v="12">12 Monate</button></div>`;
+  if (!any) {
+    stBody.innerHTML = h + `<div class="st-empty"><b>Noch zu wenig Daten</b><br>Sobald du ein paar Ausgaben erfasst hast, siehst du hier, wie sich deine Monate entwickeln.</div>`;
+    paintSegEl($('#stRange', stBody), String(st.n));
+    return;
+  }
+  const withSpent = data.filter(d => d.spent > 0 && d.c.phase !== 'future');
+  const avg = withSpent.reduce((a, d) => a + d.spent, 0) / Math.max(1, withSpent.length);
+  const maxD = withSpent.slice().sort((a, b) => b.spent - a.spent)[0];
+  const overAny = data.some(d => d.over), limAny = data.some(d => d.limit != null);
+  h += `<div class="st-card">
+    <div class="st-h"><b>Ausgaben pro Monat</b><button class="txt-btn" type="button" id="stTable" aria-pressed="${st.table}">${st.table ? 'Diagramm' : 'Tabelle'}</button></div>
+    ${st.table ? `<table class="st-table num"><caption>Beträge in ${esc(S.currency)} · Differenz zum Budget</caption><thead><tr><th>Monat</th><th>Ausgaben</th><th>Budget</th><th>Differenz</th></tr></thead><tbody>${data.slice().reverse().map(d => {
+      const [yy, mm] = kParts(d.key);
+      return `<tr><td>${MON_S[mm]} ${String(yy).slice(2)}</td><td>${fmt(d.spent)}</td><td>${d.limit != null ? fmt(d.limit) : '–'}</td><td${d.over ? ' class="over"' : ''}>${d.limit != null ? (d.over ? '+' : '−') + fmt(d.spent - d.limit) : '–'}</td></tr>`;
+    }).join('')}</tbody></table>` : `<div class="legend-row"><span><i class="k-bar"></i>Ausgaben</span>${limAny ? '<span><i class="k-line"></i>Budget</span>' : ''}${overAny ? '<span><i class="k-over"></i>Über Budget</span>' : ''}</div>
+    <div class="chart" id="stChart"></div>`}
+  </div>
+  <div class="g-facts st-facts">
+    <div><span>Ø pro Monat</span><b class="num">${money(avg)}</b></div>
+    <div><span>Total ${st.n} Monate</span><b class="num">${money(data.reduce((a, d) => a + d.spent, 0))}</b></div>
+    <div><span>Höchster Monat${maxD ? ' · ' + MONTHS[kParts(maxD.key)[1]] : ''}</span><b class="num">${maxD ? money(maxD.spent) : '–'}</b></div>
+    <div><span>${MONTHS[em]} bisher</span><b class="num">${money(cur.spent)}</b></div>
+  </div>`;
+  const rows = catCompare(cur, prev);
+  if (rows.length) {
+    const pn = MONTHS[kParts(prev.key)[1]], cmp = prev.spent > 0;
+    const cnt = {};
+    cur.exps.forEach(e => { const k = catKey(e.cat); cnt[k] = (cnt[k] || 0) + 1; });
+    h += `<div class="st-card"><div class="st-h"><b>Kategorien im ${MONTHS[em]}</b><span>${cur.phase === 'now' ? 'bis heute' : ''}${cur.phase === 'now' && cmp ? ' · ' : ''}${cmp ? 'vs. ' + pn : ''}</span></div><div class="cmp">${rows.slice(0, 8).map(r => {
+      const c = catOf(r.id), d = r2(r.now - r.before);
+      const delta = !cmp ? '' : r.before === 0 ? 'neu' : d === 0 ? 'gleich viel' : `${d > 0 ? '↑ +' : '↓ −'}${money(Math.abs(d))} · ${d > 0 ? '+' : '−'}${Math.abs(Math.round(d / r.before * 100))} %`;
+      const sub = cmp ? `${pn}: ${money(r.before)}` : (cnt[r.id] === 1 ? '1 Ausgabe' : `${cnt[r.id] || 0} Ausgaben`);
+      return `<div class="cmp-row"><span class="cat-ic">${ic('c-' + c.ic)}</span><div class="lr-main"><div class="cmp-n">${esc(c.n)}</div><div class="cmp-s num">${sub}</div></div>
+        <div class="cmp-v num">${money(r.now)}${delta ? `<span class="cmp-d${d > 0 && r.before > 0 ? ' up' : ''}">${delta}</span>` : ''}</div></div>`;
+    }).join('')}</div></div>`;
+  }
+  const ins = insights(data, cur, prev, rows);
+  if (ins.length) h += `<div class="st-card"><div class="st-h"><b>Aufgefallen</b></div><ul class="insights">${ins.map(([i, t]) => `<li><span class="cat-ic">${ic(i)}</span><span>${t}</span></li>`).join('')}</ul></div>`;
+  h += `<p class="set-note">Ein Monat läuft von Lohntag zu Lohntag. Stand: ${rangeLabel(view.key)}.</p>`;
+  stBody.innerHTML = h;
+  paintSegEl($('#stRange', stBody), String(st.n));
+  const box = $('#stChart', stBody);
+  if (box) { box._w = 0; drawChart(); }
+}
+function openStats() {
+  $('#shStatsT').textContent = `Statistik bis ${MONTHS[kParts(view.key)[1]]}`;
+  showSheet(shStats);
+  renderStats();
+  $('.sheet-body', shStats).scrollTop = 0;
+}
+if (window.ResizeObserver) { st.ro = new ResizeObserver(() => { if (shStats.classList.contains('open')) drawChart(); }); st.ro.observe(stBody); }
+stBody.addEventListener('click', e => {
+  const seg = e.target.closest('#stRange button');
+  if (seg) { const n = Number(seg.dataset.v); if (n !== st.n) { st.n = n; haptic(); renderStats(); } return; }
+  if (e.target.closest('#stTable')) { st.table = !st.table; haptic(); renderStats(); return; }
+  const hit = e.target.closest('.hit');
+  if (hit) showTip(Number(hit.dataset.i)); else hideTip();
+});
+stBody.addEventListener('pointerover', e => { const hit = e.target.closest('.hit'); if (hit && e.pointerType === 'mouse') showTip(Number(hit.dataset.i)); });
+stBody.addEventListener('pointerout', e => { if (e.target.closest('.hit') && e.pointerType === 'mouse' && !(e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.hit'))) hideTip(); });
+stBody.addEventListener('focusin', e => { const hit = e.target.closest('.hit'); if (hit) showTip(Number(hit.dataset.i)); });
+stBody.addEventListener('focusout', e => { if (e.target.closest('.hit')) hideTip(); });
+stBody.addEventListener('keydown', e => {
+  const hit = e.target.closest('.hit'); if (!hit || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+  const next = $(`.hit[data-i="${Number(hit.dataset.i) + (e.key === 'ArrowLeft' ? -1 : 1)}"]`, stBody);
+  e.preventDefault(); e.stopPropagation();
+  if (next) next.focus();
+});
+$('#btnStats').addEventListener('click', () => { haptic(); closeRows(); openStats(); });
+
+/* ---------- Sparziele ---------- */
+const shGoal = $('#shGoal'), goalBody = $('#goalBody'), shGoalEd = $('#shGoalEd');
+const glName = $('#glName'), glTarget = $('#glTarget'), glPicker = $('#glPicker'), glIcons = $('#glIcons'), glErr = $('#glErr');
+const gs = { id: null, edit: null, icon: 'ziel', deadline: null, pickY: 0, armed: false, armT: 0, busy: false };
+const goalOf = id => S.goals.find(g => g.id === id);
+// Eingabe wie "1'250.50" oder "1250,5" in eine Zahl umwandeln
+function parseMoneyIn(s) {
+  const t = String(s || '').replace(/[\s'’]/g, '').replace(',', '.');
+  if (!/^\d+(\.\d{0,2})?$/.test(t)) return null;
+  const v = r2(Number(t));
+  return v > 0 && v < 1e9 ? v : null;
+}
+const monthsUntil = ds => { const t = today(), d = parseD(ds); return Math.max(1, (d.getFullYear() - t.getFullYear()) * 12 + d.getMonth() - t.getMonth() + (d.getDate() >= t.getDate() ? 1 : 0)); };
+const deadlineLbl = ds => `Ende ${MONTHS[parseD(ds).getMonth()]} ${parseD(ds).getFullYear()}`;
+function goalSub(g, saved) {
+  if (saved >= g.target) return `Ziel erreicht · ${money(g.target)}`;
+  const parts = [`${Math.floor(saved / g.target * 100)} % von ${moneyR(g.target)}`];
+  if (g.deadline) parts.push(g.deadline < dkey(today()) ? 'Termin vorbei' : `${moneyR(Math.ceil((g.target - saved) / monthsUntil(g.deadline)))} pro Monat`);
+  return parts.join(' · ');
+}
+function goalsHTML() {
+  if (!ME) return '';
+  const list = S.goals || [];
+  const total = list.reduce((a, g) => a + goalSaved(g), 0);
+  const head = `<div class="sec-h"><h2>Sparziele</h2><span class="sec-r">${list.length ? `<span class="aside num">${money(total)}</span>` : ''}
+    <button class="icon-btn sm" type="button" data-act="goal-new" aria-label="Sparziel anlegen">${ic('i-plus')}</button></span></div>`;
+  if (!list.length) {
+    return head + `<section class="card"><button class="goal-empty" type="button" data-act="goal-new"><span class="b-ic">${ic('c-ziel')}</span>
+      <span class="goal-main"><span class="b-t">Worauf sparst du?</span><span class="b-s">Lege ein Sparziel an, etwa Ferien oder ein neues Velo, und sieh zu, wie es wächst.</span></span></button></section>`;
+  }
+  return head + `<section class="card goals">${list.map(g => {
+    const saved = goalSaved(g), p = Math.max(0, Math.min(1, saved / g.target));
+    return `<button class="goal-row" type="button" data-act="goal" data-id="${esc(g.id)}"><span class="goal-ic">${ic('c-' + g.icon)}</span><span class="goal-main">
+      <span class="goal-top"><span class="goal-n">${esc(g.name)}</span><span class="goal-v num">${money(saved)}</span></span>
+      <span class="goal-track"><i data-goal="${esc(g.id)}" data-scale="${p}"></i></span>
+      <span class="goal-s num">${goalSub(g, saved)}</span></span></button>`;
+  }).join('')}</section>`;
+}
+function goalSaved(g) { return r2((g.entries || []).reduce((a, e) => a + e.amt, 0)); }
+// Änderungen gehen direkt an den Server; die Antwort enthält alle Sparziele
+async function goalApi(method, url, body) {
+  if (gs.busy) return false;
+  gs.busy = true;
+  try {
+    const r = await api(method, url, body);
+    S.goals = r.goals || []; Store.writeLocal(); render();
+    return true;
+  } catch (e) {
+    if (e.status === 401) toLogin();
+    else toast(e.status ? e.message : 'Keine Verbindung. Sparziele lassen sich nur online ändern.');
+    haptic('heavy');
+    return false;
+  } finally { gs.busy = false; }
+}
+
+function renderGoal() {
+  const g = goalOf(gs.id);
+  if (!g) { hideSheet(shGoal); return; }
+  const saved = goalSaved(g), open = r2(g.target - saved), p = Math.max(0, Math.min(1, saved / g.target));
+  $('#shGoalT').textContent = g.name;
+  let need = '–';
+  if (open <= 0) need = 'Erreicht';
+  else if (g.deadline && g.deadline >= dkey(today())) need = money(open / monthsUntil(g.deadline));
+  else if (g.deadline) need = 'Termin vorbei';
+  const entries = (g.entries || []).slice().sort((a, b) => b.date.localeCompare(a.date) || (a.id < b.id ? 1 : -1));
+  const quick = [50, 100, 200].map(v => [v, `+ ${moneyR(v)}`]);
+  if (open > 0 && !quick.some(q => q[0] === open)) quick.push([open, `Rest ${money(open)}`]);
+  goalBody.innerHTML = `<div class="g-hero">
+      <div class="g-l">Gespart</div>
+      <div class="g-v num">${money(saved)}</div>
+      <div class="g-s num">${open > 0 ? `von ${money(g.target)} · ${Math.floor(p * 100)} %` : `Ziel von ${money(g.target)} erreicht`}</div>
+      <div class="bar" role="img" aria-label="${Math.floor(p * 100)} Prozent gespart"><div class="bar-fill" style="transform:scaleX(${p})"></div></div>
+    </div>
+    <div class="g-facts">
+      <div><span>Noch offen</span><b class="num">${money(Math.max(0, open))}</b></div>
+      <div><span>Termin</span><b>${g.deadline ? deadlineLbl(g.deadline) : 'Ohne Termin'}</b></div>
+      <div><span>Pro Monat nötig</span><b class="num">${need}</b></div>
+      <div><span>Einzahlungen</span><b class="num">${entries.filter(e => e.amt > 0).length}</b></div>
+    </div>
+    <div class="g-add">
+      <label class="field"><span class="field-cur">${esc(sym())}</span><input id="gaAmt" type="text" inputmode="decimal" placeholder="Betrag" autocomplete="off" enterkeyhint="done" aria-label="Betrag"></label>
+      <div class="chips" id="gaQuick">${quick.map(([v, l]) => `<button type="button" class="chip plain num" data-v="${v}">${l}</button>`).join('')}</div>
+      <div class="form-err" id="gaErr" role="alert"></div>
+      <div class="opts"><button class="opt" type="button" data-gact="out">Entnehmen</button><button class="btn-primary grow" type="button" data-gact="in">Einzahlen</button></div>
+    </div>
+    ${entries.length ? `<div class="set-label">Verlauf</div><div class="g-entries">${entries.map(e => `<div class="g-entry">
+      <div class="lr-main"><div class="t">${esc(e.note || (e.amt > 0 ? 'Einzahlung' : 'Entnahme'))}</div><div class="s num">${imDate(e.date)}</div></div>
+      <div class="a num">${e.amt > 0 ? '+' : '−'}${money(Math.abs(e.amt))}</div>
+      <button class="icon-btn" type="button" data-gact="del" data-id="${esc(e.id)}" aria-label="Eintrag löschen">${ic('i-x')}</button></div>`).join('')}</div>` : ''}`;
+}
+// Änderung von einem anderen Gerät: offenes Sparziel neu zeichnen, Eingabe behalten
+function refreshGoalSheet() {
+  if (openSheet !== shGoal) return;
+  const inp = $('#gaAmt', goalBody), v = inp ? inp.value : '', f = !!inp && document.activeElement === inp;
+  renderGoal();
+  const n = $('#gaAmt', goalBody); if (n) { n.value = v; if (f) n.focus({ preventScroll: true }); }
+}
+function openGoal(id) {
+  gs.id = id;
+  renderGoal();
+  showSheet(shGoal);
+  $('.sheet-body', shGoal).scrollTop = 0;
+}
+async function goalMove(sign) {
+  const inp = $('#gaAmt', goalBody), err = $('#gaErr', goalBody), g = goalOf(gs.id);
+  const v = parseMoneyIn(inp.value);
+  if (!v) { setErr(err, 'Gib einen Betrag ein, z. B. 150 oder 49.90.'); shake(inp.closest('.field')); return; }
+  if (sign < 0 && v > goalSaved(g) + 0.001) { setErr(err, `Es sind erst ${money(goalSaved(g))} gespart.`); shake(inp.closest('.field')); return; }
+  setErr(err);
+  const ok = await goalApi('POST', `/api/goals/${encodeURIComponent(g.id)}/entries`, { id: uid(), amt: sign * v, date: dkey(today()) });
+  if (!ok) return;
+  haptic('success');
+  const ng = goalOf(g.id), was = goalSaved(g), now = ng ? goalSaved(ng) : 0;
+  renderGoal();
+  if (sign > 0 && was < g.target && now >= g.target) toast(`Geschafft! „${g.name}“ ist erreicht.`);
+  else toast(sign > 0 ? `${money(v)} eingezahlt` : `${money(v)} entnommen`);
+}
+goalBody.addEventListener('click', async e => {
+  const q = e.target.closest('#gaQuick .chip');
+  if (q) { const inp = $('#gaAmt', goalBody); inp.value = String(Number(q.dataset.v)); haptic(); inp.focus(); return; }
+  const b = e.target.closest('[data-gact]'); if (!b) return;
+  if (b.dataset.gact === 'in') goalMove(1);
+  else if (b.dataset.gact === 'out') goalMove(-1);
+  else if (b.dataset.gact === 'del') {
+    const g = goalOf(gs.id), en = g && g.entries.find(x => x.id === b.dataset.id);
+    if (!en) return;
+    b.disabled = true;
+    if (await goalApi('DELETE', `/api/goals/${encodeURIComponent(g.id)}/entries/${encodeURIComponent(en.id)}`)) {
+      haptic(); renderGoal();
+      toast('Eintrag gelöscht', 'Rückgängig', () => goalApi('POST', `/api/goals/${encodeURIComponent(g.id)}/entries`, { ...en, id: uid() }).then(ok => { if (ok && openSheet === shGoal) renderGoal(); }));
+    } else b.disabled = false;
+  }
+});
+goalBody.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'gaAmt') { e.preventDefault(); e.stopPropagation(); goalMove(1); } });
+$('#goalEdit').addEventListener('click', () => { haptic(); const id = gs.id; hideSheet(shGoal, true); openGoalEd(id, true); });
+
+/* Anlegen / Bearbeiten */
+function paintGlDate() {
+  $('#glDateLbl').textContent = gs.deadline ? deadlineLbl(gs.deadline) : 'Ohne Termin';
+  $('#glDateOpt').classList.toggle('on', !!gs.deadline);
+}
+function renderGlPicker() {
+  const t = today(), cur = gs.deadline ? parseD(gs.deadline) : null;
+  glPicker.innerHTML = `<div class="pk-head"><button class="icon-btn" type="button" data-gy="-1" aria-label="Vorheriges Jahr"${gs.pickY <= t.getFullYear() ? ' disabled' : ''}>${ic('i-chev-l')}</button>
+    <div class="pk-title num">${gs.pickY}</div><button class="icon-btn" type="button" data-gy="1" aria-label="Nächstes Jahr">${ic('i-chev-r')}</button></div>
+    <div class="mp-grid">${MON_S.map((m, i) => {
+      const past = gs.pickY < t.getFullYear() || (gs.pickY === t.getFullYear() && i < t.getMonth());
+      const on = cur && cur.getFullYear() === gs.pickY && cur.getMonth() === i;
+      return `<button type="button" data-gm="${i}" class="${on ? 'on' : ''}" aria-pressed="${!!on}"${past ? ' disabled' : ''}>${m}</button>`;
+    }).join('')}</div>
+    <button class="txt-btn" type="button" data-gnone>Ohne Termin</button>`;
+}
+function openGoalEd(id, back) {
+  const g = id ? goalOf(id) : null;
+  gs.edit = g ? g.id : null; gs.icon = g ? g.icon : 'ziel'; gs.deadline = g ? g.deadline : null; gs.armed = false;
+  glName.value = g ? g.name : ''; glTarget.value = g ? String(g.target) : '';
+  $('#glCur').textContent = sym();
+  $('#shGoalEdT').textContent = g ? 'Sparziel bearbeiten' : 'Neues Sparziel';
+  $('#glSave').textContent = g ? 'Sichern' : 'Sparziel anlegen';
+  $('#glDelete').hidden = !g; $('#glDelete').textContent = 'Sparziel löschen';
+  glPicker.hidden = true; $('#glDateOpt').setAttribute('aria-expanded', 'false');
+  glIcons.innerHTML = iconGrid(ICONS, gs.icon);
+  setErr(glErr); paintGlDate();
+  showSheet(shGoalEd);
+  if (back && g) shGoalEd._back = () => { if (goalOf(g.id)) openGoal(g.id); };
+  if (!g && !coarse.matches) setTimeout(() => glName.focus(), 80);
+}
+$('#glDateOpt').addEventListener('click', () => {
+  const open = glPicker.hidden;
+  haptic();
+  if (open) { gs.pickY = gs.deadline ? parseD(gs.deadline).getFullYear() : today().getFullYear(); renderGlPicker(); }
+  glPicker.hidden = !open; $('#glDateOpt').setAttribute('aria-expanded', String(open));
+});
+glPicker.addEventListener('click', e => {
+  const y = e.target.closest('[data-gy]');
+  if (y) { gs.pickY += Number(y.dataset.gy); haptic(); renderGlPicker(); return; }
+  const m = e.target.closest('[data-gm]');
+  if (m) {
+    const mo = Number(m.dataset.gm);
+    gs.deadline = dkey(new Date(gs.pickY, mo, dim(gs.pickY, mo)));
+    haptic(); paintGlDate(); glPicker.hidden = true; $('#glDateOpt').setAttribute('aria-expanded', 'false');
+    return;
+  }
+  if (e.target.closest('[data-gnone]')) { gs.deadline = null; haptic(); paintGlDate(); glPicker.hidden = true; $('#glDateOpt').setAttribute('aria-expanded', 'false'); }
+});
+glIcons.addEventListener('click', e => {
+  const b = e.target.closest('[data-ic]'); if (!b) return;
+  gs.icon = b.dataset.ic; haptic(); glIcons.innerHTML = iconGrid(ICONS, gs.icon);
+});
+async function saveGoal() {
+  const name = glName.value.trim().replace(/\s+/g, ' '), target = parseMoneyIn(glTarget.value);
+  if (!name) { setErr(glErr, 'Wofür sparst du? Gib dem Ziel einen Namen.'); haptic('heavy'); glName.focus(); return; }
+  if (!target) { setErr(glErr, 'Gib einen Zielbetrag ein, z. B. 2000.'); haptic('heavy'); glTarget.focus(); return; }
+  setErr(glErr);
+  const id = gs.edit || uid();
+  const btn = $('#glSave'); btn.disabled = true;
+  const ok = await goalApi('PUT', `/api/goals/${encodeURIComponent(id)}`, { name, target, deadline: gs.deadline, icon: gs.icon });
+  btn.disabled = false;
+  if (!ok) return;
+  haptic('success');
+  const isNew = !gs.edit;
+  shGoalEd._back = null;
+  hideSheet(shGoalEd, true);
+  if (isNew) toast(`„${name}“ angelegt`);
+  openGoal(id);
+}
+$('#glSave').addEventListener('click', saveGoal);
+[glName, glTarget].forEach(i => i.addEventListener('input', () => setErr(glErr)));
+goalBody.addEventListener('input', e => { if (e.target.id === 'gaAmt') setErr($('#gaErr', goalBody)); });
+glName.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); glTarget.focus(); } });
+glTarget.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); saveGoal(); } });
+$('#glDelete').addEventListener('click', async () => {
+  const b = $('#glDelete');
+  clearTimeout(gs.armT);
+  if (!gs.armed) {
+    gs.armed = true; b.textContent = 'Nochmals tippen zum Löschen'; haptic('heavy');
+    gs.armT = setTimeout(() => { gs.armed = false; b.textContent = 'Sparziel löschen'; }, 4000);
+    return;
+  }
+  gs.armed = false;
+  const g = goalOf(gs.edit); if (!g) return;
+  if (await goalApi('DELETE', `/api/goals/${encodeURIComponent(g.id)}`)) {
+    shGoalEd._back = null; hideSheet(shGoalEd, true); haptic('success'); toast(`„${g.name}“ gelöscht`);
+  }
+});
+
+/* ---------- KI-Belegerkennung einrichten (Admin) ---------- */
+const grpAi = $('#grpAi'), aiKey = $('#aiKey'), aiModel = $('#aiModel'), aiErr = $('#aiErr'), aiModels = $('#aiModels');
+const aiUI = { limit: 3, armed: false, armT: 0, cfg: null };
+function paintAiLimit() {
+  $('#aiLimit').textContent = aiUI.limit;
+  $('#aiDown').disabled = aiUI.limit <= 0; $('#aiUp').disabled = aiUI.limit >= 50;
+}
+function paintAiCfg(c) {
+  aiUI.cfg = c; aiUI.limit = c.limit; paintAiLimit();
+  $('#aiState').textContent = c.hasKey ? `Eingerichtet · Schlüssel ${c.keyHint}` : 'Nicht eingerichtet';
+  $('#aiStateS').textContent = c.hasKey
+    ? `${c.fromEnv ? 'Schlüssel aus der Umgebungsvariable · ' : ''}Modell ${c.model}`
+    : 'Mit einem OpenRouter-Schlüssel liest die App Belegfotos automatisch aus.';
+  aiKey.value = ''; aiKey.placeholder = c.hasKey ? 'Neuen Schlüssel eingeben (optional)' : 'OpenRouter-Schlüssel (sk-or-…)';
+  aiKey.disabled = c.fromEnv;
+  aiModel.value = c.model === c.defaultModel ? '' : c.model;
+  aiModel.placeholder = `Modell (Standard: ${c.defaultModel})`;
+  aiModel.disabled = c.modelFromEnv;
+  $('#aiRemove').hidden = !c.hasKey || c.fromEnv;
+  $('#aiRemove').textContent = 'Schlüssel entfernen'; aiUI.armed = false;
+  $('#aiSave').textContent = c.hasKey ? 'Sichern' : 'Einrichten';
+  setErr(aiErr);
+}
+async function loadAiCfg() {
+  grpAi.hidden = !(ME && ME.admin);
+  if (grpAi.hidden) return;
+  aiModels.hidden = true;
+  try { paintAiCfg(await api('GET', '/api/admin/ai')); }
+  catch (e) { if (e.status === 401) toLogin(); else setErr(aiErr, e.message); }
+}
+$('#aiDown').addEventListener('click', () => { aiUI.limit = Math.max(0, aiUI.limit - 1); haptic(); paintAiLimit(); });
+$('#aiUp').addEventListener('click', () => { aiUI.limit = Math.min(50, aiUI.limit + 1); haptic(); paintAiLimit(); });
+$('#aiLoad').addEventListener('click', async () => {
+  const b = $('#aiLoad');
+  b.disabled = true; b.innerHTML = '<span class="spin"></span>Lade Modelle …';
+  try {
+    const { models } = await api('GET', '/api/admin/ai/models');
+    const price = m => (m.price > 0 ? `$${m.price < 1 ? m.price.toFixed(2) : m.price.toFixed(1)} pro 1 Mio. Tokens` : 'kostenlos');
+    aiModels.innerHTML = models.slice(0, 60).map(m => `<button type="button" class="${m.id === (aiModel.value || aiUI.cfg.model) ? 'on' : ''}" data-model="${esc(m.id)}"><b>${esc(m.name)}</b><span>${esc(m.id)} · ${price(m)}</span></button>`).join('')
+      || '<p class="set-note">Keine passenden Modelle gefunden.</p>';
+    aiModels.hidden = false;
+  } catch (e) { if (e.status === 401) return toLogin(); setErr(aiErr, e.message); }
+  finally { b.disabled = false; b.textContent = 'Verfügbare Modelle mit Bilderkennung laden'; }
+});
+aiModels.addEventListener('click', e => {
+  const b = e.target.closest('[data-model]'); if (!b) return;
+  aiModel.value = b.dataset.model; haptic();
+  $$('button', aiModels).forEach(x => x.classList.toggle('on', x === b));
+});
+$('#aiSave').addEventListener('click', async () => {
+  const body = { limit: aiUI.limit }, key = aiKey.value.trim();
+  if (key) body.key = key;
+  if (!aiUI.cfg.modelFromEnv) body.model = aiModel.value.trim() || null;
+  if (!key && !aiUI.cfg.hasKey) { setErr(aiErr, 'Gib zuerst deinen OpenRouter-Schlüssel ein.'); haptic('heavy'); aiKey.focus(); return; }
+  const b = $('#aiSave'); b.disabled = true;
+  try {
+    paintAiCfg(await api('PUT', '/api/admin/ai', body));
+    aiModels.hidden = true; haptic('success'); toast('KI-Belegerkennung gespeichert');
+    loadAi();
+  } catch (e) { if (e.status === 401) return toLogin(); setErr(aiErr, e.message); haptic('heavy'); }
+  finally { b.disabled = false; }
+});
+aiKey.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#aiSave').click(); } });
+$('#aiRemove').addEventListener('click', async () => {
+  const b = $('#aiRemove');
+  clearTimeout(aiUI.armT);
+  if (!aiUI.armed) {
+    aiUI.armed = true; b.textContent = 'Nochmals tippen zum Entfernen'; haptic('heavy');
+    aiUI.armT = setTimeout(() => { aiUI.armed = false; b.textContent = 'Schlüssel entfernen'; }, 4000);
+    return;
+  }
+  try { paintAiCfg(await api('PUT', '/api/admin/ai', { key: null })); toast('Schlüssel entfernt'); loadAi(); }
+  catch (e) { if (e.status === 401) return toLogin(); setErr(aiErr, e.message); }
+});
+
+/* ---------- Face ID / Passkeys ---------- */
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+const pkUI = { list: [], armed: null, armT: 0 };
+// Passkeys brauchen HTTPS und einen Hostnamen; mit einer IP-Adresse lehnen Browser sie ab
+function pkBlocker() {
+  if (!window.PublicKeyCredential) return 'Dieser Browser unterstützt keine Passkeys.';
+  if (!window.isSecureContext || /^[\d.]+$|:/.test(location.hostname)) return 'Nur über HTTPS mit eigenem Hostnamen möglich, z. B. https://budget.dein-nas.ch. Über eine IP-Adresse lassen Browser keine Passkeys zu.';
+  return null;
+}
+function deviceName() {
+  const ua = navigator.userAgent;
+  if (/iPhone/.test(ua)) return 'iPhone';
+  if (/iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'iPad';
+  if (/Macintosh/.test(ua)) return 'Mac';
+  if (/Android/.test(ua)) return 'Android';
+  if (/Windows/.test(ua)) return 'Windows';
+  if (/Linux/.test(ua)) return 'Linux';
+  return 'Passkey';
+}
+const fmtTs = ts => { const d = new Date(ts); return `${d.getDate()}. ${MON_S[d.getMonth()]} ${d.getFullYear()}`; };
+function renderPasskeys() {
+  const block = pkBlocker(), n = pkUI.list.length;
+  $('#pkNote').textContent = block || (n ? (n === 1 ? '1 Gerät eingerichtet' : `${n} Geräte eingerichtet`) : 'Ohne Passwort anmelden, mit Face ID, Touch ID oder Windows Hello');
+  $('#pkNote').classList.toggle('warn', !!block);
+  $('#pkAdd').disabled = !!block;
+  $('#pkAdd').textContent = n ? 'Hinzufügen' : 'Einrichten';
+  $('#pkList').innerHTML = pkUI.list.map(k => `<div class="list-row"><span class="cat-ic">${ic('i-face')}</span>
+    <div class="lr-main"><div class="lr-t">${esc(k.name)}</div><div class="lr-s num">Seit ${fmtTs(k.createdAt)}${k.lastUsed ? ` · zuletzt ${fmtTs(k.lastUsed)}` : ''}</div></div>
+    <button class="pill-btn danger" type="button" data-pk="${esc(k.id)}">${pkUI.armed === k.id ? 'Sicher?' : 'Entfernen'}</button></div>`).join('');
+}
+async function loadPasskeys() {
+  if (!ME) return;
+  pkUI.armed = null;
+  renderPasskeys();
+  try { pkUI.list = (await api('GET', '/api/passkeys')).passkeys; renderPasskeys(); }
+  catch (e) { if (e.status === 401) toLogin(); }
+}
+$('#pkAdd').addEventListener('click', async () => {
+  const b = $('#pkAdd');
+  if (pkBlocker()) return;
+  b.disabled = true; haptic();
+  try {
+    const o = await api('POST', '/api/passkeys/options');
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: unb64u(o.challenge), rp: { id: o.rpId, name: 'Monatsbudget' },
+      user: { id: unb64u(o.userId), name: o.username, displayName: o.username },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -8 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { residentKey: 'required', requireResidentKey: true, userVerification: 'required' },
+      excludeCredentials: (o.exclude || []).map(id => ({ type: 'public-key', id: unb64u(id) })),
+      timeout: 120000, attestation: 'none',
+    } });
+    const r = cred.response;
+    const pk = r.getPublicKey && r.getPublicKey(), ad = r.getAuthenticatorData && r.getAuthenticatorData();
+    if (!pk || !ad) throw new Error('Dieser Browser ist für Passkeys zu alt. Bitte aktualisieren.');
+    const res = await api('POST', '/api/passkeys', { id: cred.id, clientDataJSON: b64u(r.clientDataJSON), authenticatorData: b64u(ad),
+      publicKey: b64u(pk), alg: r.getPublicKeyAlgorithm(), name: deviceName() });
+    pkUI.list = res.passkeys; renderPasskeys();
+    haptic('success'); toast('Passkey eingerichtet. Ab jetzt geht die Anmeldung ohne Passwort.');
+  } catch (e) {
+    if (e.status === 401) return toLogin();
+    if (e.name === 'InvalidStateError') toast('Auf diesem Gerät ist schon ein Passkey eingerichtet.');
+    else if (e.name === 'NotAllowedError' || e.name === 'AbortError') toast('Einrichtung abgebrochen');
+    else toast(e.message || 'Passkey konnte nicht eingerichtet werden.');
+  } finally { b.disabled = !!pkBlocker(); }
+});
+$('#pkList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-pk]'); if (!b) return;
+  const id = b.dataset.pk;
+  clearTimeout(pkUI.armT);
+  if (pkUI.armed !== id) {
+    pkUI.armed = id; haptic('heavy'); renderPasskeys();
+    pkUI.armT = setTimeout(() => { pkUI.armed = null; renderPasskeys(); }, 4000);
+    return;
+  }
+  pkUI.armed = null; b.disabled = true;
+  try { pkUI.list = (await api('DELETE', `/api/passkeys/${encodeURIComponent(id)}`)).passkeys; renderPasskeys(); haptic('success'); toast('Passkey entfernt'); }
+  catch (x) { if (x.status === 401) return toLogin(); toast(x.message); renderPasskeys(); }
+});
+
+/* ---------- Neuigkeiten ----------
+   Öffnet sich beim ersten Start nach einem Update von selbst (gemerkt pro Gerät), danach über die Einstellungen. */
+const APP_VERSION = '3.0';
+const CHANGELOG = [
+  { v: '3.0', title: 'Das ist neu', sub: 'Zehn neue Funktionen für dein Budget, auf dem Handy und am Computer.', items: [
+    ['i-search', 'Suche und Filter', 'Finde jede Ausgabe über alle Monate, nach Text, Betrag oder Kategorie. Am Computer mit der Taste /.'],
+    ['i-chart', 'Statistik', 'Deine Ausgaben der letzten 6 oder 12 Monate, der Vergleich mit dem Vormonat und was dabei auffällt.'],
+    ['c-ziel', 'Sparziele', 'Spare auf Ferien oder ein neues Velo, mit Termin, nötiger Monatsrate und Verlauf.'],
+    ['i-camera', 'Belegfotos mit KI', 'Fotografiere den Kassenzettel, die KI trägt Betrag, Händler, Datum und Kategorie ein.'],
+    ['i-upload', 'Bankauszug importieren', 'Lade die CSV-Datei aus dem E-Banking. Was schon erfasst ist, erkennt die App.'],
+    ['i-download', 'Export', 'Alle Ausgaben als CSV für Excel oder Numbers, oder als vollständige Sicherung.'],
+    ['c-sonst', 'Eigene Kategorien', 'Lege eigene Kategorien mit Symbol an, benenne sie um oder lösche sie.'],
+    ['i-moon', 'Hell oder Dunkel', 'Wähle die Darstellung selbst oder lass sie dem System folgen.'],
+    ['i-face', 'Face ID und Passkeys', 'Anmelden ohne Passwort, auf iPhone, Mac, Windows und Android.'],
+    ['i-offline', 'Offline-Hinweis', 'Ist dein NAS nicht erreichbar, sagt dir die App das klar und verbindet sich von selbst wieder.'],
+  ] },
+  { v: '2.3', items: [['i-cal', 'Eigene Datumswahl und Scrollbalken', 'Auf Handy und Computer im Stil der App.']] },
+  { v: '2.2', items: [['i-wallet', 'Ansicht für den Computer', 'Übersicht und Ausgabenliste nebeneinander, dazu Tastaturkürzel.']] },
+  { v: '2.1', items: [['i-spark', 'Eigenes App-Symbol', 'Auf dem Home-Bildschirm mit eigenem Symbol statt einem Buchstaben.']] },
+  { v: '2.0', items: [['i-user', 'Konten und Datenbank', 'Anmeldung, Daten auf deinem NAS, tägliche Sicherung und Abgleich zwischen Geräten.']] },
+  { v: '1.0', items: [['i-target', 'Monatsbudget auf dem NAS', 'Die App läuft auf deinem eigenen Server.']] },
+];
+const shNews = $('#shNews'), newsBody = $('#newsBody');
+let newsWait = false;
+const itemHTML = ([icon, t, d], i) => `<div class="nw-item" style="--i:${i}"><span class="nw-ic">${ic(icon)}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></div>`;
+function renderNews() {
+  const [cur, ...old] = CHANGELOG;
+  newsBody.innerHTML = `<div class="nw-hero"><span class="nw-badge">Version ${cur.v}</span><div class="nw-t">${esc(cur.title)}</div><div class="nw-s">${esc(cur.sub)}</div></div>
+    <div class="nw-list">${cur.items.map(itemHTML).join('')}</div>
+    <details class="im-map nw-old"><summary>Frühere Versionen</summary>${old.map(v => `<div class="set-label">Version ${v.v}</div><div class="nw-list">${v.items.map(itemHTML).join('')}</div>`).join('')}</details>
+    <button class="btn-primary" type="button" data-news-ok>Weiter</button>`;
+}
+const seenNews = () => { try { return localStorage.getItem('mb.seen'); } catch (e) { return APP_VERSION; } };
+function markNewsSeen() { try { localStorage.setItem('mb.seen', APP_VERSION); } catch (e) { /* egal */ } }
+function openNews(fromSettings) {
+  renderNews();
+  showSheet(shNews);
+  $('.sheet-body', shNews).scrollTop = 0;
+  markNewsSeen();
+  if (fromSettings) shNews._back = openSettings;
+}
+function maybeShowNews() {
+  const seen = seenNews();
+  if (seen === APP_VERSION) return;
+  // Ganz neu hier (noch keine eigenen Daten): nichts zu zeigen, nur merken
+  if (!seen && (S.sample || !hasData())) { markNewsSeen(); return; }
+  if (openSheet) { newsWait = true; return; }
+  setTimeout(() => {
+    if (seenNews() === APP_VERSION) return;
+    if (openSheet) newsWait = true; else openNews(false);
+  }, 700);
+}
+function newsAfterSheet() { if (newsWait && !openSheet) { newsWait = false; setTimeout(maybeShowNews, 400); } }
+newsBody.addEventListener('click', e => { if (e.target.closest('[data-news-ok]')) { haptic(); hideSheet(shNews); } });
+$('#btnNews').addEventListener('click', () => { haptic(); openNews(true); });
+
 /* ---------- Konto & Benutzerverwaltung ---------- */
 const grpAcc = $('#grpAcc'), grpUsers = $('#grpUsers'), pwForm = $('#pwForm'), btnPw = $('#btnPw'), btnLogout = $('#btnLogout');
 const setErr = (el, msg) => { if (el) el.textContent = msg || ''; };
@@ -2514,6 +3320,7 @@ function paintAccount() {
   $('#pwCur').value = ''; $('#pwNew').value = ''; setErr($('#pwErr'));
   btnLogout.disabled = false;
   if (ME.admin) { usersUI.reset = null; usersUI.armed = null; setErr($('#nuErr')); loadUsers(); }
+  loadPasskeys();
 }
 btnPw.addEventListener('click', () => {
   const open = pwForm.hidden;
@@ -2626,6 +3433,7 @@ function openSettings() {
   $('#catsNote').textContent = `${CATS.length} Kategorien${S.categories ? ' · angepasst' : ''}`;
   $('#grpData').hidden = !ME;
   btnReset.textContent = 'Alle Daten löschen';
+  loadAiCfg();
   showSheet(shSet);
 }
 
@@ -2680,6 +3488,8 @@ content.addEventListener('click', e => {
     case 'day': view.day = view.day === b.dataset.d ? null : b.dataset.d; haptic(); render(); break;
     case 'clear-day': view.day = null; haptic(); render(); break;
     case 'search': haptic(); openSearch(!view.qopen); break;
+    case 'goal': haptic(); openGoal(b.dataset.id); break;
+    case 'goal-new': haptic(); openGoalEd(null); break;
     case 'qclear': view.q = ''; haptic(); updateList(); { const q = $('#q', content); if (q) { q.value = ''; q.focus(); } } break;
     case 'qcat': view.qcat = b.dataset.cat && view.qcat !== b.dataset.cat ? b.dataset.cat : null; haptic(); updateList(); break;
     case 'row': if (openRow) { closeRows(); break; } if (S.sample) { exitSample(); break; } haptic(); openExpense(b.dataset.id); break;
@@ -2879,6 +3689,9 @@ function boot() {
   setTimeout(() => content.classList.remove('intro'), 1000);
   updateStoreInfo();
   Store.init();
+  loadAi();
+  // Offline-Seite, falls der Server einmal nicht erreichbar ist (nur über HTTPS)
+  if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('/sw.js').catch(() => {});
   let lastDay = dkey(today());
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) return;

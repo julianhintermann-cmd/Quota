@@ -339,4 +339,10 @@ test('Offline-Seite und Service Worker sind öffentlich', async () => {
   r = await fetch(base + '/offline');
   assert.equal(r.status, 200);
   assert.match(await r.text(), /Der Server scheint nicht erreichbar zu sein/);
+  // Skripte der App (Bank-Import) und Vorschau gewählter Fotos (blob:) im CSP
+  r = await fetch(base + '/js/bankcsv.js');
+  assert.equal(r.status, 200);
+  assert.match(await r.text(), /BankCSV/);
+  r = await fetch(base + '/login');
+  assert.match(r.headers.get('content-security-policy'), /img-src 'self' data: blob:/);
 });

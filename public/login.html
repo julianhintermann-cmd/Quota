@@ -92,13 +92,23 @@ h1{margin:0;font-family:var(--fd);font-size:34px;font-weight:700;letter-spacing:
 @keyframes intro{from{opacity:.35;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+#pkBox{display:flex;flex-direction:column;gap:10px;margin-top:2px}
+.or{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-3);margin:2px 4px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--fill-2)}
+.btn-pk{height:54px;border-radius:17px;background:var(--fill);color:var(--text);font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .3s var(--spring),opacity .25s}
+.btn-pk svg.i{width:24px;height:24px}
+.btn-pk:active{transform:scale(.97)}
+.btn-pk:disabled{opacity:.4}
 </style>
+<script>try{var t=localStorage.getItem('mb.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
     <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 8a2.5 2.5 0 0 1 2.5-2.5H17a1.5 1.5 0 0 1 1.5 1.5v1"/><rect x="4" y="8" width="16.5" height="11.5" rx="2.5"/><path d="M15.5 13.75h1.5"/></symbol>
     <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-face" viewBox="0 0 24 24"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16M9 9.5v1.5M15 9.5v1.5M12 9.5v3.5h-1M9.5 15.5c1.4 1.2 3.6 1.2 5 0"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
   </defs>
 </svg>
@@ -119,6 +129,10 @@ h1{margin:0;font-family:var(--fd);font-size:34px;font-weight:700;letter-spacing:
       <input id="pw2" name="password2" type="password" placeholder="Passwort wiederholen" autocomplete="new-password" aria-label="Passwort wiederholen"></label>
     <div class="err" id="err" role="alert"></div>
     <button class="btn-primary" id="submit" type="submit">Anmelden</button>
+    <div id="pkBox" hidden>
+      <div class="or">oder</div>
+      <button class="btn-pk" id="pkLogin" type="button"><svg class="i"><use href="#i-face"/></svg><span id="pkLabel">Mit Face ID anmelden</span></button>
+    </div>
   </form>
   <div class="switch-mode" id="switchRow" hidden><span id="switchTxt"></span> <button class="txt-btn" id="switchBtn" type="button"></button></div>
   <p class="note" id="note">Deine Daten liegen in der Datenbank auf deinem Server.</p>
@@ -160,6 +174,7 @@ function setMode(m) {
   pw.autocomplete = isNew ? 'new-password' : 'current-password';
   pw.placeholder = isNew ? 'Passwort (mind. 8 Zeichen)' : 'Passwort';
   $('#switchRow').hidden = m === 'setup' || !registration;
+  if (pkOk && m !== 'setup') $('#pkBox').hidden = m !== 'login';
   $('#switchTxt').textContent = m === 'login' ? 'Noch kein Konto?' : 'Schon registriert?';
   $('#switchBtn').textContent = m === 'login' ? 'Registrieren' : 'Anmelden';
   err.textContent = '';
@@ -191,15 +206,68 @@ form.addEventListener('submit', async e => {
 });
 $('#switchBtn').addEventListener('click', () => { setMode(mode === 'login' ? 'register' : 'login'); user.focus(); });
 
+/* ---------- Passkeys: Face ID, Touch ID, Windows Hello ----------
+   Funktioniert nur über HTTPS mit einem Hostnamen (nicht über eine IP-Adresse). */
+const b64u = buf => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const unb64u = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4)), c => c.charCodeAt(0));
+const pkOk = !!window.PublicKeyCredential && window.isSecureContext && !/^[\d.]+$|:/.test(location.hostname);
+let pkAbort = null;
+function pkName() {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'Mit Face ID anmelden';
+  if (/Macintosh/.test(ua)) return 'Mit Touch ID anmelden';
+  if (/Windows/.test(ua)) return 'Mit Windows Hello anmelden';
+  return 'Mit Passkey anmelden';
+}
+async function passkeyLogin(conditional) {
+  const o = await call('POST', '/api/auth/passkey/options');
+  if (pkAbort) pkAbort.abort();
+  const ctl = pkAbort = new AbortController();
+  const cred = await navigator.credentials.get({
+    mediation: conditional ? 'conditional' : 'optional', signal: ctl.signal,
+    publicKey: { challenge: unb64u(o.challenge), rpId: o.rpId, userVerification: 'required', timeout: 120000, allowCredentials: [] },
+  });
+  const r = cred.response;
+  await call('POST', '/api/auth/passkey', { id: cred.id, clientDataJSON: b64u(r.clientDataJSON), authenticatorData: b64u(r.authenticatorData), signature: b64u(r.signature) });
+  location.replace('/');
+}
+function pkFail(x) {
+  if (x && x.name === 'AbortError') return;
+  if (x && x.name === 'NotAllowedError') return fail('Anmeldung abgebrochen oder kein Passkey für diese Adresse gefunden.');
+  if (x && (x.name === 'NotSupportedError' || x.name === 'SecurityError')) return fail('Auf diesem Gerät ist keine Anmeldung mit Passkey möglich.');
+  fail(x && !(x instanceof DOMException) && x.message ? x.message : 'Anmeldung mit Passkey fehlgeschlagen.');
+}
+$('#pkLogin').addEventListener('click', async () => {
+  const b = $('#pkLogin');
+  b.disabled = true; err.textContent = '';
+  try { await passkeyLogin(false); } catch (x) { pkFail(x); startConditional(); }
+  finally { b.disabled = false; }
+});
+// iOS/macOS: Passkey direkt im Benutzername-Feld vorschlagen (Autofill)
+async function startConditional() {
+  try {
+    if (!(PublicKeyCredential.isConditionalMediationAvailable && await PublicKeyCredential.isConditionalMediationAvailable())) return;
+    await passkeyLogin(true);
+  } catch (x) { /* Autofill ist nur ein Zusatz, Fehler hier nicht anzeigen */ }
+}
+
 (async () => {
   try {
     const s = await call('GET', '/api/auth/status');
     if (s.user) { location.replace('/'); return; }
     registration = !!s.registration;
     setMode(s.setup ? 'setup' : 'login');
+    if (pkOk && !s.setup) {
+      $('#pkLabel').textContent = pkName();
+      $('#pkBox').hidden = false;
+      user.setAttribute('autocomplete', 'username webauthn');
+      startConditional();
+    }
   } catch (x) { setMode('login'); err.textContent = x.message; }
   if (matchMedia('(pointer: fine)').matches) user.focus();
 })();
+// Offline-Seite, falls der Server später einmal nicht erreichbar ist (nur über HTTPS)
+if ('serviceWorker' in navigator && window.isSecureContext) navigator.serviceWorker.register('/sw.js').catch(() => {});
 })();
 </script>
 </body>
