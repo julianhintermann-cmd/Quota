@@ -1,7 +1,7 @@
 import http from 'node:http';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
-import { join } from 'node:path';
+import { join, extname } from 'node:path';
 import { openDatabase, CATEGORIES, CURRENCIES } from './db.js';
 import {
   hashPassword, verifyPassword, burnTime, newToken, hashToken, checkUsername, checkPassword, RateLimiter,
@@ -16,6 +16,9 @@ const DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const MAX_AMOUNT = 1e9;
 const ME_PLACEHOLDER = '<script id="me" type="application/json">null</script>';
+const STATIC_TYPES = {
+  '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json; charset=utf-8',
+};
 
 const CSP = [
   "default-src 'self'",
@@ -119,6 +122,20 @@ export function createApp({
   const indexTpl = readFileSync(join(publicDir, 'index.html'), 'utf8');
   const loginHtml = readFileSync(join(publicDir, 'login.html'), 'utf8');
   if (!indexTpl.includes(ME_PLACEHOLDER)) throw new Error('index.html: Platzhalter für den Benutzer fehlt');
+
+  // Öffentliche Dateien (Icons, Manifest): ohne Anmeldung abrufbar, weil iOS und Android sie
+  // beim Hinzufügen zum Home-Bildschirm holen. iOS fragt zusätzlich feste Pfade im Wurzelverzeichnis ab.
+  const statics = new Map();
+  const addStatic = (url, file) => {
+    const type = STATIC_TYPES[extname(file)];
+    if (type && existsSync(file)) statics.set(url, { type, body: readFileSync(file) });
+  };
+  const iconDir = join(publicDir, 'icons');
+  if (existsSync(iconDir)) for (const f of readdirSync(iconDir)) addStatic(`/icons/${f}`, join(iconDir, f));
+  addStatic('/manifest.webmanifest', join(publicDir, 'manifest.webmanifest'));
+  addStatic('/apple-touch-icon.png', join(iconDir, 'apple-touch-icon.png'));
+  addStatic('/apple-touch-icon-precomposed.png', join(iconDir, 'apple-touch-icon.png'));
+  addStatic('/favicon.ico', join(iconDir, 'favicon.ico'));
 
   const loginLimiter = new RateLimiter({ max: 10, windowMs: 15 * 60 * 1000 });
   const ipLimiter = new RateLimiter({ max: 50, windowMs: 15 * 60 * 1000 });
@@ -358,6 +375,11 @@ export function createApp({
         db.ping();
         res.writeHead(200, { 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' });
         return res.end('ok\n');
+      }
+      const file = statics.get(p);
+      if (file && (req.method === 'GET' || req.method === 'HEAD')) {
+        res.writeHead(200, { 'Content-Type': file.type, 'Content-Length': file.body.length, 'Cache-Control': 'public, max-age=86400' });
+        return res.end(req.method === 'HEAD' ? undefined : file.body);
       }
       const user = authenticate(req, res);
       if (p.startsWith('/api/')) {

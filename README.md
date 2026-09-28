@@ -22,6 +22,9 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   auf diesem Gerät automatisch ins Konto übernommen
 - Sicherheit: Passwörter mit scrypt gehasht, HttpOnly-Cookies, Schutz gegen Cross-Site-Anfragen,
   Sperre nach 10 falschen Passwörtern (15 Minuten), Container läuft ohne Root-Rechte
+- Eigenes App-Icon und Web-App-Manifest: *Teilen → Zum Home-Bildschirm* (iPhone) bzw.
+  *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
+  Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
 
 ## Auf dem NAS starten
 

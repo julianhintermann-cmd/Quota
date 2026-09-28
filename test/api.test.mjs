@@ -292,3 +292,29 @@ test('Healthcheck', async () => {
   assert.equal(r.status, 200);
   assert.equal(await r.text(), 'ok\n');
 });
+
+test('Home-Bildschirm: Icons und Manifest sind ohne Anmeldung abrufbar', async () => {
+  const pngSize = buf => [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+  for (const [path, size] of [['/apple-touch-icon.png', 180], ['/icons/apple-touch-icon.png', 180], ['/icons/icon-192.png', 192],
+    ['/icons/icon-512.png', 512], ['/icons/icon-maskable-512.png', 512]]) {
+    const r = await fetch(base + path);
+    assert.equal(r.status, 200, path);
+    assert.equal(r.headers.get('content-type'), 'image/png', path);
+    const buf = Buffer.from(await r.arrayBuffer());
+    assert.equal(buf.toString('latin1', 1, 4), 'PNG', path);
+    assert.deepEqual(pngSize(buf), [size, size], path);
+  }
+  let r = await fetch(base + '/favicon.ico');
+  assert.equal(r.status, 200);
+  assert.equal(r.headers.get('content-type'), 'image/x-icon');
+  r = await fetch(base + '/manifest.webmanifest');
+  assert.equal(r.status, 200);
+  const m = await r.json();
+  assert.equal(m.name, 'Monatsbudget');
+  assert.equal(m.display, 'standalone');
+  for (const icon of m.icons) assert.equal((await fetch(base + icon.src)).status, 200, icon.src);
+  r = await fetch(base + '/icons/../server/app.js');
+  assert.equal(r.status, 404, 'keine Dateien ausserhalb der Liste');
+  const html = (await admin('GET', '/')).data;
+  assert.match(html, /<link rel="apple-touch-icon" href="\/apple-touch-icon.png">[\s\S]*<\/head><body>/, 'Icon-Links stehen im <head>');
+});
