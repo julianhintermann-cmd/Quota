@@ -1,11 +1,14 @@
 import http from 'node:http';
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { join, extname } from 'node:path';
 import { openDatabase, CATEGORIES, CURRENCIES } from './db.js';
 import {
   hashPassword, verifyPassword, burnTime, newToken, hashToken, checkUsername, checkPassword, RateLimiter,
 } from './auth.js';
+import { analyzeReceipt, listVisionModels, AiError, DEFAULT_MODEL } from './ai.js';
+import { verifyRegistration, verifyAssertion, ChallengeStore, challengeOf, WebAuthnError } from './webauthn.js';
 
 const DAY = 864e5;
 const SESSION_DAYS = 90;
@@ -18,7 +21,25 @@ const MAX_AMOUNT = 1e9;
 const ME_PLACEHOLDER = '<script id="me" type="application/json">null</script>';
 const STATIC_TYPES = {
   '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
 };
+
+// Standardkategorien (Namen für Export und KI) und die erlaubten Symbole für eigene Kategorien/Sparziele
+const DEFAULT_CATS = [
+  { id: 'essen', n: 'Essen & Trinken', ic: 'essen' }, { id: 'einkauf', n: 'Einkauf', ic: 'einkauf' },
+  { id: 'wohnen', n: 'Wohnen', ic: 'wohnen' }, { id: 'mobil', n: 'Mobilität', ic: 'mobil' },
+  { id: 'freizeit', n: 'Freizeit', ic: 'freizeit' }, { id: 'gesund', n: 'Gesundheit', ic: 'gesund' },
+  { id: 'abos', n: 'Abos', ic: 'abos' }, { id: 'sonst', n: 'Sonstiges', ic: 'sonst' },
+];
+export const ICONS = [
+  ...CATEGORIES, 'geschenk', 'reisen', 'auto', 'kind', 'tier', 'sport', 'bildung', 'technik', 'kleidung', 'haushalt',
+  'versicherung', 'steuern', 'spende', 'sparen', 'handy', 'musik', 'pflanze', 'bar', 'werkzeug', 'arbeit', 'ziel',
+];
+const CAT_ID_RE = /^[a-z0-9_]{1,24}$/;
+const RECEIPT_RE = /^[a-f0-9]{24}$/;
+const GOAL_ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+const IMAGE_TYPES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
+const MAX_IMAGE = 6 * 1024 * 1024;
 
 const CSP = [
   "default-src 'self'",
@@ -58,18 +79,61 @@ function parseMonthDoc(body) {
     byId.set(e.id, {
       id: e.id, amt, date: e.date,
       title: typeof e.title === 'string' ? e.title.slice(0, 40) : '',
-      cat: CATEGORIES.includes(e.cat) ? e.cat : 'sonst',
+      cat: typeof e.cat === 'string' && CAT_ID_RE.test(e.cat) ? e.cat : 'sonst',
       rep: !!e.rep,
       ts: Number.isFinite(e.ts) ? Math.max(0, Math.trunc(e.ts)) : 0,
+      rc: typeof e.rc === 'string' && RECEIPT_RE.test(e.rc) ? e.rc : null,
     });
   }
   return { income, budget, expenses: [...byId.values()] };
 }
+function parseCategories(list) {
+  if (list === null) return null;
+  if (!Array.isArray(list) || !list.length || list.length > 40) return undefined;
+  const seen = new Set(), out = [];
+  for (const c of list) {
+    if (!c || typeof c.id !== 'string' || !CAT_ID_RE.test(c.id) || seen.has(c.id)) return undefined;
+    const n = typeof c.n === 'string' ? c.n.trim().slice(0, 24) : '';
+    if (!n || !ICONS.includes(c.ic)) return undefined;
+    seen.add(c.id); out.push({ id: c.id, n, ic: c.ic });
+  }
+  return seen.has('sonst') ? out : undefined;
+}
 function parseSettings(body) {
   if (!body || !CURRENCIES.includes(body.currency)) return null;
   if (!Number.isInteger(body.startDay) || body.startDay < 1 || body.startDay > 28) return null;
-  return { currency: body.currency, startDay: body.startDay };
+  const s = { currency: body.currency, startDay: body.startDay };
+  if ('categories' in body) {
+    const cats = parseCategories(body.categories);
+    if (cats === undefined) return null;
+    s.categories = cats;
+  }
+  return s;
 }
+function parseGoal(body, id) {
+  if (!body || !GOAL_ID_RE.test(id)) return null;
+  const name = typeof body.name === 'string' ? body.name.trim().slice(0, 40) : '';
+  const target = money(body.target);
+  if (!name || !target) return null;
+  if (body.deadline != null && (typeof body.deadline !== 'string' || !DATE_RE.test(body.deadline))) return null;
+  const icon = ICONS.includes(body.icon) ? body.icon : 'ziel';
+  return { id, name, target, deadline: body.deadline || null, icon };
+}
+function parseGoalEntry(body) {
+  if (!body || typeof body.id !== 'string' || !GOAL_ID_RE.test(body.id)) return null;
+  const amt = typeof body.amt === 'number' && Number.isFinite(body.amt) && body.amt !== 0 && Math.abs(body.amt) <= MAX_AMOUNT
+    ? Math.round(body.amt * 100) / 100 : null;
+  if (!amt || typeof body.date !== 'string' || !DATE_RE.test(body.date)) return null;
+  return { id: body.id, amt, date: body.date, note: typeof body.note === 'string' ? body.note.trim().slice(0, 60) : '' };
+}
+const localDay = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+function imageType(buf) {
+  if (buf.length > 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+  if (buf.length > 8 && buf.readUInt32BE(0) === 0x89504e47) return 'image/png';
+  if (buf.length > 12 && buf.toString('latin1', 0, 4) === 'RIFF' && buf.toString('latin1', 8, 12) === 'WEBP') return 'image/webp';
+  return null;
+}
+const csvCell = v => { const s = String(v ?? ''); return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
 
 /* ---------- HTTP-Helfer ---------- */
 function parseCookies(header) {
@@ -79,6 +143,18 @@ function parseCookies(header) {
     if (i > 0) out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
   }
   return out;
+}
+function readRaw(req, limit) {
+  return new Promise((resolve, reject) => {
+    let size = 0; const chunks = [];
+    req.on('data', c => {
+      size += c.length;
+      if (size > limit) { reject(new HttpError(413, 'Die Datei ist zu gross.')); req.destroy(); return; }
+      chunks.push(c);
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
 }
 function readJson(req) {
   return new Promise((resolve, reject) => {
@@ -117,8 +193,12 @@ const publicUser = u => ({ id: u.id, username: u.username, admin: !!u.is_admin }
 export function createApp({
   dataDir, publicDir, backupDir = join(dataDir, 'backups'), backupKeep = 14,
   cookieSecure = 'auto', trustProxy = false, log = console,
+  appUrl = null, aiKey = null, aiModel = null, openrouterUrl = 'https://openrouter.ai/api/v1',
 }) {
   const db = openDatabase(dataDir);
+  const receiptDir = join(dataDir, 'receipts');
+  mkdirSync(receiptDir, { recursive: true });
+  const offlineHtml = existsSync(join(publicDir, 'offline.html')) ? readFileSync(join(publicDir, 'offline.html'), 'utf8') : null;
   const indexTpl = readFileSync(join(publicDir, 'index.html'), 'utf8');
   const loginHtml = readFileSync(join(publicDir, 'login.html'), 'utf8');
   if (!indexTpl.includes(ME_PLACEHOLDER)) throw new Error('index.html: Platzhalter für den Benutzer fehlt');
@@ -126,12 +206,15 @@ export function createApp({
   // Öffentliche Dateien (Icons, Manifest): ohne Anmeldung abrufbar, weil iOS und Android sie
   // beim Hinzufügen zum Home-Bildschirm holen. iOS fragt zusätzlich feste Pfade im Wurzelverzeichnis ab.
   const statics = new Map();
-  const addStatic = (url, file) => {
+  const addStatic = (url, file, cache = 'public, max-age=86400') => {
     const type = STATIC_TYPES[extname(file)];
-    if (type && existsSync(file)) statics.set(url, { type, body: readFileSync(file) });
+    if (type && existsSync(file)) statics.set(url, { type, body: readFileSync(file), cache });
   };
   const iconDir = join(publicDir, 'icons');
   if (existsSync(iconDir)) for (const f of readdirSync(iconDir)) addStatic(`/icons/${f}`, join(iconDir, f));
+  const jsDir = join(publicDir, 'js');
+  if (existsSync(jsDir)) for (const f of readdirSync(jsDir)) addStatic(`/js/${f}`, join(jsDir, f), 'no-cache');
+  addStatic('/sw.js', join(publicDir, 'sw.js'), 'no-cache');
   addStatic('/manifest.webmanifest', join(publicDir, 'manifest.webmanifest'));
   addStatic('/apple-touch-icon.png', join(iconDir, 'apple-touch-icon.png'));
   addStatic('/apple-touch-icon-precomposed.png', join(iconDir, 'apple-touch-icon.png'));
@@ -139,6 +222,41 @@ export function createApp({
 
   const loginLimiter = new RateLimiter({ max: 10, windowMs: 15 * 60 * 1000 });
   const ipLimiter = new RateLimiter({ max: 50, windowMs: 15 * 60 * 1000 });
+  const uploadLimiter = new RateLimiter({ max: 60, windowMs: 60 * 60 * 1000 });
+  const challenges = new ChallengeStore();
+  const aiBusy = new Set();
+
+  /* KI-Einstellungen: Umgebungsvariable hat Vorrang vor dem in der App hinterlegten Schlüssel */
+  const ai = {
+    key: () => aiKey || db.getConfig('openrouter_key'),
+    model: () => aiModel || db.getConfig('openrouter_model') || DEFAULT_MODEL,
+    limit: () => Number(db.getConfig('ai_daily_limit', '3')),
+  };
+  function aiStatus(user) {
+    const used = db.aiUsage(user.id, localDay());
+    const limit = user.is_admin ? null : ai.limit();
+    return { enabled: !!ai.key(), limit, used, remaining: limit == null ? null : Math.max(0, limit - used) };
+  }
+  const userCategories = userId => {
+    const s = db.getSettings(userId);
+    return s && Array.isArray(s.categories) ? s.categories : DEFAULT_CATS;
+  };
+  const receiptFile = (id, mime) => join(receiptDir, id + (IMAGE_TYPES[mime] || '.bin'));
+
+  /* Passkeys: erwartete Herkunft und Domain (rpId) */
+  function passkeyContext(req) {
+    const host = String(req.headers.host || '');
+    const origins = new Set([`https://${host}`, `http://${host}`]);
+    let rpId = host.replace(/:\d+$/, '').replace(/^\[|\]$/g, '');
+    if (appUrl) { const u = new URL(appUrl); origins.add(u.origin); rpId = u.hostname; }
+    return { origins, rpId };
+  }
+  const withOrigin = (ctx, clientDataJSON) => {
+    try {
+      const o = JSON.parse(Buffer.from(String(clientDataJSON || ''), 'base64url').toString('utf8')).origin;
+      return ctx.origins.has(o) ? o : '-';
+    } catch { return '-'; }
+  };
   const streams = new Map(); // userId -> Set<{ res, cid, sid }>
 
   const clientIp = req => (trustProxy && String(req.headers['x-forwarded-for'] || '').split(',')[0].trim())
@@ -263,6 +381,33 @@ export function createApp({
       return sendJson(res, 200, { user: publicUser(u) });
     }
 
+    if (p === '/api/auth/passkey/options' && m === 'POST') {
+      const { rpId } = passkeyContext(req);
+      return sendJson(res, 200, { challenge: challenges.issue({ type: 'auth' }), rpId });
+    }
+    if (p === '/api/auth/passkey' && m === 'POST') {
+      const ip = clientIp(req);
+      const wait = ipLimiter.blocked(ip);
+      if (wait) throw new HttpError(429, `Zu viele Versuche. Bitte in ${Math.ceil(wait / 60)} Min. erneut versuchen.`);
+      const body = await readJson(req);
+      const fail = msg => { ipLimiter.fail(ip); throw new HttpError(401, msg); };
+      const ch = challengeOf(body.clientDataJSON);
+      const issued = ch && challenges.take(ch);
+      if (!issued || issued.type !== 'auth') fail('Anmeldung abgelaufen. Bitte nochmals versuchen.');
+      const stored = typeof body.id === 'string' ? db.getPasskey(body.id) : null;
+      if (!stored) fail('Dieser Passkey ist hier nicht (mehr) eingerichtet.');
+      const ctx = passkeyContext(req);
+      try {
+        const r = verifyAssertion(body, stored, { challenge: ch, origin: withOrigin(ctx, body.clientDataJSON), rpId: ctx.rpId });
+        db.usePasskey(stored.id, r.signCount);
+      } catch (e) {
+        if (e instanceof WebAuthnError) fail(e.message);
+        throw e;
+      }
+      startSession(req, res, stored.user_id);
+      return sendJson(res, 200, { user: publicUser({ id: stored.user_id, username: stored.username, is_admin: stored.is_admin }) });
+    }
+
     /* Ab hier nur angemeldet */
     if (!user) throw new HttpError(401, 'Nicht angemeldet.');
 
@@ -290,8 +435,131 @@ export function createApp({
       const s = parseSettings(await readJson(req));
       if (!s) throw new HttpError(400, 'Ungültige Einstellungen.');
       db.putSettings(user.id, s);
-      broadcast(user.id, cid, { kind: 'settings', data: s });
+      broadcast(user.id, cid, { kind: 'settings', data: db.getSettings(user.id) });
       return sendJson(res, 200, { ok: true });
+    }
+
+    /* Sparziele */
+    const gm = p.match(/^\/api\/goals\/([^/]+)(?:\/entries(?:\/([^/]+))?)?$/);
+    if (gm) {
+      const [, gid, eid] = gm;
+      const isEntries = p.includes('/entries');
+      if (!isEntries && m === 'PUT') {
+        const g = parseGoal(await readJson(req), gid);
+        if (!g) throw new HttpError(400, 'Ungültiges Sparziel.');
+        if (!db.hasGoal(user.id, gid) && db.listGoals(user.id).length >= 50) throw new HttpError(400, 'Höchstens 50 Sparziele.');
+        db.putGoal(user.id, g);
+      } else if (!isEntries && m === 'DELETE') {
+        db.deleteGoal(user.id, gid);
+      } else if (isEntries && !eid && m === 'POST') {
+        if (!db.hasGoal(user.id, gid)) throw new HttpError(404, 'Sparziel nicht gefunden.');
+        const e = parseGoalEntry(await readJson(req));
+        if (!e) throw new HttpError(400, 'Ungültiger Betrag.');
+        try { db.addGoalEntry(user.id, gid, e); }
+        catch (x) { if (/UNIQUE/.test(x.message)) throw new HttpError(409, 'Schon gespeichert.'); throw x; }
+      } else if (isEntries && eid && m === 'DELETE') {
+        db.deleteGoalEntry(user.id, gid, eid);
+      } else throw new HttpError(404, 'Nicht gefunden.');
+      const goals = db.listGoals(user.id);
+      broadcast(user.id, cid, { kind: 'goals', data: goals });
+      return sendJson(res, 200, { goals });
+    }
+
+    /* Belegfotos und KI-Erkennung */
+    if (p === '/api/ai' && m === 'GET') return sendJson(res, 200, aiStatus(user));
+    if (p === '/api/receipts' && m === 'POST') {
+      if (uploadLimiter.blocked(String(user.id))) throw new HttpError(429, 'Zu viele Fotos in kurzer Zeit.');
+      const buf = await readRaw(req, MAX_IMAGE);
+      const mime = imageType(buf);
+      if (!mime) throw new HttpError(400, 'Das ist kein unterstütztes Bild (JPEG, PNG oder WebP).');
+      uploadLimiter.fail(String(user.id));
+      const id = randomBytes(12).toString('hex');
+      writeFileSync(receiptFile(id, mime), buf);
+      db.addReceipt(user.id, id, mime, buf.length);
+      return sendJson(res, 201, { id });
+    }
+    const rm = p.match(/^\/api\/receipts\/([a-f0-9]{24})(\/analyze)?$/);
+    if (rm) {
+      const r = db.getReceipt(user.id, rm[1]);
+      if (!r) throw new HttpError(404, 'Beleg nicht gefunden.');
+      if (!rm[2] && m === 'GET') {
+        const body = readFileSync(receiptFile(r.id, r.mime));
+        res.writeHead(200, { 'Content-Type': r.mime, 'Content-Length': body.length, 'Cache-Control': 'private, max-age=604800' });
+        return res.end(body);
+      }
+      if (rm[2] && m === 'POST') {
+        if (r.analysis) return sendJson(res, 200, { result: r.analysis, ...aiStatus(user) });
+        const key = ai.key();
+        if (!key) throw new HttpError(409, 'Die KI-Belegerkennung ist nicht eingerichtet.');
+        const st = aiStatus(user);
+        if (st.remaining === 0) throw new HttpError(429, `Heute sind keine KI-Analysen mehr übrig (${st.limit} pro Tag).`);
+        if (aiBusy.has(user.id)) throw new HttpError(429, 'Es läuft bereits eine Analyse.');
+        aiBusy.add(user.id);
+        try {
+          const result = await analyzeReceipt({
+            apiKey: key, model: ai.model(), image: readFileSync(receiptFile(r.id, r.mime)), mime: r.mime,
+            categories: userCategories(user.id), baseUrl: openrouterUrl,
+          });
+          db.aiCount(user.id, localDay());
+          db.setReceiptAnalysis(user.id, r.id, result);
+          return sendJson(res, 200, { result, ...aiStatus(user) });
+        } catch (e) {
+          if (e instanceof AiError) throw new HttpError(e.status, e.message);
+          throw e;
+        } finally { aiBusy.delete(user.id); }
+      }
+    }
+
+    /* Export */
+    if ((p === '/api/export.csv' || p === '/api/export.json') && m === 'GET') {
+      const data = db.getData(user.id);
+      const day = localDay();
+      if (p.endsWith('.json')) {
+        const body = JSON.stringify({ app: 'Monatsbudget', version: 2, exportedAt: new Date().toISOString(), user: user.username, ...data }, null, 2);
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store',
+          'Content-Disposition': `attachment; filename="monatsbudget-sicherung-${day}.json"` });
+        return res.end(body);
+      }
+      const names = Object.fromEntries(userCategories(user.id).map(c => [c.id, c.n]));
+      const currency = (data.settings && data.settings.currency) || 'CHF';
+      const rows = Object.values(data.months).flatMap(mo => mo.expenses)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts)
+        .map(e => [e.date, e.title, names[e.cat] || names.sonst || 'Sonstiges', e.amt.toFixed(2), currency, e.rep ? 'ja' : 'nein'].map(csvCell).join(';'));
+      const csv = '\ufeff' + ['Datum;Titel;Kategorie;Betrag;Währung;Monatlich', ...rows].join('\r\n') + '\r\n';
+      res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Cache-Control': 'no-store',
+        'Content-Disposition': `attachment; filename="monatsbudget-ausgaben-${day}.csv"` });
+      return res.end(csv);
+    }
+
+    /* Passkeys verwalten */
+    if (p === '/api/passkeys' && m === 'GET') return sendJson(res, 200, { passkeys: db.listPasskeys(user.id) });
+    if (p === '/api/passkeys/options' && m === 'POST') {
+      const { rpId } = passkeyContext(req);
+      return sendJson(res, 200, {
+        challenge: challenges.issue({ type: 'reg', userId: user.id }), rpId,
+        userId: Buffer.from(`mb-user-${user.id}`).toString('base64url'), username: user.username,
+        exclude: db.listPasskeys(user.id).map(k => k.id),
+      });
+    }
+    if (p === '/api/passkeys' && m === 'POST') {
+      const body = await readJson(req);
+      const ch = challengeOf(body.clientDataJSON);
+      const issued = ch && challenges.take(ch);
+      if (!issued || issued.type !== 'reg' || issued.userId !== user.id) throw new HttpError(400, 'Einrichtung abgelaufen. Bitte nochmals versuchen.');
+      const ctx = passkeyContext(req);
+      let k;
+      try { k = verifyRegistration(body, { challenge: ch, origin: withOrigin(ctx, body.clientDataJSON), rpId: ctx.rpId }); }
+      catch (e) { if (e instanceof WebAuthnError) throw new HttpError(400, e.message); throw e; }
+      const name = typeof body.name === 'string' && body.name.trim() ? body.name.trim().slice(0, 40) : 'Passkey';
+      try { db.addPasskey(user.id, { ...k, name }); }
+      catch (e) { if (/UNIQUE|PRIMARY/.test(e.message)) throw new HttpError(409, 'Dieser Passkey ist schon eingerichtet.'); throw e; }
+      log.info(`Passkey eingerichtet: ${user.username} (${name})`);
+      return sendJson(res, 201, { passkeys: db.listPasskeys(user.id) });
+    }
+    const pm = p.match(/^\/api\/passkeys\/([A-Za-z0-9_-]{16,1024})$/);
+    if (pm && m === 'DELETE') {
+      db.deletePasskey(user.id, pm[1]);
+      return sendJson(res, 200, { passkeys: db.listPasskeys(user.id) });
     }
     const mm = p.match(/^\/api\/months\/([^/]+)$/);
     if (mm) {
@@ -351,6 +619,34 @@ export function createApp({
           return sendJson(res, 200, { ok: true });
         }
       }
+      if (p === '/api/admin/ai') {
+        if (m === 'PUT') {
+          const body = await readJson(req);
+          if ('key' in body) {
+            if (body.key === null || body.key === '') db.delConfig('openrouter_key');
+            else if (typeof body.key === 'string' && /^[A-Za-z0-9_\-:.]{10,300}$/.test(body.key.trim())) db.setConfig('openrouter_key', body.key.trim());
+            else throw new HttpError(400, 'Das sieht nicht nach einem OpenRouter-Schlüssel aus.');
+          }
+          if ('model' in body) {
+            if (!body.model) db.delConfig('openrouter_model');
+            else if (typeof body.model === 'string' && /^[A-Za-z0-9._\-\/:]{3,120}$/.test(body.model.trim())) db.setConfig('openrouter_model', body.model.trim());
+            else throw new HttpError(400, 'Ungültiger Modellname.');
+          }
+          if ('limit' in body) {
+            if (!Number.isInteger(body.limit) || body.limit < 0 || body.limit > 50) throw new HttpError(400, 'Das Tageslimit muss zwischen 0 und 50 liegen.');
+            db.setConfig('ai_daily_limit', body.limit);
+          }
+        } else if (m !== 'GET') throw new HttpError(405, 'Methode nicht erlaubt.');
+        const key = ai.key();
+        return sendJson(res, 200, {
+          hasKey: !!key, keyHint: key ? `…${key.slice(-4)}` : null, fromEnv: !!aiKey,
+          model: ai.model(), modelFromEnv: !!aiModel, defaultModel: DEFAULT_MODEL, limit: ai.limit(),
+        });
+      }
+      if (p === '/api/admin/ai/models' && m === 'GET') {
+        try { return sendJson(res, 200, { models: await listVisionModels({ baseUrl: openrouterUrl }) }); }
+        catch (e) { if (e instanceof AiError) throw new HttpError(e.status, e.message); throw e; }
+      }
       if (p === '/api/admin/config') {
         if (m === 'GET') return sendJson(res, 200, { registration: db.getConfig('registration', 'closed') === 'open' });
         if (m === 'PUT') {
@@ -378,7 +674,9 @@ export function createApp({
       }
       const file = statics.get(p);
       if (file && (req.method === 'GET' || req.method === 'HEAD')) {
-        res.writeHead(200, { 'Content-Type': file.type, 'Content-Length': file.body.length, 'Cache-Control': 'public, max-age=86400' });
+        const headers = { 'Content-Type': file.type, 'Content-Length': file.body.length, 'Cache-Control': file.cache };
+        if (p === '/sw.js') headers['Service-Worker-Allowed'] = '/';
+        res.writeHead(200, headers);
         return res.end(req.method === 'HEAD' ? undefined : file.body);
       }
       const user = authenticate(req, res);
@@ -397,6 +695,7 @@ export function createApp({
         if (user) return redirect(res, '/');
         return sendHtml(req, res, loginHtml);
       }
+      if (p === '/offline' && offlineHtml) return sendHtml(req, res, offlineHtml);
       if (p === '/favicon.ico') { res.writeHead(204); return res.end(); }
       throw new HttpError(404, 'Nicht gefunden.');
     } catch (e) {
@@ -422,9 +721,26 @@ export function createApp({
       if (f) log.info(`Backup gespeichert: ${f}`);
     } catch (e) { log.error('Backup fehlgeschlagen:', e); }
   }
+  // Belegfotos ohne zugehörige Ausgabe nach 3 Tagen löschen, ebenso Dateien ohne Datenbankeintrag
+  function cleanReceipts(olderThan = Date.now() - 3 * DAY) {
+    let n = 0;
+    for (const r of db.orphanReceipts(olderThan)) {
+      try { unlinkSync(receiptFile(r.id, r.mime)); } catch { /* schon weg */ }
+      db.deleteReceipt(r.id); n++;
+    }
+    const ids = db.receiptIds();
+    for (const f of readdirSync(receiptDir)) {
+      if (!ids.has(f.split('.')[0])) { try { unlinkSync(join(receiptDir, f)); n++; } catch { /* egal */ } }
+    }
+    db.aiPurge(localDay(new Date(Date.now() - 7 * DAY)));
+    return n;
+  }
   const timers = [
     setInterval(() => { for (const set of streams.values()) for (const s of set) s.res.write(': ping\n\n'); }, 25_000),
-    setInterval(() => { db.purgeSessions(); loginLimiter.prune(); ipLimiter.prune(); }, 60 * 60 * 1000),
+    setInterval(() => {
+      db.purgeSessions(); loginLimiter.prune(); ipLimiter.prune(); uploadLimiter.prune(); challenges.prune();
+      try { cleanReceipts(); } catch (e) { log.error('Aufräumen der Belege fehlgeschlagen:', e); }
+    }, 60 * 60 * 1000),
   ];
   if (backupKeep > 0) { timers.push(setInterval(runBackup, 60 * 60 * 1000)); runBackup(); }
   timers.forEach(t => t.unref());
@@ -438,5 +754,5 @@ export function createApp({
     });
   }
 
-  return { server, db, close, runBackup };
+  return { server, db, close, runBackup, cleanReceipts };
 }

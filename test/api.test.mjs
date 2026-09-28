@@ -92,7 +92,7 @@ test('Login: falsches Passwort, richtiges Passwort, Abmelden', async () => {
 
 test('Daten: Monat speichern, laden, Beträge exakt, löschen', async () => {
   let r = await admin('GET', '/api/data');
-  assert.deepEqual(r.data, { settings: null, months: {} });
+  assert.deepEqual(r.data, { settings: null, months: {}, goals: [] });
   const doc = month([exp('a1', '2026-09-28', 42.5, { title: 'Migros', rep: true, ts: 1790585035135 }), exp('a2', '2026-09-30', 0.1)]);
   r = await admin('PUT', '/api/months/2026-09', doc);
   assert.equal(r.status, 200);
@@ -105,13 +105,15 @@ test('Daten: Monat speichern, laden, Beträge exakt, löschen', async () => {
   assert.equal(m.expenses.find(e => e.id === 'a1').amt, 42.5);
   assert.equal(m.expenses.find(e => e.id === 'a1').ts, 1790585035135);
   assert.equal(m.expenses.find(e => e.id === 'a2').amt, 0.1);
-  // Titel wird auf 40 Zeichen gekürzt, unbekannte Kategorie wird "sonst"
-  r = await admin('PUT', '/api/months/2026-10', month([exp('b1', '2026-10-02', 5, { title: 'x'.repeat(60), cat: 'hacker' })]));
+  // Titel wird auf 40 Zeichen gekürzt, Kategorie mit ungültigen Zeichen wird "sonst", eigene IDs bleiben
+  r = await admin('PUT', '/api/months/2026-10', month([exp('b1', '2026-10-02', 5, { title: 'x'.repeat(60), cat: 'Böse <Kategorie>' }),
+    exp('b2', '2026-10-03', 6, { cat: 'u_velo' })]));
   assert.equal(r.status, 200);
   r = await admin('GET', '/api/data');
-  const b1 = r.data.months['2026-10'].expenses[0];
+  const b1 = r.data.months['2026-10'].expenses.find(e => e.id === 'b1');
   assert.equal(b1.title.length, 40);
   assert.equal(b1.cat, 'sonst');
+  assert.equal(r.data.months['2026-10'].expenses.find(e => e.id === 'b2').cat, 'u_velo');
   r = await admin('DELETE', '/api/months/2026-10');
   assert.equal(r.status, 200);
   r = await admin('GET', '/api/data');
@@ -187,7 +189,7 @@ test('Registrierung: standardmässig zu, Admin kann sie öffnen; Daten sind getr
   r = await client()('POST', '/api/auth/register', { username: 'ANNA', password: 'annas-passwort' });
   assert.equal(r.status, 409, 'Name schon vergeben');
   r = await anna('GET', '/api/data');
-  assert.deepEqual(r.data, { settings: null, months: {} }, 'Anna sieht Julians Daten nicht');
+  assert.deepEqual(r.data, { settings: null, months: {}, goals: [] }, 'Anna sieht Julians Daten nicht');
   r = await anna('PUT', '/api/months/2026-09', month([exp('a1', '2026-09-01', 99)]));
   assert.equal(r.status, 200, 'gleiche Ausgaben-ID bei anderem Benutzer ist erlaubt');
   r = await admin('GET', '/api/data');

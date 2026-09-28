@@ -20,6 +20,9 @@ try {
     backupKeep: env.BACKUP_KEEP != null ? Math.max(0, Number(env.BACKUP_KEEP) || 0) : 14,
     cookieSecure: env.COOKIE_SECURE || 'auto',
     trustProxy: env.TRUST_PROXY === 'true',
+    appUrl: env.APP_URL || null,
+    aiKey: env.OPENROUTER_API_KEY || null,
+    aiModel: env.OPENROUTER_MODEL || null,
     log,
   });
 } catch (e) {

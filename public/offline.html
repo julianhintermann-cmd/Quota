@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Monatsbudget</title>
+<meta name="theme-color" content="#F2F2F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A0A0B" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Monatsbudget">
+<script>try{var t=localStorage.getItem('mb.theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<style>
+:root{color-scheme:light;--bg:#F2F2F0;--surface:#FFFFFF;--fill:#EAEAE6;--text:#0B0B0C;--text-2:#6B6B70;--text-3:#A5A5A9;
+  --hero:#111112;--hero-text:#F4F4F1;--ink:#0B0B0C;--on-ink:#FFFFFF;--shadow:0 1px 1px rgba(11,11,12,.03),0 6px 20px rgba(11,11,12,.05);
+  --f:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --fd:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.3,.64,1)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0A0A0B;--surface:#151517;--fill:#232326;--text:#F4F4F1;--text-2:#9A9AA0;--text-3:#5F5F65;
+  --hero:#ECECE8;--hero-text:#0B0B0C;--ink:#F4F4F1;--on-ink:#0B0B0C;--shadow:0 0 0 1px rgba(255,255,255,.04)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0A0A0B;--surface:#151517;--fill:#232326;--text:#F4F4F1;--text-2:#9A9AA0;--text-3:#5F5F65;
+  --hero:#ECECE8;--hero-text:#0B0B0C;--ink:#F4F4F1;--on-ink:#0B0B0C;--shadow:0 0 0 1px rgba(255,255,255,.04)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:none}
+*::-webkit-scrollbar{display:none}
+html,body{min-height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit;border:0;cursor:pointer;touch-action:manipulation}
+.wrap{min-height:100vh;min-height:100dvh;width:min(100%,420px);margin:0 auto;display:flex;flex-direction:column;justify-content:center;gap:22px;
+  padding:calc(env(safe-area-inset-top,0px) + 28px) 16px calc(env(safe-area-inset-bottom,0px) + 28px)}
+.logo{position:relative;width:58px;height:58px;border-radius:17px;background:var(--hero);color:var(--hero-text);display:grid;place-items:center;box-shadow:0 10px 30px rgba(11,11,12,.16)}
+.logo svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.logo i{position:absolute;right:-5px;bottom:-5px;width:22px;height:22px;border-radius:50%;background:var(--bg);display:grid;place-items:center}
+.logo i::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--text-3)}
+h1{margin:0;font-family:var(--fd);font-size:30px;font-weight:700;letter-spacing:-.025em;line-height:1.12;text-wrap:balance}
+p{margin:10px 0 0;font-size:16px;color:var(--text-2);line-height:1.45}
+.card{background:var(--surface);border-radius:22px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:10px}
+.status{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--text-2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--text-3);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.btn{height:54px;border-radius:17px;background:var(--ink);color:var(--on-ink);font-size:17px;font-weight:600;transition:transform .3s var(--spring),opacity .2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5}
+.tips{margin:0;padding:0 4px;list-style:none;font-size:13px;color:var(--text-3);line-height:1.6}
+.brand,.card,.tips{animation:intro .6s var(--ease) both}.card{animation-delay:.06s}.tips{animation-delay:.12s}
+@keyframes intro{from{opacity:.35;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M4 8a2.5 2.5 0 0 1 2.5-2.5H17a1.5 1.5 0 0 1 1.5 1.5v1"/><rect x="4" y="8" width="16.5" height="11.5" rx="2.5"/><path d="M15.5 13.75h1.5"/></svg>
+      <i></i>
+    </div>
+    <h1 style="margin-top:18px">Der Server scheint nicht erreichbar zu sein</h1>
+    <p>Monatsbudget kann gerade keine Verbindung zu deinem NAS aufbauen. Deine Daten sind sicher gespeichert, sobald die Verbindung wieder steht, geht es hier automatisch weiter.</p>
+  </div>
+  <div class="card">
+    <div class="status" role="status" aria-live="polite"><span class="dot"></span><span id="st">Versuche es alle paar Sekunden erneut …</span></div>
+    <button class="btn" id="retry" type="button">Erneut versuchen</button>
+  </div>
+  <ul class="tips">
+    <li>· Bist du im gleichen WLAN wie dein NAS oder per VPN verbunden?</li>
+    <li>· Läuft der Container „monatsbudget“ auf dem NAS?</li>
+  </ul>
+</main>
+<script>
+(function () {
+  var btn = document.getElementById('retry'), st = document.getElementById('st'), busy = false;
+  function check(manual) {
+    if (busy) return; busy = true;
+    if (manual) { btn.disabled = true; st.textContent = 'Verbinde …'; }
+    fetch('/healthz', { cache: 'no-store' }).then(function (r) {
+      if (r.ok) { st.textContent = 'Verbunden, lade die App …'; location.replace(location.pathname === '/offline' ? '/' : location.href); }
+      else throw new Error();
+    }).catch(function () {
+      st.textContent = manual ? 'Noch nicht erreichbar. Nächster Versuch in wenigen Sekunden.' : 'Versuche es alle paar Sekunden erneut …';
+    }).then(function () { busy = false; btn.disabled = false; });
+  }
+  btn.addEventListener('click', function () { check(true); });
+  addEventListener('online', function () { check(false); });
+  setInterval(function () { if (!document.hidden) check(false); }, 5000);
+})();
+</script>
+</body>
+</html>
