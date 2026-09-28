@@ -44,9 +44,8 @@ echo "▸ Datenbank und Backup liegen im gemounteten Ordner, Prozess läuft nich
 $SUDO test -f "$DIR/monatsbudget.db"
 [ "$($SUDO stat -c %u "$DIR/monatsbudget.db")" = 1000 ]
 grep -q '^monatsbudget-.*\.db$' <<<"$($SUDO ls "$DIR/backups")"
-procs="$(docker top "$NAME" -o uid,args)"
-echo "$procs"
-grep -Eq '^\s*1000\s.*node' <<<"$procs"
+[ "$(docker exec "$NAME" stat -c %u /proc/1)" = 1000 ]
+grep -q node <<<"$(docker exec "$NAME" cat /proc/1/cmdline | tr '\0' ' ')"
 [ "$(docker exec -u 1000 "$NAME" sh -c 'grep CapEff /proc/1/status' | awk '{print $2}')" = 0000000000000000 ]
 
 echo "▸ Neustart: Daten und Anmeldung bleiben erhalten"
