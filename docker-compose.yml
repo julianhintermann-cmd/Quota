@@ -1,0 +1,19 @@
+# Monatsbudget auf dem NAS
+# Aufruf danach im Browser: http://<NAS-IP>:8090
+services:
+  monatsbudget:
+    image: ghcr.io/julianhintermann-cmd/quota:latest
+    container_name: monatsbudget
+    restart: unless-stopped
+    ports:
+      - "8090:8080"   # links = Port am NAS (frei wählbar), rechts = Port im Container
+    environment:
+      TZ: Europe/Zurich
+    # Härtung: Container braucht keine Schreibrechte und keine Privilegien
+    read_only: true
+    tmpfs:
+      - /tmp          # nginx legt hier PID- und Temp-Dateien ab
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
