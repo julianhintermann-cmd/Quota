@@ -371,9 +371,9 @@ button.tile:active{transform:scale(.965)}
 .toast:not(.has-btn){padding-right:18px}
 
 /* load + month transitions */
-.intro > *{animation:intro .6s var(--ease) both}
-.intro > *:nth-child(2){animation-delay:.04s}.intro > *:nth-child(3){animation-delay:.08s}.intro > *:nth-child(4){animation-delay:.12s}
-.intro > *:nth-child(5){animation-delay:.16s}.intro > *:nth-child(6){animation-delay:.2s}.intro > *:nth-child(n+7){animation-delay:.24s}
+.intro :is(.col,.top,.duo,.blk) > :not(.top,.duo,.blk){animation:intro .6s var(--ease) both}
+.intro .col-main > .banner{animation-delay:.04s}.intro .top > .hero{animation-delay:.08s}.intro .top > .tiles{animation-delay:.12s}
+.intro .blk > *{animation-delay:.16s}.intro .col-side > *{animation-delay:.2s}
 @keyframes intro{from{opacity:.35;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 @media (prefers-reduced-motion:reduce){
@@ -404,6 +404,75 @@ button.tile:active{transform:scale(.965)}
 .set-form .btn-primary{height:48px;font-size:16px}
 .form-err{font-size:13px;color:var(--danger);padding:0 4px;line-height:1.4}
 .form-err:empty{display:none}
+
+/* ---------- Layout-Container: auf dem Handy unsichtbar (display:contents), ab 960px Breite ein Raster ---------- */
+.col,.top,.duo,.blk{display:contents}
+.brand,.nav-add,.kbd-note,.kbd-hint,.row-del svg.i{display:none}
+
+/* ---------- Maus: Hover-Zustände ---------- */
+@media (hover:hover){
+  .icon-btn:hover,.pill-btn:hover{background:var(--fill-2)}
+  .row-in:hover,button.tile:hover{background:var(--surface-2)}
+  .mt:not(.cur):hover,.chip:not(.on):hover,.opt:not(.on):hover,.seg button:hover{background:var(--fill-2)}
+  .day:not(.sel):hover .dn{background:var(--fill)}
+  .btn-ink:hover,.btn-primary:hover:not(:disabled),.fab:hover{opacity:.88}
+}
+
+/* ---------- Desktop ---------- */
+@media (min-width:960px){
+  :root{--gut:max(28px,calc((100% - 1320px) / 2))}
+  #screen{width:100%;border:0}
+  body.sheet-open #screen{transform:none;border-radius:0}
+  .nav{height:64px;padding:0 var(--gut);background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 .5px 0 var(--hair-2)}
+  .nav-l{gap:16px;align-items:center}
+  .nav-r{gap:10px;align-items:center}
+  .brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:700;letter-spacing:-.015em;white-space:nowrap}
+  .brand-ic{width:30px;height:30px;border-radius:9px;background:var(--hero);color:var(--hero-text);display:grid;place-items:center}
+  .brand-ic svg.i{width:18px;height:18px;stroke-width:1.9}
+  .nav-add{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 16px 0 12px;border-radius:18px}
+  .nav-add svg.i{width:18px;height:18px;stroke-width:2.2}
+  .fab{display:none}
+  #scroller{padding:88px var(--gut) 40px;scrollbar-width:thin}
+  #content{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,370px);gap:0 28px;align-items:start}
+  .col{display:flex;flex-direction:column;gap:16px;min-width:0}
+  .col-main{container-type:inline-size}
+  .col-side{position:sticky;top:0;max-height:calc(100vh - 116px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;margin:-6px -8px 0;padding:6px 8px 16px}
+  .top{display:grid;gap:14px}
+  .duo{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px 20px;align-items:start}
+  .blk{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .titlebar{padding-top:0}
+  .month-btn .mo{font-size:40px}
+  .hero{padding:24px 26px 22px}
+  .hero-amt .int{font-size:60px}
+  .toast{bottom:32px}
+  .kbd-note{display:block}
+  .col-side .footnote{margin:0}
+  /* Dialoge in der Mitte statt Bottom-Sheets */
+  .grab{display:none}
+  .sheet-h{touch-action:auto}
+  .sheet .chips{flex-wrap:wrap;overflow:visible;margin-inline:0;padding:2px 0}
+  .sheet{top:50%;bottom:auto;left:50%;right:auto;width:min(460px,calc(100% - 48px));max-height:min(820px,calc(100% - 64px));border-radius:24px;padding:10px 0 18px;
+    transform:translate(-50%,-47%) scale(.97);opacity:0;box-shadow:0 30px 90px rgba(0,0,0,.28),0 0 0 .5px var(--hair-2);
+    transition:transform .3s var(--ease),opacity .2s ease,visibility 0s linear .3s}
+  .sheet.open{transform:translate(-50%,-50%);opacity:1;transition:transform .35s var(--ease),opacity .2s ease,visibility 0s}
+}
+/* Desktop mit Maus und Tastatur: Betrag wird getippt, Löschen per Knopf beim Überfahren */
+@media (min-width:960px) and (hover:hover) and (pointer:fine){
+  .keypad{display:none}
+  .kbd-hint{display:block;text-align:center;font-size:13px;color:var(--text-3);margin-top:-6px}
+  .row-del{left:auto;right:12px;top:50%;bottom:auto;width:32px;height:32px;padding:0;border-radius:50%;justify-content:center;transform:translateY(-50%);z-index:2}
+  .row-del .del-t{display:none}
+  .row-del svg.i{display:block;width:16px;height:16px;stroke-width:2}
+  .row:hover .row-del{opacity:1}
+  .row-a{transition:transform .2s var(--ease)}
+  .row:hover .row-a{transform:translateX(-40px)}
+}
+/* Breite der Hauptspalte bestimmt die Anordnung von Übersicht und Kacheln */
+@container (min-width:620px){ .tiles{grid-template-columns:repeat(4,minmax(0,1fr))} }
+@container (min-width:780px){
+  .top{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+  .top .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -423,6 +492,7 @@ button.tile:active{transform:scale(.965)}
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9-1.9 5.1-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 16v4M16.5 18h4"/></symbol>
     <symbol id="i-carry" viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2M6.5 7l.8 11.2a2 2 0 0 0 2 1.8h5.4a2 2 0 0 0 2-1.8L17.5 7"/></symbol>
     <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
     <symbol id="c-essen" viewBox="0 0 24 24"><path d="M5 9.5h11v4.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8.5 3.5c-.9 1.1.9 2.1 0 3.2M12.2 3.5c-.9 1.1.9 2.1 0 3.2"/></symbol>
@@ -438,9 +508,9 @@ button.tile:active{transform:scale(.965)}
 
 <div id="screen">
   <header class="nav" id="nav">
-    <div class="nav-l"><button class="pill-btn" id="navToday" type="button" hidden>Heute</button></div>
+    <div class="nav-l"><div class="brand"><span class="brand-ic"><svg class="i"><use href="#i-wallet"/></svg></span>Monatsbudget</div><button class="pill-btn" id="navToday" type="button" hidden>Heute</button></div>
     <div class="nav-title num" id="navTitle">Budget</div>
-    <div class="nav-r"><button class="icon-btn" id="btnSettings" type="button" aria-label="Einstellungen"><svg class="i"><use href="#i-more"/></svg></button></div>
+    <div class="nav-r"><button class="btn-ink nav-add" id="navAdd" type="button"><svg class="i"><use href="#i-plus"/></svg>Ausgabe erfassen</button><button class="icon-btn" id="btnSettings" type="button" aria-label="Einstellungen"><svg class="i"><use href="#i-more"/></svg></button></div>
   </header>
   <main id="scroller">
     <div id="content" class="intro"></div>
@@ -456,6 +526,7 @@ button.tile:active{transform:scale(.965)}
   <div class="sheet-h"><button class="txt-btn l" type="button" data-close>Abbrechen</button><h3 id="shExpT">Neue Ausgabe</h3><span class="r"></span></div>
   <div class="sheet-body">
     <div class="amount" id="exAmt" tabindex="0" role="textbox" aria-label="Betrag"><span class="cur">CHF</span><span class="val num ph">0</span><span class="caret"></span></div>
+    <div class="kbd-hint">Betrag eintippen · Enter speichert</div>
     <label class="field"><svg class="i"><use href="#i-pen"/></svg><input id="exTitle" type="text" placeholder="Wofür?" maxlength="40" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>
     <div class="chips" id="exCats" role="radiogroup" aria-label="Kategorie"></div>
     <div class="opts">
@@ -475,6 +546,7 @@ button.tile:active{transform:scale(.965)}
   <div class="sheet-body">
     <div class="amount" id="amAmt" role="textbox" aria-label="Betrag"><span class="cur">CHF</span><span class="val num ph">0</span><span class="caret"></span></div>
     <div class="hint num" id="amHint"></div>
+    <div class="kbd-hint">Betrag eintippen · Enter speichert</div>
     <div class="chips" id="amChips"></div>
     <div class="keypad" id="amPad"></div>
     <button class="btn-primary" id="amSave" type="button">Sichern</button>
@@ -556,6 +628,7 @@ button.tile:active{transform:scale(.965)}
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
+const DESK = matchMedia('(min-width: 960px)'); // gleiche Grenze wie im CSS
 
 /* ---------- Konstanten ---------- */
 const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -1105,7 +1178,7 @@ function catsHTML(c) {
 function rowHTML(e) {
   const cat = CAT[e.cat] || CAT.sonst;
   return `<div class="row${justAdded.has(e.id) ? ' enter' : ''}" data-id="${e.id}">
-    <button class="row-del" type="button" data-act="del" data-id="${e.id}" tabindex="-1">Löschen</button>
+    <button class="row-del" type="button" data-act="del" data-id="${e.id}" tabindex="-1" aria-label="Löschen"><span class="del-t">Löschen</span>${ic('i-trash')}</button>
     <button class="row-in" type="button" data-act="row" data-id="${e.id}">
       <span class="row-ic">${ic('c-' + cat.id)}</span>
       <span class="row-mid"><span class="row-t">${esc(e.title || cat.n)}</span>
@@ -1141,12 +1214,15 @@ function footText() {
   return Store.offline ? 'Offline · wird gespeichert, sobald der Server erreichbar ist' : `Gespeichert im Konto ${ME.username}`;
 }
 function footHTML() {
-  return `<p class="footnote">${esc(footText())}</p>`;
+  return `<p class="footnote">${esc(footText())}</p><p class="footnote kbd-note">Tastatur: ← → Monat wechseln · N neue Ausgabe</p>`;
 }
 
+// Handy: alles untereinander (die Container sind dort unsichtbar). Desktop: Hauptspalte + Ausgabenliste rechts.
 function html() {
-  const c = calc(view.key);
-  return titleHTML(c) + bannerHTML(c) + heroHTML(c) + tilesHTML(c) + calHTML(c) + catsHTML(c) + listHTML(c) + footHTML();
+  const c = calc(view.key), cats = catsHTML(c);
+  return `<div class="col col-main">${titleHTML(c)}${bannerHTML(c)}<div class="top">${heroHTML(c)}${tilesHTML(c)}</div>`
+    + `<div class="duo"><div class="blk">${calHTML(c)}</div>${cats ? `<div class="blk">${cats}</div>` : ''}</div></div>`
+    + `<div class="col col-side">${listHTML(c)}${footHTML()}</div>`;
 }
 
 /* Zahlen weich hochzählen (rAF → volle Bildrate, 120 Hz auf ProMotion) */
@@ -1286,7 +1362,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape' && openSheet)
 $$('.sheet').forEach(sh => {
   let d = null;
   const start = e => {
-    if (e.target.closest('button, input')) return;
+    if (DESK.matches || e.target.closest('button, input')) return;
     d = { y0: e.clientY, t0: performance.now(), id: e.pointerId, y: 0 };
     sh.classList.add('drag');
     try { sh.setPointerCapture(e.pointerId); } catch (x) { /* egal */ }
@@ -1418,7 +1494,8 @@ exTitle.addEventListener('input', () => {
 });
 exTitle.addEventListener('focus', () => { if (coarse.matches) exPad.classList.add('hidden'); exAmt.classList.add('inactive'); });
 exTitle.addEventListener('blur', () => { exPad.classList.remove('hidden'); exAmt.classList.remove('inactive'); });
-exTitle.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); if (parseFloat(ex.buf) > 0) saveExpense(); else exTitle.blur(); } });
+// stopPropagation: sonst verarbeitet der Dialog dieselbe Enter-Taste nochmals und speichert doppelt
+exTitle.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (parseFloat(ex.buf) > 0) saveExpense(); else exTitle.blur(); } });
 exAmt.addEventListener('click', () => { if (document.activeElement === exTitle) exTitle.blur(); });
 shExp.addEventListener('keydown', e => {
   if (document.activeElement === exTitle) return;
@@ -1790,7 +1867,12 @@ content.addEventListener('click', e => {
     case 'next': go(1); break;
     case 'year': haptic(); openYear(); break;
     case 'income': case 'budget': if (S.sample) exitSample(); openAmount(act); break;
-    case 'spent': { const h = $('#listHead', content); if (h) scroller.scrollTo({ top: h.offsetTop - 56, behavior: 'smooth' }); break; }
+    case 'spent': {
+      const h = $('#listHead', content);
+      if (DESK.matches) $('.col-side', content).scrollTo({ top: 0, behavior: 'smooth' });
+      else if (h) scroller.scrollTo({ top: h.offsetTop - 56, behavior: 'smooth' });
+      break;
+    }
     case 'sample-start': haptic(); exitSample(true); openAmount('income'); break;
     case 'carry': carryOver(b.dataset.from); break;
     case 'day': view.day = view.day === b.dataset.d ? null : b.dataset.d; haptic(); render(); break;
@@ -1800,6 +1882,7 @@ content.addEventListener('click', e => {
   }
 });
 $('#fab').addEventListener('click', () => { haptic(); closeRows(); if (S.sample) exitSample(); openExpense(null); });
+$('#navAdd').addEventListener('click', () => $('#fab').click());
 $('#btnSettings').addEventListener('click', () => { haptic(); openSettings(); });
 $('#navToday').addEventListener('click', () => {
   const tk = curKey(); if (view.key === tk) return;
@@ -1819,7 +1902,8 @@ function setRow(row, x, animate) {
 }
 function closeRows() { if (openRow) { setRow(openRow, 0, true); openRow = null; } }
 scroller.addEventListener('pointerdown', e => {
-  if ((e.pointerType === 'mouse' && e.button !== 0) || openSheet) return;
+  // Wischgesten nur für Touch; auf dem Desktop gibt es dafür Knöpfe und Tastatur
+  if ((e.pointerType === 'mouse' && (e.button !== 0 || DESK.matches)) || openSheet) return;
   const row = e.target.closest('.row-in');
   if (openRow && row !== openRow && !e.target.closest('.row-del')) closeRows();
   g = { x0: e.clientX, y0: e.clientY, t0: performance.now(), row, mode: null, id: e.pointerId, x: 0, base: 0 };

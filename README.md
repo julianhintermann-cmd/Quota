@@ -22,6 +22,9 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   auf diesem Gerät automatisch ins Konto übernommen
 - Sicherheit: Passwörter mit scrypt gehasht, HttpOnly-Cookies, Schutz gegen Cross-Site-Anfragen,
   Sperre nach 10 falschen Passwörtern (15 Minuten), Container läuft ohne Root-Rechte
+- Handy und Desktop: Auf dem Handy die gewohnte App-Ansicht, ab 960 px Breite automatisch ein
+  Desktop-Layout (Übersicht und Kalender links, Ausgabenliste rechts, Dialoge statt Bottom-Sheets,
+  Beträge per Tastatur, Löschen per Knopf beim Überfahren, Tastenkürzel ← → und N)
 - Eigenes App-Icon und Web-App-Manifest: *Teilen → Zum Home-Bildschirm* (iPhone) bzw.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
