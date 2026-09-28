@@ -12,7 +12,7 @@ H=(-H 'X-Requested-With: monatsbudget' -H 'Content-Type: application/json')
 
 run() {
   docker run -d --name "$1" -p "$PORT:8080" -v "$2:/data" "${@:3}" \
-    --read-only --tmpfs /tmp --cap-drop ALL --cap-add CHOWN --cap-add SETUID --cap-add SETGID \
+    --read-only --tmpfs /tmp --cap-drop ALL --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add SETUID --cap-add SETGID \
     --security-opt no-new-privileges:true "$IMAGE" >/dev/null
 }
 wait_ready() {
@@ -44,6 +44,7 @@ grep -q '^monatsbudget-.*\.db$' <<<"$(ls "$DIR/backups")"
 procs="$(docker top "$NAME" -o uid,args)"
 echo "$procs"
 grep -Eq '^\s*1000\s.*node' <<<"$procs"
+[ "$(docker exec -u 1000 "$NAME" sh -c 'grep CapEff /proc/1/status' | awk '{print $2}')" = 0000000000000000 ]
 
 echo "▸ Neustart: Daten und Anmeldung bleiben erhalten"
 docker restart "$NAME" >/dev/null

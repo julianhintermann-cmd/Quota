@@ -46,7 +46,7 @@ Die Datenbank im Datenordner bleibt dabei erhalten.
 | Variable | Standard | Bedeutung |
 |---|---|---|
 | `BACKUP_KEEP` | `14` | So viele Tages-Backups aufbewahren, `0` schaltet Backups aus |
-| `PUID` / `PGID` | `1000` | Dateien im Datenordner gehören diesem Benutzer/dieser Gruppe |
+| `PUID` / `PGID` | `1000` | Dateien im Datenordner gehören diesem Benutzer/dieser Gruppe (wird beim Start automatisch gesetzt) |
 | `TRUST_PROXY` | `false` | `true`, wenn ein Reverse Proxy davor läuft (echte Client-IP, HTTPS-Erkennung) |
 | `COOKIE_SECURE` | `auto` | `true` erzwingt Cookies nur über HTTPS |
 | `TZ` | – | Zeitzone, bestimmt das Datum im Backup-Dateinamen |

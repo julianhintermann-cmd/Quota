@@ -26,6 +26,7 @@ services:
       - ALL
     cap_add:                   # nur beim Start nötig, um die Rechte von /data zu setzen
       - CHOWN
+      - DAC_OVERRIDE
       - SETUID
       - SETGID
     security_opt:
