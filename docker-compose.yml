@@ -1,5 +1,5 @@
 # Monatsbudget auf dem NAS
-# Aufruf danach im Browser: http://<NAS-IP>:8090
+# Danach im Browser: http://<NAS-IP>:8090 – beim ersten Aufruf legst du das Admin-Konto an.
 services:
   monatsbudget:
     image: ghcr.io/julianhintermann-cmd/quota:latest
@@ -9,13 +9,24 @@ services:
     restart: unless-stopped
     ports:
       - "8090:8080"   # links = Port am NAS (frei wählbar), rechts = Port im Container
+    volumes:
+      - ./data:/data  # Datenbank + tägliche Backups. Auf Synology z.B. /volume1/docker/monatsbudget/data
     environment:
       TZ: Europe/Zurich
-    # Härtung: Container braucht keine Schreibrechte und keine Privilegien
+      BACKUP_KEEP: "14"        # so viele Tages-Backups aufbewahren (0 = keine Backups)
+      # PUID: "1026"           # optional: Dateien gehören diesem NAS-Benutzer (Nummer per SSH: id <name>)
+      # PGID: "100"
+      # TRUST_PROXY: "true"    # nur hinter einem Reverse Proxy (z.B. für HTTPS von aussen)
+      # COOKIE_SECURE: "true"  # nur wenn die App ausschliesslich über HTTPS erreichbar ist
+    # Härtung: Dateisystem schreibgeschützt (ausser /data), keine unnötigen Rechte
     read_only: true
     tmpfs:
-      - /tmp          # nginx legt hier PID- und Temp-Dateien ab
+      - /tmp
     cap_drop:
       - ALL
+    cap_add:                   # nur beim Start nötig, um die Rechte von /data zu setzen
+      - CHOWN
+      - SETUID
+      - SETGID
     security_opt:
       - no-new-privileges:true

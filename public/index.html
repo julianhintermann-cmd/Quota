@@ -380,6 +380,23 @@ button.tile:active{transform:scale(.965)}
 .sheet{bottom:var(--kb,0px);max-height:calc(100% - var(--kb,0px) - env(safe-area-inset-top,0px) - 18px)}
 .cal-foot b{color:var(--text);font-weight:600}
 #haptic{position:fixed;left:-100px;top:-100px;width:1px;height:1px;opacity:0;pointer-events:none}
+
+/* ---------- Konto & Benutzer ---------- */
+.list-row .pill-btn{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08);flex:none}
+.pill-btn.danger{color:var(--danger)}
+.pill-btn:disabled{opacity:.4}
+.lr-btn{width:100%;text-align:left}
+.lr-btn svg.i{width:17px;height:17px;color:var(--text-3);transition:transform .3s var(--ease)}
+.lr-btn[aria-expanded="true"] svg.i{transform:rotate(180deg)}
+.lr-main{min-width:0;padding:8px 0}
+.lr-main .lr-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lr-acts{display:flex;gap:6px;flex:none}
+.tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:8px;background:var(--fill-2);font-size:12px;font-weight:600;color:var(--text-2);vertical-align:1px}
+.users{display:flex;flex-direction:column;gap:8px}
+.set-form{display:flex;flex-direction:column;gap:8px}
+.set-form .btn-primary{height:48px;font-size:16px}
+.form-err{font-size:13px;color:var(--danger);padding:0 4px;line-height:1.4}
+.form-err:empty{display:none}
 </style>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -399,6 +416,8 @@ button.tile:active{transform:scale(.965)}
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9-1.9 5.1-1.9-5.1L5 10.5l5.1-1.9z"/><path d="M18.5 16v4M16.5 18h4"/></symbol>
     <symbol id="i-carry" viewBox="0 0 24 24"><path d="M9 14l-5-5 5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
     <symbol id="c-essen" viewBox="0 0 24 24"><path d="M5 9.5h11v4.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10.5h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M8.5 3.5c-.9 1.1.9 2.1 0 3.2M12.2 3.5c-.9 1.1.9 2.1 0 3.2"/></symbol>
     <symbol id="c-einkauf" viewBox="0 0 24 24"><path d="M5 8h14l-1 12H6z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></symbol>
     <symbol id="c-wohnen" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></symbol>
@@ -476,6 +495,18 @@ button.tile:active{transform:scale(.965)}
   <div class="grab"></div>
   <div class="sheet-h"><span class="l"></span><h3 id="shSetT">Einstellungen</h3><button class="txt-btn r strong" type="button" data-close>Fertig</button></div>
   <div class="sheet-body">
+    <div class="set-group" id="grpAcc" hidden>
+      <div class="set-label">Konto</div>
+      <div class="list-row"><div class="lr-main"><div class="lr-t" id="accName"></div><div class="lr-s" id="accRole"></div></div>
+        <button class="pill-btn" id="btnLogout" type="button">Abmelden</button></div>
+      <button class="list-row lr-btn" id="btnPw" type="button" aria-expanded="false" aria-controls="pwForm"><span class="lr-t">Passwort ändern</span><svg class="i"><use href="#i-chev-d"/></svg></button>
+      <div class="set-form" id="pwForm" hidden>
+        <label class="field"><svg class="i"><use href="#i-lock"/></svg><input id="pwCur" type="password" placeholder="Aktuelles Passwort" autocomplete="current-password" enterkeyhint="next"></label>
+        <label class="field"><svg class="i"><use href="#i-lock"/></svg><input id="pwNew" type="password" placeholder="Neues Passwort (mind. 8 Zeichen)" autocomplete="new-password" enterkeyhint="done"></label>
+        <div class="form-err" id="pwErr" role="alert"></div>
+        <button class="btn-primary" id="pwSave" type="button">Passwort sichern</button>
+      </div>
+    </div>
     <div class="set-group">
       <div class="set-label">Währung</div>
       <div class="seg" id="segCur"><span class="thumb"></span><button type="button" data-v="CHF">CHF</button><button type="button" data-v="EUR">EUR</button><button type="button" data-v="USD">USD</button></div>
@@ -489,6 +520,18 @@ button.tile:active{transform:scale(.965)}
       <div class="set-label">Speicherort</div>
       <div class="list-row"><div><div class="lr-t" id="storeT">Nur auf diesem Gerät</div><div class="lr-s" id="storeS">Daten bleiben in diesem Browser.</div></div></div>
     </div>
+    <div class="set-group" id="grpUsers" hidden>
+      <div class="set-label">Benutzer</div>
+      <div class="users" id="usersList"></div>
+      <div class="list-row"><div class="lr-main"><div class="lr-t">Registrierung erlauben</div><div class="lr-s">Neue Personen legen selbst ein Konto an.</div></div>
+        <label class="switch"><input type="checkbox" id="regToggle" aria-label="Registrierung erlauben"><i></i></label></div>
+      <div class="set-form">
+        <label class="field"><svg class="i"><use href="#i-user"/></svg><input id="nuName" type="text" placeholder="Benutzername" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="32" enterkeyhint="next"></label>
+        <label class="field"><svg class="i"><use href="#i-lock"/></svg><input id="nuPw" type="password" placeholder="Passwort (mind. 8 Zeichen)" autocomplete="new-password" enterkeyhint="done"></label>
+        <div class="form-err" id="nuErr" role="alert"></div>
+        <button class="btn-primary" id="nuSave" type="button">Benutzer hinzufügen</button>
+      </div>
+    </div>
     <div class="set-group">
       <div class="set-label">So rechnet die App</div>
       <p class="set-note"><b>Verbleibend</b> ist dein Budget minus Ausgaben. <b>Frei verfügbar</b> ist, was vom Einkommen nach dem Budget übrig bleibt. Ohne Budget gilt das Einkommen als Grenze. Ein Monat läuft von Lohntag zu Lohntag, Ausgaben zählen nach ihrem Datum.</p>
@@ -499,6 +542,7 @@ button.tile:active{transform:scale(.965)}
 
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastT"></span><button id="toastB" type="button" hidden>Rückgängig</button></div>
 <label id="haptic" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
+<script id="me" type="application/json">null</script>
 <script>
 (() => {
 'use strict';
@@ -673,108 +717,197 @@ function sampleData() {
   return months;
 }
 
-/* ---------- Speicher: Claude-Konto (db, privat pro Person) mit lokalem Cache ---------- */
-const LS = 'monatsbudget.v1';
+/* ---------- Speicher: Datenbank auf dem Server (pro Konto) mit lokalem Cache ----------
+   Der Server liefert index.html nur an angemeldete Personen aus und trägt sie in #me ein.
+   Änderungen landen sofort im lokalen Cache und werden dann an den Server geschickt;
+   ohne Verbindung bleiben sie als "pending" gemerkt und werden nachgereicht. */
+const ME = (() => { try { return JSON.parse($('#me').textContent); } catch (e) { return null; } })();
+const LS_OLD = 'monatsbudget.v1';
+const LS = ME ? `monatsbudget.v2.u${ME.id}` : LS_OLD;
+const CID = uid();
+class ApiError extends Error { constructor(status, msg) { super(msg); this.status = status; } }
+async function api(method, url, body) {
+  let res;
+  try {
+    res = await fetch(url, {
+      method, cache: 'no-store', credentials: 'same-origin',
+      headers: { 'X-Requested-With': 'monatsbudget', 'X-Client-Id': CID, ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}) },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (e) { throw new ApiError(0, 'Keine Verbindung zum Server.'); }
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new ApiError(res.status, (data && data.error) || 'Unbekannter Fehler.');
+  return data;
+}
+const toLogin = () => location.replace('/login');
+// Vergleichsschlüssel für einen Monat, unabhängig von der Reihenfolge der Ausgaben
+const sig = m => JSON.stringify([m.income, m.budget, toDoc(m).expenses.sort((a, b) => (a.id < b.id ? -1 : 1))]);
+
 const Store = {
-  mode: 'local', db: null, uid: null, timers: {}, writing: new Set(), again: new Set(), dirty: new Set(), settled: false,
-  readLocal() { try { const raw = localStorage.getItem(LS); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } },
+  mode: 'local', timers: {}, writing: new Set(), again: new Set(), dirty: new Set(), pending: new Set(),
+  imported: false, settled: false, loaded: false, offline: false, retryT: null, es: null,
+  readLocal() {
+    const read = k => { try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; } catch (e) { return null; } };
+    const own = read(LS);
+    if (own) {
+      if (ME && Array.isArray(own.pending)) own.pending.forEach(k => { if (k === 'settings' || /^\d{4}-\d\d$/.test(k)) this.pending.add(k); });
+      return own;
+    }
+    // Daten aus der Version ohne Konten einmalig ins Konto übernehmen
+    const old = ME ? read(LS_OLD) : null;
+    if (old) this.imported = true;
+    return old;
+  },
   writeLocal() {
     if (S.sample) return;
-    try { localStorage.setItem(LS, JSON.stringify({ currency: S.currency, startDay: S.startDay, months: S.months })); } catch (e) { /* kein Speicher */ }
+    try { localStorage.setItem(LS, JSON.stringify({ currency: S.currency, startDay: S.startDay, months: S.months, pending: [...this.pending] })); } catch (e) { /* kein Speicher */ }
   },
-  ref(key) { return this.db.doc(`data/users/${this.uid}/${key === 'settings' ? 'settings' : 'm-' + key}`); },
+  clearLocal() { try { localStorage.removeItem(LS); } catch (e) { /* egal */ } },
   touch(key) {
     if (S.sample) return;
+    if (ME) this.pending.add(key);
     this.writeLocal();
-    if (this.mode !== 'cloud') return;
+    if (this.mode !== 'server') return;
     this.dirty.add(key);
     clearTimeout(this.timers[key]);
     this.timers[key] = setTimeout(() => this.flush(key), 350);
   },
-  async flush(key, retry) {
-    if (this.mode !== 'cloud') return;
+  async flush(key) {
+    if (this.mode !== 'server') return;
     if (this.writing.has(key)) { this.again.add(key); return; }
+    clearTimeout(this.timers[key]);
     this.writing.add(key); this.dirty.delete(key);
     try {
-      if (key === 'settings') await this.ref(key).set({ currency: S.currency, startDay: S.startDay });
-      else if (isEmptyM(S.months[key])) await this.ref(key).delete();
-      else await this.ref(key).set(toDoc(S.months[key]));
+      if (key === 'settings') await api('PUT', '/api/settings', { currency: S.currency, startDay: S.startDay });
+      else if (isEmptyM(S.months[key])) await api('DELETE', '/api/months/' + key);
+      else await api('PUT', '/api/months/' + key, toDoc(S.months[key]));
+      if (!this.dirty.has(key) && !this.again.has(key)) { this.pending.delete(key); this.writeLocal(); }
+      this.online();
     } catch (e) {
-      const code = e && e.code;
-      if (code === 'unavailable' && !retry) { this.writing.delete(key); setTimeout(() => this.flush(key, true), 600 + Math.random() * 900); return; }
-      if (code === 'quota_exceeded') toast('Speicher voll. Lösche alte Monate, um Platz zu schaffen.');
-      else if (code !== 'unavailable') { this.mode = 'local'; updateStoreInfo(); toast('Nur noch auf diesem Gerät gespeichert.'); }
+      if (e.status === 401) toLogin();
+      else if (!e.status || e.status >= 500) this.retryLater();
+      else {
+        this.pending.delete(key); this.writeLocal();
+        toast(e.status === 413 ? 'Speicher voll. Lösche alte Monate, um Platz zu schaffen.' : 'Konnte nicht gespeichert werden.');
+      }
     } finally {
       this.writing.delete(key);
       if (this.again.has(key)) { this.again.delete(key); this.flush(key); }
     }
   },
-  async init() {
-    const c = window.claude;
-    if (!c || typeof c.use !== 'function') return this.settle();
-    let db = null, user = null;
-    try { [db, user] = await Promise.all([c.use('db'), c.use('user')]); } catch (e) { /* ohne Cloud */ }
-    if (!db || !user) return this.settle();
-    let id = null;
-    try { id = await user.id(); } catch (e) { /* ohne Cloud */ }
-    if (!id) return this.settle();
-    this.db = db; this.uid = id;
-    let definitive = false;
-    try {
-      db.collection('data/users/' + id).onSnapshot(snap => {
-        if (!definitive) {
-          if (snap.metadata && snap.metadata.fromCache && snap.empty) return; // auf verbindliche Antwort warten
-          definitive = true; this.first(snap);
-        } else this.change(snap);
-      }, () => { this.mode = 'local'; updateStoreInfo(); });
-    } catch (e) { this.settle(); }
-    setTimeout(() => { if (!definitive) this.settle(); }, 6000);
+  retryLater() {
+    if (!this.offline) { this.offline = true; updateStoreInfo(); toast('Keine Verbindung. Änderungen werden nachgereicht.'); }
+    clearTimeout(this.retryT);
+    this.retryT = setTimeout(() => this.sync(), 10000);
   },
-  first(snap) {
-    const cloud = {}; let cur = null, sd = null, hasSet = false;
-    snap.docs.forEach(d => {
-      const b = d.data();
-      if (d.id === 'settings') { hasSet = true; cur = b && b.currency; sd = b && b.startDay; }
-      else if (d.id.startsWith('m-')) cloud[d.id.slice(2)] = cleanMonth(b);
-    });
+  online() {
+    if (!this.offline) return;
+    this.offline = false; clearTimeout(this.retryT); updateStoreInfo();
+  },
+  async sync() {
+    if (!ME) return;
+    clearTimeout(this.retryT);
+    let d;
+    try { d = await api('GET', '/api/data'); }
+    catch (e) { if (e.status === 401) return toLogin(); return this.retryLater(); }
+    this.online();
+    if (!this.loaded) this.first(d); else this.apply(d);
+    this.pending.forEach(k => { if (!this.writing.has(k) && !this.dirty.has(k)) this.flush(k); });
+  },
+  init() {
+    if (!ME) return this.settle();
+    this.sync();
+    this.listen();
+    window.addEventListener('online', () => this.sync());
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && this.loaded) this.sync(); });
+    setTimeout(() => { if (!this.loaded) this.settle(); }, 6000);
+  },
+  // Live-Updates von anderen Geräten
+  listen() {
+    if (!window.EventSource) return;
+    let opened = false;
+    const es = this.es = new EventSource('/api/events?cid=' + encodeURIComponent(CID));
+    es.onmessage = e => { let ev = null; try { ev = JSON.parse(e.data); } catch (x) { return; } this.change(ev); };
+    es.onopen = () => { if (opened) this.sync(); opened = true; };
+    es.onerror = () => {
+      if (es.readyState !== 2) return; // verbindet sich selbst neu
+      this.es = null;
+      setTimeout(() => { this.sync(); this.listen(); }, 15000);
+    };
+  },
+  busy(k) { return this.pending.has(k) || this.dirty.has(k) || this.writing.has(k); },
+  // Alles Offene sofort speichern (z.B. vor dem Abmelden)
+  async flushAll() {
+    if (this.mode !== 'server') return;
+    await Promise.all([...new Set([...this.pending, ...this.dirty])].map(k => this.flush(k)));
+    for (let i = 0; i < 50 && (this.writing.size || this.again.size); i++) await new Promise(r => setTimeout(r, 100));
+  },
+  // Erste Antwort vom Server: Server gewinnt, ausser bei lokal noch nicht gespeicherten Änderungen
+  first(d) {
+    const server = {};
+    Object.entries(d.months || {}).forEach(([k, m]) => { if (/^\d{4}-\d\d$/.test(k)) server[k] = cleanMonth(m); });
     const local = S.sample ? {} : S.months;
-    const merged = { ...cloud };
-    const upload = [];
-    Object.keys(local).forEach(k => {
-      if (isEmptyM(local[k])) return;
-      if (!cloud[k] || this.dirty.has(k)) { merged[k] = local[k]; upload.push(k); }
+    const merged = { ...server }, upload = new Set();
+    this.pending.forEach(k => {
+      if (k === 'settings') return;
+      if (isEmptyM(local[k])) delete merged[k]; else merged[k] = local[k];
+      upload.add(k);
     });
-    const wasSample = S.sample;
-    this.mode = 'cloud';
+    const imported = this.imported;
+    if (imported) Object.keys(local).forEach(k => { if (!server[k] && !isEmptyM(local[k])) { merged[k] = local[k]; upload.add(k); } });
+    this.mode = 'server'; this.loaded = true;
     if (Object.keys(merged).length) { S.sample = false; S.months = merged; }
-    if (cur && SYM[cur]) S.currency = cur;
-    if (okStart(sd)) this.applyStart(sd);
+    else if (!S.sample) S.months = merged;
+    const st = d.settings;
+    if (this.pending.has('settings') || (imported && !st)) upload.add('settings');
+    else if (st) this.applySettings(st);
+    else if (S.currency !== 'CHF' || S.startDay !== 25) upload.add('settings');
     this.writeLocal();
     upload.forEach(k => this.touch(k));
-    if (!hasSet && (S.currency !== 'CHF' || S.startDay !== 25)) this.touch('settings');
+    if (imported) {
+      this.imported = false;
+      try { localStorage.removeItem(LS_OLD); } catch (e) { /* egal */ }
+      if (upload.size) setTimeout(() => toast('Daten von diesem Gerät ins Konto übernommen'), 600);
+    }
     this.settled = true;
     updateStoreInfo();
     render({ anim: 'swap' });
   },
-  change(snap) {
+  // Späterer Abgleich (Neuverbindung, App wieder im Vordergrund)
+  apply(d) {
+    const server = {};
+    Object.entries(d.months || {}).forEach(([k, m]) => { if (/^\d{4}-\d\d$/.test(k)) server[k] = cleanMonth(m); });
     let touched = false;
-    snap.docChanges().forEach(ch => {
-      const d = ch.doc;
-      if (d.metadata && d.metadata.hasPendingWrites) return;
-      if (d.id === 'settings') {
-        if (ch.type === 'removed' || this.dirty.has('settings') || this.writing.has('settings')) return;
-        const b = d.data() || {};
-        if (b.currency && SYM[b.currency] && b.currency !== S.currency) { S.currency = b.currency; touched = true; }
-        if (okStart(b.startDay) && b.startDay !== S.startDay) { this.applyStart(b.startDay); touched = true; }
-        return;
-      }
-      if (!d.id.startsWith('m-')) return;
-      const k = d.id.slice(2);
-      if (this.dirty.has(k) || this.writing.has(k)) return;
-      if (ch.type === 'removed') { if (S.months[k]) { delete S.months[k]; touched = true; } }
-      else { const nm = cleanMonth(d.data()); if (JSON.stringify(toDoc(nm)) !== JSON.stringify(toDoc(getM(k)))) { S.months[k] = nm; touched = true; } }
+    if (S.sample) {
+      if (!Object.keys(server).length) return;
+      S.sample = false; S.months = {}; touched = true;
+    }
+    new Set([...Object.keys(server), ...Object.keys(S.months)]).forEach(k => {
+      if (this.busy(k)) return;
+      if (!server[k]) { if (S.months[k]) { if (!isEmptyM(S.months[k])) touched = true; delete S.months[k]; } return; }
+      if (sig(server[k]) !== sig(getM(k))) { S.months[k] = server[k]; touched = true; }
     });
-    if (touched) { S.sample = false; this.writeLocal(); render({ anim: 'none' }); }
+    if (this.applySettings(d.settings)) touched = true;
+    if (touched) { this.writeLocal(); updateStoreInfo(); render({ anim: 'none' }); }
+  },
+  applySettings(st) {
+    if (!st || this.busy('settings')) return false;
+    let t = false;
+    if (SYM[st.currency] && st.currency !== S.currency) { S.currency = st.currency; t = true; }
+    if (okStart(st.startDay) && st.startDay !== S.startDay) { this.applyStart(st.startDay); t = true; }
+    return t;
+  },
+  change(ev) {
+    if (!ev || ev.origin === CID || !this.loaded) return;
+    if (S.sample) { this.sync(); return; }
+    let touched = false;
+    if (ev.kind === 'settings') touched = this.applySettings(ev.data);
+    else if (ev.kind === 'month' && /^\d{4}-\d\d$/.test(ev.key) && !this.busy(ev.key)) {
+      const k = ev.key;
+      if (!ev.data) { if (S.months[k]) { delete S.months[k]; touched = true; } }
+      else { const nm = cleanMonth(ev.data); if (sig(nm) !== sig(getM(k))) { S.months[k] = nm; touched = true; } }
+    }
+    if (touched) { this.writeLocal(); render({ anim: 'none' }); }
   },
   applyStart(v) {
     if (v === S.startDay) return;
@@ -995,9 +1128,13 @@ function listHTML(c) {
     <div class="rows">${g.items.map(rowHTML).join('')}</div></div>`).join('');
 }
 
+function footText() {
+  if (S.sample) return 'Beispieldaten · es wird nichts gespeichert';
+  if (Store.mode !== 'server') return 'Auf diesem Gerät gespeichert';
+  return Store.offline ? 'Offline · wird gespeichert, sobald der Server erreichbar ist' : `Gespeichert im Konto ${ME.username}`;
+}
 function footHTML() {
-  const t = S.sample ? 'Beispieldaten · es wird nichts gespeichert' : Store.mode === 'cloud' ? 'Privat in deinem Claude-Konto gespeichert' : 'Auf diesem Gerät gespeichert';
-  return `<p class="footnote">${t}</p>`;
+  return `<p class="footnote">${esc(footText())}</p>`;
 }
 
 function html() {
@@ -1089,12 +1226,13 @@ function renderNav() {
 }
 
 function updateStoreInfo() {
-  const cloud = Store.mode === 'cloud';
-  $('#storeT').textContent = S.sample ? 'Beispieldaten' : cloud ? 'Claude-Konto' : 'Nur auf diesem Gerät';
+  const srv = Store.mode === 'server';
+  $('#storeT').textContent = S.sample ? 'Beispieldaten' : !srv ? 'Nur auf diesem Gerät' : Store.offline ? 'Offline' : 'Datenbank auf dem Server';
   $('#storeS').textContent = S.sample ? 'Sobald du loslegst, werden deine Zahlen gespeichert.'
-    : cloud ? 'Privat gespeichert, nur für dich sichtbar, auf allen Geräten.' : 'Daten bleiben in diesem Browser.';
+    : !srv ? 'Daten bleiben in diesem Browser.'
+    : Store.offline ? 'Änderungen werden nachgereicht, sobald der Server erreichbar ist.' : 'In deinem Konto gespeichert, auf allen Geräten verfügbar.';
   const fn = $('.footnote', content);
-  if (fn) fn.textContent = S.sample ? 'Beispieldaten · es wird nichts gespeichert' : cloud ? 'Privat in deinem Claude-Konto gespeichert' : 'Auf diesem Gerät gespeichert';
+  if (fn) fn.textContent = footText();
 }
 
 /* ---------- Toast ---------- */
@@ -1483,7 +1621,127 @@ function stepStart(d) {
 }
 $('#stDown').addEventListener('click', () => stepStart(-1));
 $('#stUp').addEventListener('click', () => stepStart(1));
-function openSettings() { paintSeg(); paintStart(); updateStoreInfo(); btnReset.textContent = 'Alle Daten löschen'; showSheet(shSet); }
+/* ---------- Konto & Benutzerverwaltung ---------- */
+const grpAcc = $('#grpAcc'), grpUsers = $('#grpUsers'), pwForm = $('#pwForm'), btnPw = $('#btnPw'), btnLogout = $('#btnLogout');
+const setErr = (el, msg) => { if (el) el.textContent = msg || ''; };
+function paintAccount() {
+  grpAcc.hidden = !ME;
+  grpUsers.hidden = !(ME && ME.admin);
+  if (!ME) return;
+  $('#accName').textContent = ME.username;
+  $('#accRole').textContent = ME.admin ? 'Angemeldet · Administrator' : 'Angemeldet';
+  pwForm.hidden = true; btnPw.setAttribute('aria-expanded', 'false');
+  $('#pwCur').value = ''; $('#pwNew').value = ''; setErr($('#pwErr'));
+  btnLogout.disabled = false;
+  if (ME.admin) { usersUI.reset = null; usersUI.armed = null; setErr($('#nuErr')); loadUsers(); }
+}
+btnPw.addEventListener('click', () => {
+  const open = pwForm.hidden;
+  pwForm.hidden = !open; btnPw.setAttribute('aria-expanded', String(open)); haptic();
+  if (open) $('#pwCur').focus();
+});
+async function changePassword() {
+  const cur = $('#pwCur').value, next = $('#pwNew').value, err = $('#pwErr'), btn = $('#pwSave');
+  if (!cur || !next) { setErr(err, 'Bitte beide Felder ausfüllen.'); haptic('heavy'); return; }
+  if (next.length < 8) { setErr(err, 'Das neue Passwort braucht mindestens 8 Zeichen.'); haptic('heavy'); return; }
+  btn.disabled = true;
+  try {
+    await api('POST', '/api/me/password', { current: cur, next });
+    haptic('success'); paintAccount(); toast('Passwort geändert');
+  } catch (e) {
+    if (e.status === 401) return toLogin();
+    setErr(err, e.message); haptic('heavy');
+  } finally { btn.disabled = false; }
+}
+$('#pwSave').addEventListener('click', changePassword);
+$('#pwCur').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#pwNew').focus(); } });
+$('#pwNew').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); changePassword(); } });
+
+btnLogout.addEventListener('click', async () => {
+  btnLogout.disabled = true; haptic();
+  // Offene Änderungen zuerst speichern, sonst gingen sie beim Abmelden verloren
+  await Store.flushAll();
+  if (Store.pending.size) { btnLogout.disabled = false; toast('Erst speichern: keine Verbindung zum Server.'); return; }
+  try { await api('POST', '/api/auth/logout'); }
+  catch (e) { if (e.status !== 401) { btnLogout.disabled = false; toast(e.message); return; } }
+  Store.clearLocal();
+  toLogin();
+});
+
+const usersUI = { list: [], reset: null, armed: null, armT: null };
+async function loadUsers() {
+  try {
+    const [u, c] = await Promise.all([api('GET', '/api/admin/users'), api('GET', '/api/admin/config')]);
+    usersUI.list = u.users; $('#regToggle').checked = c.registration;
+    renderUsers();
+  } catch (e) { if (e.status === 401) toLogin(); else setErr($('#nuErr'), e.message); }
+}
+function renderUsers() {
+  $('#usersList').innerHTML = usersUI.list.map(u => {
+    const tag = u.self ? '<span class="tag">Du</span>' : u.admin ? '<span class="tag">Admin</span>' : '';
+    const n = u.expenses === 1 ? '1 Ausgabe' : `${u.expenses} Ausgaben`;
+    const acts = u.self ? '' : `<div class="lr-acts">
+      <button class="pill-btn" type="button" data-uact="pw" data-id="${u.id}" aria-expanded="${usersUI.reset === u.id}">Passwort</button>
+      <button class="pill-btn danger" type="button" data-uact="del" data-id="${u.id}">${usersUI.armed === u.id ? 'Sicher?' : 'Löschen'}</button></div>`;
+    const form = usersUI.reset !== u.id ? '' : `<div class="set-form">
+      <label class="field"><svg class="i"><use href="#i-lock"/></svg><input type="password" id="rsPw" placeholder="Neues Passwort für ${esc(u.username)}" autocomplete="new-password" enterkeyhint="done"></label>
+      <div class="form-err" id="rsErr" role="alert"></div>
+      <button class="btn-primary" type="button" data-uact="setpw" data-id="${u.id}">Passwort setzen</button></div>`;
+    return `<div class="list-row"><div class="lr-main"><div class="lr-t">${esc(u.username)}${tag}</div><div class="lr-s num">${n}</div></div>${acts}</div>${form}`;
+  }).join('');
+}
+$('#usersList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-uact]'); if (!b) return;
+  const id = Number(b.dataset.id), act = b.dataset.uact;
+  if (act === 'pw') {
+    usersUI.reset = usersUI.reset === id ? null : id; usersUI.armed = null; haptic(); renderUsers();
+    const i = $('#rsPw'); if (i) i.focus();
+  } else if (act === 'setpw') resetPassword(id);
+  else if (act === 'del') {
+    clearTimeout(usersUI.armT);
+    if (usersUI.armed !== id) {
+      usersUI.armed = id; haptic('heavy'); renderUsers();
+      usersUI.armT = setTimeout(() => { usersUI.armed = null; renderUsers(); }, 4000);
+      return;
+    }
+    usersUI.armed = null; b.disabled = true;
+    try { await api('DELETE', `/api/admin/users/${id}`); haptic('success'); toast('Benutzer gelöscht'); }
+    catch (x) { if (x.status === 401) return toLogin(); toast(x.message); }
+    loadUsers();
+  }
+});
+$('#usersList').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'rsPw') { e.preventDefault(); resetPassword(usersUI.reset); } });
+async function resetPassword(id) {
+  const i = $('#rsPw'), err = $('#rsErr');
+  if (!i || id == null) return;
+  if (i.value.length < 8) { setErr(err, 'Das Passwort braucht mindestens 8 Zeichen.'); haptic('heavy'); return; }
+  try {
+    await api('PUT', `/api/admin/users/${id}/password`, { password: i.value });
+    usersUI.reset = null; haptic('success'); renderUsers(); toast('Passwort gesetzt');
+  } catch (x) { if (x.status === 401) return toLogin(); setErr(err, x.message); haptic('heavy'); }
+}
+$('#regToggle').addEventListener('change', async e => {
+  const on = e.target.checked; haptic();
+  try { await api('PUT', '/api/admin/config', { registration: on }); toast(on ? 'Registrierung erlaubt' : 'Registrierung gesperrt'); }
+  catch (x) { e.target.checked = !on; if (x.status === 401) return toLogin(); toast(x.message); }
+});
+async function addUser() {
+  const name = $('#nuName').value.trim(), pw = $('#nuPw').value, err = $('#nuErr'), btn = $('#nuSave');
+  setErr(err);
+  if (!name || !pw) { setErr(err, 'Benutzername und Passwort eingeben.'); haptic('heavy'); return; }
+  btn.disabled = true;
+  try {
+    await api('POST', '/api/admin/users', { username: name, password: pw });
+    $('#nuName').value = ''; $('#nuPw').value = ''; haptic('success'); toast(`${name} hinzugefügt`);
+    loadUsers();
+  } catch (x) { if (x.status === 401) return toLogin(); setErr(err, x.message); haptic('heavy'); }
+  finally { btn.disabled = false; }
+}
+$('#nuSave').addEventListener('click', addUser);
+$('#nuName').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#nuPw').focus(); } });
+$('#nuPw').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addUser(); } });
+
+function openSettings() { paintSeg(); paintStart(); updateStoreInfo(); paintAccount(); btnReset.textContent = 'Alle Daten löschen'; showSheet(shSet); }
 
 /* ---------- Aktionen ---------- */
 function exitSample(silent) {

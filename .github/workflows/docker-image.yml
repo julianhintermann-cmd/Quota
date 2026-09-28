@@ -16,7 +16,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Tests
+        run: npm test
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     env:
       # Optional: Sind diese beiden Repository-Secrets gesetzt, wird zusätzlich nach Docker Hub gepusht
@@ -39,6 +56,18 @@ jobs:
 
       - name: Buildx einrichten
         uses: docker/setup-buildx-action@v3
+
+      - name: Image für den Test bauen (amd64)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: monatsbudget:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Container testen
+        run: test/smoke.sh monatsbudget:test
 
       - name: Bei GHCR anmelden
         if: github.event_name != 'pull_request'
@@ -68,9 +97,9 @@ jobs:
             type=sha,format=short
           labels: |
             org.opencontainers.image.title=Monatsbudget
-            org.opencontainers.image.description=Monatsbudget – persönliche Budget-App als statische Web-App
+            org.opencontainers.image.description=Monatsbudget – persönliche Budget-App mit Benutzerkonten und SQLite-Datenbank
 
-      - name: Bauen und pushen
+      - name: Bauen und pushen (amd64, arm64, arm/v7)
         uses: docker/build-push-action@v6
         with:
           context: .

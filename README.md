@@ -1,13 +1,81 @@
 # Monatsbudget
 
-Persönliche Budget-App (Einkommen, Budget, Ausgaben pro Lohnperiode) als einzelne HTML-Datei.
-Die App (`index.html`) ist unverändert aus dem Claude-Artefakt übernommen und wird hier von
-einem schlanken nginx-Container ausgeliefert.
+Persönliche Budget-App (Einkommen, Budget, Ausgaben pro Lohnperiode) mit Benutzerkonten.
+Jede Person meldet sich an und sieht nur ihre eigenen Zahlen. Alles wird in einer
+SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
+
+- **App:** `public/index.html` – Oberfläche und Rechenlogik aus dem ursprünglichen Claude-Artefakt,
+  nur der Speicherteil wurde auf die Datenbank umgestellt (plus Konto-Bereich in den Einstellungen).
+- **Login:** `public/login.html` – im selben Design.
+- **Server:** `server/` – Node.js ohne zusätzliche Pakete (eingebautes `node:sqlite`).
+
+## Funktionen
+
+- Anmeldung mit Benutzername und Passwort; Sitzung bleibt 90 Tage bestehen (verlängert sich bei Nutzung)
+- Das erste Konto wird beim ersten Aufruf angelegt und ist **Administrator**
+- Admin kann in den Einstellungen Benutzer anlegen, löschen, Passwörter zurücksetzen und die
+  Selbst-Registrierung ein- oder ausschalten (standardmässig aus)
+- Jede Person kann ihr Passwort ändern und sich abmelden
+- Änderungen erscheinen sofort auf allen angemeldeten Geräten (Live-Sync)
+- Kurz ohne Verbindung? Änderungen bleiben im Browser gemerkt und werden nachgereicht
+- Daten aus der früheren Version ohne Konten (im Browser gespeichert) werden beim ersten Login
+  auf diesem Gerät automatisch ins Konto übernommen
+- Sicherheit: Passwörter mit scrypt gehasht, HttpOnly-Cookies, Schutz gegen Cross-Site-Anfragen,
+  Sperre nach 10 falschen Passwörtern (15 Minuten), Container läuft ohne Root-Rechte
+
+## Auf dem NAS starten
+
+`docker-compose.yml` aus diesem Repo verwenden:
+
+- **Synology (Container Manager):** Projekt → Erstellen → Pfad wählen → YAML einfügen.
+- **QNAP (Container Station):** Anwendungen → Erstellen → YAML einfügen.
+- **Portainer / Unraid (Compose Manager):** Stack anlegen und YAML einfügen.
+- **Per SSH:** `docker compose up -d` im Ordner mit der Datei.
+
+Danach im Browser `http://<NAS-IP>:8090` öffnen und das Admin-Konto anlegen.
+
+**Wichtig:** Den Pfad bei `volumes:` so wählen, dass er auf deinem NAS liegt, z. B.
+`/volume1/docker/monatsbudget/data:/data` (Synology). Dort liegen die Datenbank und die Backups.
+Ohne diesen Ordner gehen die Daten beim Neuerstellen des Containers verloren.
+
+**Update:** `docker compose pull && docker compose up -d` (bzw. im NAS-GUI das Projekt neu erstellen).
+Die Datenbank im Datenordner bleibt dabei erhalten.
+
+### Einstellungen (Umgebungsvariablen)
+
+| Variable | Standard | Bedeutung |
+|---|---|---|
+| `BACKUP_KEEP` | `14` | So viele Tages-Backups aufbewahren, `0` schaltet Backups aus |
+| `PUID` / `PGID` | `1000` | Dateien im Datenordner gehören diesem Benutzer/dieser Gruppe |
+| `TRUST_PROXY` | `false` | `true`, wenn ein Reverse Proxy davor läuft (echte Client-IP, HTTPS-Erkennung) |
+| `COOKIE_SECURE` | `auto` | `true` erzwingt Cookies nur über HTTPS |
+| `TZ` | – | Zeitzone, bestimmt das Datum im Backup-Dateinamen |
+
+Soll die App **von ausserhalb** erreichbar sein, bitte nur über HTTPS (z. B. Reverse Proxy des NAS
+mit Let's-Encrypt-Zertifikat) und dann `TRUST_PROXY: "true"` setzen.
+
+## Datenbank und Backups
+
+```
+data/
+├── monatsbudget.db          # Datenbank (SQLite)
+└── backups/
+    ├── monatsbudget-2026-09-27.db
+    └── monatsbudget-2026-09-28.db
+```
+
+- Tabellen: `users`, `sessions`, `settings`, `months` (Einkommen/Budget pro Monat) und
+  `expenses` (jede Ausgabe als eigene Zeile). Beträge werden in Rappen/Cent gespeichert.
+- Backups entstehen beim Start und danach stündlich, sofern sich etwas geändert hat –
+  eine Datei pro Tag, die ältesten werden nach `BACKUP_KEEP` Tagen gelöscht.
+- **Wiederherstellen:** Container stoppen, `monatsbudget.db` durch die gewünschte Backup-Datei
+  ersetzen (umbenennen in `monatsbudget.db`, `monatsbudget.db-wal` und `-shm` löschen), Container starten.
+- Die Dateien lassen sich mit jedem SQLite-Programm öffnen (z. B. „DB Browser for SQLite“).
 
 ## Docker-Image
 
-Jeder Push baut automatisch ein Image über GitHub Actions
-(`.github/workflows/docker-image.yml`) und legt es in der GitHub Container Registry ab:
+Jeder Push baut über GitHub Actions (`.github/workflows/docker-image.yml`) ein Image, nachdem
+die Tests und ein Container-Test durchgelaufen sind:
 
 ```
 ghcr.io/julianhintermann-cmd/quota:latest
@@ -36,37 +104,18 @@ sobald zwei Secrets hinterlegt sind:
 
 Ohne diese Secrets wird nur nach GHCR gepusht.
 
-> **Sichtbarkeit:** Neue Pakete auf GHCR sind zunächst privat. Entweder auf GitHub unter
-> *Packages → quota → Package settings → Change visibility* auf **Public** stellen, oder auf dem
-> NAS einmalig `docker login ghcr.io` mit einem Personal Access Token (Scope `read:packages`) ausführen.
+## Entwicklung
 
-## Auf dem NAS starten
+Voraussetzung: Node.js 22.13 oder neuer.
 
-`docker-compose.yml` aus diesem Repo verwenden:
+```
+npm start          # Server auf http://localhost:8080, Daten in ./data
+npm test           # API-Tests
+```
 
-- **Synology (Container Manager):** Projekt → Erstellen → Pfad wählen → „docker-compose.yml hochladen“.
-- **QNAP (Container Station):** Anwendungen → Erstellen → YAML einfügen.
-- **Portainer / Unraid (Compose Manager):** Stack anlegen und YAML einfügen.
-- **Per SSH:** `docker compose up -d` im Ordner mit der Datei.
-
-Danach im Browser: `http://<NAS-IP>:8090`. Der Port links in `ports:` ist frei wählbar.
-
-**Update:** `docker compose pull && docker compose up -d` (bzw. im NAS-GUI „Projekt neu erstellen“ / „Image aktualisieren“).
-
-## Wo liegen die Daten?
-
-Die App speichert alles im Browser (`localStorage`) des jeweiligen Geräts – der Container selbst
-speichert nichts und braucht kein Volume. Deshalb:
-
-- Immer dieselbe Adresse aufrufen (z. B. nicht mal IP, mal Hostname), sonst sieht der Browser getrennte Speicher.
-- Handy und Computer haben jeweils eigene Daten.
-- Browserdaten für die Seite löschen = Budgetdaten weg.
-
-Auf dem iPhone lässt sich die Seite über *Teilen → Zum Home-Bildschirm* wie eine App starten.
-
-## Lokal testen
+Container lokal bauen und testen:
 
 ```
 docker build -t monatsbudget .
-docker run --rm -p 8090:8080 monatsbudget
+test/smoke.sh monatsbudget
 ```

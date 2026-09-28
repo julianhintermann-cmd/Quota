@@ -1,4 +1,8 @@
 .git
 .github
+.claude
 README.md
 docker-compose.yml
+test
+data
+node_modules
