@@ -25,6 +25,9 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
 - Handy und Desktop: Auf dem Handy die gewohnte App-Ansicht, ab 960 px Breite automatisch ein
   Desktop-Layout (Übersicht und Kalender links, Ausgabenliste rechts, Dialoge statt Bottom-Sheets,
   Beträge per Tastatur, Löschen per Knopf beim Überfahren, Tastenkürzel ← → und N)
+- Eigene Bedienelemente statt Browser-Standard: schmale Scrollbalken im App-Stil (erscheinen beim
+  Scrollen, am Desktop auch ziehbar) und ein eigener Kalender für die Datumswahl mit Schnellwahl
+  Heute/Gestern/Vorgestern (am Desktop per Pfeiltasten und Bild auf/ab bedienbar)
 - Eigenes App-Icon und Web-App-Manifest: *Teilen → Zum Home-Bildschirm* (iPhone) bzw.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
