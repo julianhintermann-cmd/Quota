@@ -46,10 +46,24 @@ Die Datenbank im Datenordner bleibt dabei erhalten.
 | Variable | Standard | Bedeutung |
 |---|---|---|
 | `BACKUP_KEEP` | `14` | So viele Tages-Backups aufbewahren, `0` schaltet Backups aus |
-| `PUID` / `PGID` | `1000` | Dateien im Datenordner gehören diesem Benutzer/dieser Gruppe (wird beim Start automatisch gesetzt) |
+| `PUID` / `PGID` | automatisch | Unter diesem Benutzer läuft die App; der Datenordner wird ihm übergeben (siehe unten) |
 | `TRUST_PROXY` | `false` | `true`, wenn ein Reverse Proxy davor läuft (echte Client-IP, HTTPS-Erkennung) |
 | `COOKIE_SECURE` | `auto` | `true` erzwingt Cookies nur über HTTPS |
 | `TZ` | – | Zeitzone, bestimmt das Datum im Backup-Dateinamen |
+
+### Rechte des Datenordners
+
+Das Start-Skript wählt den Benutzer, unter dem die App läuft, selbst:
+
+1. `PUID`/`PGID`, falls gesetzt.
+2. Sonst den Besitzer des Datenordners – hast du den Ordner z. B. in der File Station mit deinem
+   NAS-Konto angelegt, läuft die App als dieses Konto.
+3. Sonst `1000:1000`; der Ordner wird diesem Benutzer übergeben.
+
+Verhindern die Rechte der NAS-Freigabe das Schreiben trotzdem (typisch bei **Synology**, wo ACLs
+statt der Linux-Rechte gelten), läuft die App als root weiter und schreibt einen Hinweis ins Log.
+Wer das vermeiden will, setzt `PUID`/`PGID` auf das eigene NAS-Konto mit Schreibrecht auf die
+Freigabe. Die Nummern zeigt `id <benutzername>` per SSH (Synology: meist `1026` und Gruppe `100`).
 
 Soll die App **von ausserhalb** erreichbar sein, bitte nur über HTTPS (z. B. Reverse Proxy des NAS
 mit Let's-Encrypt-Zertifikat) und dann `TRUST_PROXY: "true"` setzen.
