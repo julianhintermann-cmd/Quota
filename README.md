@@ -22,6 +22,20 @@ ghcr.io/julianhintermann-cmd/quota:latest
 
 Plattformen: `linux/amd64`, `linux/arm64`, `linux/arm/v7` – läuft also auf Intel/AMD- und ARM-NAS.
 
+### Zusätzlich auf Docker Hub (optional)
+
+Der Workflow pusht das Image zusätzlich nach Docker Hub als `<dein-dockerhub-name>/monatsbudget`,
+sobald zwei Secrets hinterlegt sind:
+
+1. Auf hub.docker.com: *Account settings → Personal access tokens → Generate new token*
+   (Berechtigung *Read & Write*).
+2. Auf GitHub im Repo: *Settings → Secrets and variables → Actions → New repository secret*
+   - `DOCKERHUB_USERNAME` = dein Docker-Hub-Benutzername
+   - `DOCKERHUB_TOKEN` = das Token aus Schritt 1
+3. Unter *Actions → Docker-Image → Run workflow* einmal manuell starten (oder etwas pushen).
+
+Ohne diese Secrets wird nur nach GHCR gepusht.
+
 > **Sichtbarkeit:** Neue Pakete auf GHCR sind zunächst privat. Entweder auf GitHub unter
 > *Packages → quota → Package settings → Change visibility* auf **Public** stellen, oder auf dem
 > NAS einmalig `docker login ghcr.io` mit einem Personal Access Token (Scope `read:packages`) ausführen.

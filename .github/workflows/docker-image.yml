@@ -18,12 +18,21 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Optional: Sind diese beiden Repository-Secrets gesetzt, wird zusätzlich nach Docker Hub gepusht
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Image-Name (lowercase)
-        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - name: Image-Namen (lowercase)
+        run: |
+          images="ghcr.io/${GITHUB_REPOSITORY,,}"
+          if [ -n "$DOCKERHUB_USERNAME" ]; then
+            images="$images"$'\n'"${DOCKERHUB_USERNAME,,}/monatsbudget"
+          fi
+          { echo "IMAGES<<EOF"; echo "$images"; echo "EOF"; } >> "$GITHUB_ENV"
 
       - name: QEMU einrichten (ARM-Builds)
         uses: docker/setup-qemu-action@v3
@@ -39,11 +48,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Bei Docker Hub anmelden
+        if: github.event_name != 'pull_request' && env.DOCKERHUB_USERNAME != ''
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
+
       - name: Tags und Labels
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.IMAGE }}
+          images: ${{ env.IMAGES }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch

@@ -3,6 +3,8 @@
 services:
   monatsbudget:
     image: ghcr.io/julianhintermann-cmd/quota:latest
+    # oder von Docker Hub (sobald eingerichtet, siehe README):
+    # image: <dein-dockerhub-name>/monatsbudget:latest
     container_name: monatsbudget
     restart: unless-stopped
     ports:
