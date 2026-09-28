@@ -21,6 +21,9 @@ wait_ready() {
 }
 cleanup() { docker rm -f "$NAME" "$NAME-puid" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
+trap 'echo "✗ Fehler in Zeile $LINENO"; docker logs "$NAME" 2>&1 | tail -20 || true' ERR
+# Der Datenordner gehört nach dem Start dem App-Benutzer; der Host prüft ihn als root (wie auf dem NAS)
+SUDO=""; [ "$(id -u)" = 0 ] || SUDO="sudo"
 
 echo "▸ Start mit leerem Ordner"
 run "$NAME" "$DIR"
@@ -38,9 +41,9 @@ grep -q '"amt":12.5' <<<"$(curl -fsS -b "$JAR" "$B/api/data")"
 [ "$(curl -s -b "$JAR" -o /dev/null -w '%{http_code}' "$B/")" = 200 ]
 
 echo "▸ Datenbank und Backup liegen im gemounteten Ordner, Prozess läuft nicht als root"
-test -f "$DIR/monatsbudget.db"
-[ "$(stat -c %u "$DIR/monatsbudget.db")" = 1000 ]
-grep -q '^monatsbudget-.*\.db$' <<<"$(ls "$DIR/backups")"
+$SUDO test -f "$DIR/monatsbudget.db"
+[ "$($SUDO stat -c %u "$DIR/monatsbudget.db")" = 1000 ]
+grep -q '^monatsbudget-.*\.db$' <<<"$($SUDO ls "$DIR/backups")"
 procs="$(docker top "$NAME" -o uid,args)"
 echo "$procs"
 grep -Eq '^\s*1000\s.*node' <<<"$procs"
@@ -56,6 +59,6 @@ echo "▸ PUID/PGID: Dateien gehören dem gewünschten Benutzer"
 DIR2="$(mktemp -d)"
 run "$NAME-puid" "$DIR2" -e PUID=1234 -e PGID=1234
 wait_ready "$NAME-puid"
-[ "$(stat -c '%u:%g' "$DIR2/monatsbudget.db")" = "1234:1234" ]
+[ "$($SUDO stat -c '%u:%g' "$DIR2/monatsbudget.db")" = "1234:1234" ]
 
 echo "✓ Smoke-Test bestanden"
