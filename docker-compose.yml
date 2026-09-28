@@ -5,6 +5,7 @@ services:
     image: ghcr.io/julianhintermann-cmd/quota:latest
     # oder von Docker Hub (sobald eingerichtet, siehe README):
     # image: <dein-dockerhub-name>/monatsbudget:latest
+    pull_policy: always        # beim Starten immer die neueste Version holen
     container_name: monatsbudget
     restart: unless-stopped
     ports:

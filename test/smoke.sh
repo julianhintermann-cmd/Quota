@@ -60,4 +60,17 @@ run "$NAME-puid" "$DIR2" -e PUID=1234 -e PGID=1234
 wait_ready "$NAME-puid"
 [ "$($SUDO stat -c '%u:%g' "$DIR2/monatsbudget.db")" = "1234:1234" ]
 
+docker rm -f "$NAME-puid" >/dev/null
+
+echo "▸ Nicht beschreibbarer Datenordner: klare Fehlermeldung statt stillem Absturz"
+DIR3="$(mktemp -d)"
+set +e
+out="$(docker run --rm -v "$DIR3:/data:ro" --read-only --tmpfs /tmp --cap-drop ALL --cap-add CHOWN --cap-add DAC_OVERRIDE \
+  --cap-add SETUID --cap-add SETGID --security-opt no-new-privileges:true "$IMAGE" 2>&1)"
+code=$?
+set -e
+echo "$out"
+[ "$code" = 1 ]
+grep -q "nicht beschreibbar" <<<"$out"
+
 echo "✓ Smoke-Test bestanden"

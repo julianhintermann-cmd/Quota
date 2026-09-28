@@ -38,7 +38,7 @@ Danach im Browser `http://<NAS-IP>:8090` öffnen und das Admin-Konto anlegen.
 `/volume1/docker/monatsbudget/data:/data` (Synology). Dort liegen die Datenbank und die Backups.
 Ohne diesen Ordner gehen die Daten beim Neuerstellen des Containers verloren.
 
-**Update:** `docker compose pull && docker compose up -d` (bzw. im NAS-GUI das Projekt neu erstellen).
+**Update:** Dank `pull_policy: always` holt jedes Neuerstellen des Projekts die neueste Version. Per SSH: `docker compose pull && docker compose up -d`.
 Die Datenbank im Datenordner bleibt dabei erhalten.
 
 ### Einstellungen (Umgebungsvariablen)
