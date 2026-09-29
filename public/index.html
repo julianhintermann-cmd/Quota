@@ -467,15 +467,26 @@ a.list-row{color:inherit;text-decoration:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ---------- Belege ---------- */
-.rc-strip{display:flex;align-items:center;gap:12px;background:var(--fill);border-radius:14px;padding:8px}
-.rc-thumb{width:46px;height:46px;border-radius:10px;overflow:hidden;background:var(--fill-2);flex:none}
+.rc-card{display:flex;flex-direction:column;gap:8px;background:var(--fill);border-radius:14px;padding:8px}
+.rc-strip{display:flex;align-items:center;gap:12px}
+.rc-open{flex:1;min-width:0;display:flex;align-items:center;gap:12px;text-align:left;border-radius:10px;cursor:zoom-in}
+.rc-thumb{width:46px;height:46px;border-radius:10px;overflow:hidden;background:var(--fill-2);flex:none;transition:transform .3s var(--spring)}
+.rc-open:active .rc-thumb{transform:scale(.94)}
 .rc-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .rc-main{flex:1;min-width:0}
-.rc-t{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rc-s{font-size:13px;color:var(--text-2);margin-top:2px;line-height:1.35}
+.rc-t{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-s{display:block;font-size:13px;color:var(--text-2);margin-top:2px;line-height:1.35}
 .rc-s.warn,.lr-s.warn{color:var(--danger)}
-.rc-strip .pill-btn{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08);flex:none}
 .rc-x{width:32px;height:32px;background:var(--surface);flex:none}
+.rc-ai{height:40px;border-radius:12px;background:var(--ink);color:var(--on-ink);font-size:15px;font-weight:600;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:center;gap:7px;transition:transform .25s var(--spring),opacity .2s}
+.rc-ai:active{transform:scale(.97)}
+.rc-ai.soft{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.rc-ai:disabled{opacity:.6}
+.rc-ai svg.i{width:17px;height:17px}
+.rc-ai .spin{margin-right:8px}
+.rc-ai:disabled svg.i{display:none}
+.rc-ai-n{font-weight:500;opacity:.6}
 .rc-x svg.i{width:15px;height:15px}
 .row-s .clip{width:12px;height:12px}
 .model-list{display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:var(--fill);border-radius:14px;padding:4px}
@@ -486,8 +497,10 @@ a.list-row{color:inherit;text-decoration:none}
 .model-list button.on span{color:inherit;opacity:.7}
 @media (hover:hover){.model-list button:not(.on):hover{background:var(--fill-2)}}
 .viewer{position:fixed;inset:0;z-index:70;background:rgba(6,6,7,.94);display:grid;place-items:center;padding:calc(env(safe-area-inset-top,0px) + 56px) 16px calc(env(safe-area-inset-bottom,0px) + 24px)}
-.viewer img{max-width:100%;max-height:100%;border-radius:12px;object-fit:contain}
-.viewer .icon-btn{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;background:rgba(255,255,255,.14);color:#fff}
+.viewer img{max-width:100%;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 80px);border-radius:12px;object-fit:contain;cursor:zoom-in}
+.viewer.zoom{display:block;overflow:auto;overscroll-behavior:contain}
+.viewer.zoom img{max-width:none;max-height:none;height:auto;cursor:zoom-out}
+.viewer .icon-btn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;background:rgba(38,38,40,.78);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 
 /* ---------- Suche ---------- */
 .sec-r{display:flex;align-items:center;gap:10px}
@@ -811,17 +824,19 @@ a.list-row{color:inherit;text-decoration:none}
 <section class="sheet" id="shExp" role="dialog" aria-modal="true" aria-labelledby="shExpT">
   <div class="grab"></div>
   <div class="sheet-h"><button class="txt-btn l" type="button" data-close>Abbrechen</button><h3 id="shExpT">Neue Ausgabe</h3>
-    <span class="r"><label class="icon-btn" id="exRcBtn" for="exRcFile" role="button" tabindex="0" aria-label="Beleg fotografieren"><svg class="i"><use href="#i-camera"/></svg></label>
+    <span class="r"><label class="icon-btn" id="exRcBtn" for="exRcFile" role="button" tabindex="0" aria-label="Beleg hinzufügen" title="Beleg hinzufügen"><svg class="i"><use href="#i-camera"/></svg></label>
     <input class="file-in" type="file" id="exRcFile" accept="image/*" tabindex="-1"></span></div>
   <div class="sheet-body">
     <div class="amount" id="exAmt" tabindex="0" role="textbox" aria-label="Betrag"><span class="cur">CHF</span><span class="val num ph">0</span><span class="caret"></span></div>
     <div class="kbd-hint">Betrag eintippen · Enter speichert</div>
     <label class="field"><svg class="i"><use href="#i-pen"/></svg><input id="exTitle" type="text" placeholder="Wofür?" maxlength="40" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>
-    <div class="rc-strip" id="exRc" hidden>
-      <button class="rc-thumb" id="exRcThumb" type="button" aria-label="Beleg ansehen"><img id="exRcImg" alt=""></button>
-      <div class="rc-main"><div class="rc-t" id="exRcT">Beleg</div><div class="rc-s" id="exRcS"></div></div>
-      <button class="pill-btn" id="exRcAi" type="button" hidden>Auslesen</button>
-      <button class="icon-btn rc-x" id="exRcDel" type="button" aria-label="Beleg entfernen"><svg class="i"><use href="#i-x"/></svg></button>
+    <div class="rc-card" id="exRc" hidden>
+      <div class="rc-strip">
+        <button class="rc-open" id="exRcOpen" type="button" title="Beleg ansehen"><span class="rc-thumb"><img id="exRcImg" alt=""></span>
+          <span class="rc-main"><span class="rc-t" id="exRcT">Beleg</span><span class="rc-s" id="exRcS" aria-live="polite"></span></span></button>
+        <button class="icon-btn rc-x" id="exRcDel" type="button" aria-label="Beleg entfernen"><svg class="i"><use href="#i-x"/></svg></button>
+      </div>
+      <button class="rc-ai" id="exRcAi" type="button" hidden><svg class="i"><use href="#i-spark"/></svg><span id="exRcAiL">Mit KI auslesen</span><span class="rc-ai-n" id="exRcAiN"></span></button>
     </div>
     <div class="chips" id="exCats" role="radiogroup" aria-label="Kategorie"></div>
     <div class="opts">
@@ -2114,7 +2129,7 @@ function openExpense(id) {
   Object.assign(ex, f ? { id, origKey: f.key, buf: bufOf(f.e.amt), cat: f.e.cat, manualCat: true, manualDate: true, date: f.e.date, rep: f.e.rep }
     : { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: defaultDate(), rep: false });
   resetRc(f ? f.e.rc : null);
-  if (ME && !f) loadAi().then(() => { if (openSheet === shExp && rc.state === 'ready') paintRc('ready', readyText()); });
+  if (ME && (!f || f.e.rc)) loadAi().then(() => { if (openSheet === shExp && rc.state === 'ready') paintRc('ready', readyText()); });
   exTitle.value = f ? f.e.title : '';
   $('#shExpT').textContent = f ? 'Ausgabe' : 'Neue Ausgabe';
   exSave.textContent = f ? 'Sichern' : 'Hinzufügen';
@@ -2173,15 +2188,19 @@ function deleteExpense(id) {
   toast('Ausgabe gelöscht', 'Rückgängig', () => { ensureM(f.key).expenses.push(rec); justAdded.add(rec.id); Store.touch(f.key); render(); });
 }
 
-/* ---------- Belegfotos und KI-Auslesen ---------- */
-const exRc = $('#exRc'), exRcFile = $('#exRcFile'), exRcImg = $('#exRcImg'), exRcT = $('#exRcT'), exRcS = $('#exRcS'), exRcAi = $('#exRcAi');
+/* ---------- Belegfotos und KI-Auslesen ----------
+   Abgelegt wird eine kleine Fassung des Fotos. Die schärfere bleibt nur im Browser
+   und geht allein zum Auslesen an den Server, wenn man auf „Mit KI auslesen“ tippt. */
+const exRc = $('#exRc'), exRcFile = $('#exRcFile'), exRcImg = $('#exRcImg'), exRcT = $('#exRcT'), exRcS = $('#exRcS');
+const exRcAi = $('#exRcAi'), exRcAiL = $('#exRcAiL'), exRcAiN = $('#exRcAiN'), exRcOpen = $('#exRcOpen');
 const AI = { enabled: false, limit: 3, used: 0, remaining: 3 };
-const rc = { tok: 0, url: null, state: null, pending: null };
+const rc = { tok: 0, url: null, state: null, pending: null, sharp: null, saved: false };
+const RC_SHARP = [1600, 0.85], RC_STORE = [1024, 0.72]; // längste Seite in px, JPEG-Qualität
+const FINE = matchMedia('(hover: hover) and (pointer: fine)');
 async function loadAi() {
   if (!ME) return;
   try { Object.assign(AI, await api('GET', '/api/ai')); } catch (e) { /* später nochmals */ }
 }
-const aiLeft = () => (AI.remaining == null ? 'KI-Auslesen ohne Tageslimit' : AI.remaining === 1 ? 'Noch 1 KI-Analyse heute' : `Noch ${AI.remaining} KI-Analysen heute`);
 function setRcPreview(url) {
   if (rc.url && rc.url.startsWith('blob:') && rc.url !== url) URL.revokeObjectURL(rc.url);
   rc.url = url; exRcImg.src = url || '';
@@ -2192,60 +2211,72 @@ function paintRc(state, msg, title) {
   if (!state) return;
   exRcT.textContent = title || 'Beleg';
   exRcS.classList.toggle('warn', state === 'error');
-  const spin = state === 'upload' || state === 'analyze';
-  exRcS.innerHTML = (spin ? '<span class="spin"></span>' : '') + esc(msg || '');
-  const canAi = AI.enabled && ex.rc && AI.remaining !== 0 && (state === 'ready' || state === 'error');
-  exRcAi.hidden = !canAi;
+  exRcS.innerHTML = (state === 'upload' ? '<span class="spin"></span>' : '') + esc(msg || '');
+  const busy = state === 'analyze';
+  exRcAi.hidden = !(busy || (AI.enabled && ex.rc && AI.remaining !== 0 && (state === 'ready' || state === 'error')));
+  exRcAi.disabled = busy;
+  exRcAi.classList.toggle('soft', rc.saved); // bei abgelegten Belegen nur Nebensache
+  exRcAiL.innerHTML = busy ? '<span class="spin"></span>KI liest den Beleg …' : 'Mit KI auslesen';
+  exRcAiN.textContent = busy || AI.remaining == null ? '' : ` · noch ${AI.remaining} heute`;
 }
 function readyText() {
-  if (!AI.enabled) return ME && ME.admin ? 'Wird gespeichert · KI-Auslesen in den Einstellungen einrichten' : 'Wird mit der Ausgabe gespeichert';
-  if (AI.remaining === 0) return `Heute keine KI-Analysen mehr übrig (${AI.limit} pro Tag)`;
-  return aiLeft();
+  const base = rc.saved ? `Abgelegt · zum Ansehen ${FINE.matches ? 'anklicken' : 'antippen'}` : 'Wird mit der Ausgabe abgelegt';
+  if (!AI.enabled) return ME && ME.admin && !rc.saved ? `${base} · KI-Auslesen in den Einstellungen einrichten` : base;
+  if (AI.remaining === 0) return `${base} · heute keine KI-Analysen mehr (${AI.limit} pro Tag)`;
+  return base;
 }
-// Foto verkleinern (max. 1600 px, JPEG): schneller hochgeladen und günstiger für die KI
-async function shrinkImage(file) {
-  const MAX = 1600;
+// Foto in den gewünschten Grössen als JPEG (Ausrichtung aus dem Foto, weisser Hintergrund für PNG)
+async function shrinkImage(file, sizes) {
   let src = null, url = null;
   try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
   catch (e) {
     url = URL.createObjectURL(file);
     src = await new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = url; });
   }
-  const w = src.width, h = src.height, k = Math.min(1, MAX / Math.max(w, h));
-  const c = document.createElement('canvas');
-  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
-  const g = c.getContext('2d');
-  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
-  g.drawImage(src, 0, 0, c.width, c.height);
-  if (src.close) src.close();
-  if (url) URL.revokeObjectURL(url);
-  const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', 0.82));
-  if (!blob) throw new Error('Bild konnte nicht verarbeitet werden.');
-  return blob;
+  try {
+    const out = [];
+    for (const [max, q] of sizes) {
+      const w = src.width, h = src.height, k = Math.min(1, max / Math.max(w, h));
+      const c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+      const g = c.getContext('2d');
+      g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+      g.imageSmoothingQuality = 'high';
+      g.drawImage(src, 0, 0, c.width, c.height);
+      const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', q));
+      if (!blob) throw new Error('Bild konnte nicht verarbeitet werden.');
+      out.push(blob);
+    }
+    return out;
+  } finally {
+    if (src.close) src.close();
+    if (url) URL.revokeObjectURL(url);
+  }
 }
-async function uploadReceipt(blob) {
+async function postImage(url, blob, fail) {
   let res;
   try {
-    res = await fetch('/api/receipts', { method: 'POST', credentials: 'same-origin', cache: 'no-store',
+    res = await fetch(url, { method: 'POST', credentials: 'same-origin', cache: 'no-store',
       headers: { 'X-Requested-With': 'monatsbudget', 'X-Client-Id': CID, 'Content-Type': blob.type || 'image/jpeg' }, body: blob });
   } catch (e) { throw new ApiError(0, 'Keine Verbindung zum Server.'); }
   const data = await res.json().catch(() => null);
-  if (!res.ok) throw new ApiError(res.status, (data && data.error) || 'Hochladen fehlgeschlagen.');
-  return data.id;
+  if (!res.ok) throw new ApiError(res.status, (data && data.error) || fail);
+  return data;
 }
+const uploadReceipt = async blob => (await postImage('/api/receipts', blob, 'Hochladen fehlgeschlagen.')).id;
 async function pickReceipt(file) {
   if (!file) return;
   const tok = ++rc.tok;
-  ex.rc = null;
+  ex.rc = null; rc.sharp = null; rc.saved = false;
   setRcPreview(URL.createObjectURL(file));
-  paintRc('upload', 'Beleg wird hochgeladen …');
+  paintRc('upload', 'Beleg wird abgelegt …');
   haptic();
-  let blob = file;
-  try { blob = await shrinkImage(file); }
+  let store = file, sharp = null;
+  try { [sharp, store] = await shrinkImage(file, [RC_SHARP, RC_STORE]); }
   catch (e) { if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { if (tok === rc.tok) paintRc('error', 'Dieses Bildformat wird nicht unterstützt. Bitte ein Foto (JPEG oder PNG) wählen.'); return; } }
   if (tok !== rc.tok) return;
-  setRcPreview(URL.createObjectURL(blob));
-  const up = rc.pending = uploadReceipt(blob);
+  setRcPreview(URL.createObjectURL(store));
+  const up = rc.pending = uploadReceipt(store);
   let id;
   try { id = await up; }
   catch (e) {
@@ -2256,16 +2287,15 @@ async function pickReceipt(file) {
   }
   if (rc.pending === up) rc.pending = null;
   if (tok !== rc.tok) return;
-  ex.rc = id;
+  ex.rc = id; rc.sharp = sharp;
   paintRc('ready', readyText());
-  // Neue Ausgabe ohne Betrag: gleich auslesen lassen
-  if (AI.enabled && AI.remaining !== 0 && !ex.id && !ex.buf) analyzeReceipt(tok);
 }
 async function analyzeReceipt(tok = rc.tok) {
-  if (!ex.rc) return;
-  paintRc('analyze', 'KI liest den Beleg …');
+  if (!ex.rc || rc.state === 'analyze') return;
+  const url = `/api/receipts/${ex.rc}/analyze`;
+  paintRc('analyze', rc.saved ? 'Abgelegt' : 'Wird mit der Ausgabe abgelegt');
   let r;
-  try { r = await api('POST', `/api/receipts/${ex.rc}/analyze`); }
+  try { r = rc.sharp ? await postImage(url, rc.sharp, 'Auslesen fehlgeschlagen.') : await api('POST', url); }
   catch (e) {
     if (e.status === 401) return toLogin();
     if (e.status === 429 && /keine KI-Analysen/.test(e.message)) AI.remaining = 0;
@@ -2275,6 +2305,7 @@ async function analyzeReceipt(tok = rc.tok) {
   }
   Object.assign(AI, { enabled: r.enabled, limit: r.limit, used: r.used, remaining: r.remaining });
   if (tok !== rc.tok) return;
+  rc.sharp = null; // Ergebnis liegt jetzt auf dem Server, das scharfe Foto wird nicht mehr gebraucht
   const a = r.result || {}, got = [];
   if (a.amount && !ex.buf) { ex.buf = bufOf(a.amount); paintExAmount(); got.push('Betrag'); }
   if (a.merchant && !exTitle.value.trim()) { exTitle.value = a.merchant.slice(0, 40); got.push('Händler'); }
@@ -2292,19 +2323,34 @@ async function analyzeReceipt(tok = rc.tok) {
 }
 exRcFile.addEventListener('change', () => { const f = exRcFile.files[0]; exRcFile.value = ''; pickReceipt(f); });
 exRcAi.addEventListener('click', () => { haptic(); analyzeReceipt(); });
-$('#exRcDel').addEventListener('click', () => { rc.tok++; rc.pending = null; ex.rc = null; setRcPreview(null); paintRc(null); haptic(); });
-$('#exRcThumb').addEventListener('click', () => { if (rc.url) openViewer(rc.url); });
+$('#exRcDel').addEventListener('click', () => { rc.tok++; rc.pending = null; rc.sharp = null; ex.rc = null; setRcPreview(null); paintRc(null); haptic(); });
+exRcOpen.addEventListener('click', () => { if (rc.url) openViewer(rc.url); });
 function resetRc(id) {
-  rc.tok++; rc.pending = null;
+  rc.tok++; rc.pending = null; rc.sharp = null; rc.saved = !!id;
   $('#exRcBtn').hidden = !ME;
-  if (id) { ex.rc = id; setRcPreview(`/api/receipts/${id}`); paintRc('ready', AI.enabled && AI.remaining !== 0 ? `Beleg gespeichert · ${aiLeft()}` : 'Beleg gespeichert', 'Beleg'); }
+  if (id) { ex.rc = id; setRcPreview(`/api/receipts/${id}`); paintRc('ready', readyText()); }
   else { ex.rc = null; setRcPreview(null); paintRc(null); }
 }
+// Am Computer: Foto einfach auf das Fenster ziehen
+shExp.addEventListener('dragover', e => { if (ME && e.dataTransfer && [...e.dataTransfer.types].includes('Files')) { e.preventDefault(); shExp.classList.add('drop'); } });
+shExp.addEventListener('dragleave', e => { if (!shExp.contains(e.relatedTarget)) shExp.classList.remove('drop'); });
+shExp.addEventListener('drop', e => { e.preventDefault(); shExp.classList.remove('drop'); const f = ME && e.dataTransfer.files[0]; if (f) pickReceipt(f); });
 
-/* Vollbild-Ansicht */
-const viewer = $('#viewer');
-function openViewer(url) { $('#viewerImg').src = url; viewer.hidden = false; haptic(); $('#viewerX').focus(); }
-function closeViewer() { viewer.hidden = true; $('#viewerImg').removeAttribute('src'); const t = $('#exRcThumb'); if (openSheet && t) t.focus({ preventScroll: true }); }
+/* Vollbild-Ansicht: Tippen vergrössert, nochmals Tippen passt das Bild wieder ein */
+const viewer = $('#viewer'), viewerImg = $('#viewerImg');
+function openViewer(url) { viewerImg.src = url; viewer.hidden = false; haptic(); $('#viewerX').focus(); }
+function unzoom() { viewer.classList.remove('zoom'); viewerImg.style.width = ''; }
+function closeViewer() { viewer.hidden = true; unzoom(); viewerImg.removeAttribute('src'); if (openSheet) exRcOpen.focus({ preventScroll: true }); }
+viewerImg.addEventListener('click', e => {
+  if (viewer.classList.contains('zoom')) return unzoom();
+  const r = viewerImg.getBoundingClientRect();
+  const w = Math.min(r.width * 2.5, Math.max(viewerImg.naturalWidth, r.width * 1.5));
+  if (w < r.width * 1.2) return;
+  const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+  viewer.classList.add('zoom'); viewerImg.style.width = w + 'px';
+  viewer.scrollLeft = viewerImg.offsetLeft + fx * viewerImg.offsetWidth - viewer.clientWidth / 2;
+  viewer.scrollTop = viewerImg.offsetTop + fy * viewerImg.offsetHeight - viewer.clientHeight / 2;
+});
 viewer.addEventListener('click', e => { if (e.target === viewer || e.target.closest('#viewerX')) closeViewer(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !viewer.hidden) { e.preventDefault(); e.stopImmediatePropagation(); closeViewer(); } }, true);
 
@@ -3274,8 +3320,13 @@ $('#pkList').addEventListener('click', async e => {
 
 /* ---------- Neuigkeiten ----------
    Öffnet sich beim ersten Start nach einem Update von selbst (gemerkt pro Gerät), danach über die Einstellungen. */
-const APP_VERSION = '3.1';
+const APP_VERSION = '3.2';
 const CHANGELOG = [
+  { v: '3.2', title: 'Belege auf Knopfdruck', sub: 'Foto hochladen, bei der Ausgabe ablegen und nur auslesen lassen, wenn du willst.', items: [
+    ['i-spark', 'Auslesen, wenn du willst', 'Nach dem Foto liest die KI erst, wenn du auf „Mit KI auslesen“ tippst. So geht keine Analyse aus Versehen weg.'],
+    ['i-receipt', 'Beleg ablegen und wieder ansehen', 'Das Foto wird platzsparend in kleinerer Auflösung bei der Ausgabe abgelegt. Tippe später auf die Ausgabe und dann auf den Beleg. Nochmals Tippen vergrössert ihn.'],
+    ['i-upload', 'Bild statt Foto', 'Statt zu fotografieren kannst du auch ein Bild aus den Fotos oder Dateien wählen. Am Computer ziehst du es einfach auf das Fenster.'],
+  ] },
   { v: '3.1', title: 'Aus Monatsbudget wird Quota', sub: 'Neuer Name, gleiche App. Dazu eine aufgeräumte Ansicht am Computer.', items: [
     ['i-wallet', 'Neuer Name: Quota', 'Deine Daten, Konten und Passkeys bleiben, wie sie sind. Auf dem Home-Bildschirm erscheint der neue Name, wenn du die App neu hinzufügst.'],
     ['i-chart', 'Übersichtlicher am Computer', 'Nur noch ein Scrollbalken. Die Übersicht bleibt stehen, während du durch die Ausgaben scrollst, und der Kopf der Liste bleibt sichtbar.'],

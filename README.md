@@ -34,6 +34,15 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
 
+### Neu in Version 3.2
+
+- Belegfotos werden **nicht mehr automatisch ausgelesen**: Nach dem Hochladen erscheint der Knopf
+  *Mit KI auslesen*, erst dann geht das Foto an die KI.
+- Abgelegt wird nur eine **kleine Fassung** (max. 1024 px, JPEG, meist unter 150 KB). Fürs Auslesen schickt der
+  Browser einmalig eine schärfere Fassung (max. 1600 px) mit, die nicht gespeichert wird.
+- Beleg später wieder ansehen: Ausgabe antippen → Beleg antippen; in der Vollbildansicht vergrössert ein weiteres Tippen.
+- Bild statt Foto: aus Fotos oder Dateien wählen, am Computer auch per Drag & Drop auf das Ausgabe-Fenster.
+
 ### Neu in Version 3.1
 
 - Neuer Name: **Quota**. Daten, Konten und Passkeys bleiben unverändert. Wer die App auf dem Home-Bildschirm hat,
@@ -67,12 +76,13 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
 1. Auf [openrouter.ai](https://openrouter.ai) ein Konto anlegen, etwas Guthaben laden und unter *Keys* einen Schlüssel erstellen.
 2. In der App als Admin: *Einstellungen → KI-Belegerkennung* → Schlüssel einfügen → *Einrichten*.
    Optional ein anderes Modell wählen („Verfügbare Modelle mit Bilderkennung laden“) und das Tageslimit anpassen.
-3. Fertig: Beim Erfassen einer Ausgabe oben rechts auf die Kamera tippen.
+3. Fertig: Beim Erfassen einer Ausgabe oben rechts auf die Kamera tippen, Foto wählen und *Mit KI auslesen* antippen.
 
 Der Schlüssel bleibt in der Datenbank auf deinem NAS und wird nie an den Browser geschickt (nur die letzten
 4 Zeichen werden angezeigt). Alternativ lässt er sich per Umgebungsvariable `OPENROUTER_API_KEY` setzen.
-Belegfotos werden verkleinert (max. 1600 px) im Datenordner unter `receipts/` gespeichert und nur zum Auslesen
-an OpenRouter geschickt. Ein Beleg kostet mit dem Standardmodell Bruchteile eines Rappens.
+Belegfotos werden verkleinert (max. 1024 px) im Datenordner unter `receipts/` abgelegt. Zum Auslesen schickt der
+Browser eine schärfere Fassung (max. 1600 px), die der Server nur an OpenRouter weiterreicht und nicht speichert.
+Ältere Belege (vor Version 3.2) bleiben in ihrer bisherigen Grösse. Ein Beleg kostet mit dem Standardmodell Bruchteile eines Rappens.
 
 ### Face ID und Offline-Seite: nur über HTTPS
 

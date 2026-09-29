@@ -218,6 +218,19 @@ test('KI: 3 Analysen pro Tag für Benutzer, Admin unbegrenzt, Fehler zählen nic
   assert.deepEqual(r.data.models.map(m => m.id), ['guenstig/vision', 'teuer/vision'], 'nur Bildmodelle, günstigste zuerst');
 });
 
+test('KI: schärferes Foto nur zum Auslesen, abgelegt bleibt die kleine Fassung', async () => {
+  fakeState.content = '{"amount": 12.5, "currency": "CHF", "date": null, "merchant": "Kiosk", "category": null}';
+  const small = jpeg(50), sharp = jpeg(900);
+  const id = (await admin('POST', '/api/receipts', undefined, { raw: small })).data.id;
+  assert.equal((await admin('POST', `/api/receipts/${id}/analyze`, undefined, { raw: Buffer.from('kein Bild') })).status, 400);
+  const r = await admin('POST', `/api/receipts/${id}/analyze`, undefined, { raw: sharp, headers: { 'Content-Type': 'image/jpeg' } });
+  assert.equal(r.status, 200);
+  assert.equal(r.data.result.merchant, 'Kiosk');
+  assert.equal(fakeState.lastBody.messages[0].content[1].image_url.url, 'data:image/jpeg;base64,' + sharp.toString('base64'));
+  assert.ok((await admin('GET', `/api/receipts/${id}`)).buf.equals(small), 'gespeichert bleibt das kleine Bild');
+  assert.ok(!readdirSync(join(dir, 'receipts')).some(f => f.startsWith(id) && !f.endsWith('.jpg')), 'kein zweites Bild abgelegt');
+});
+
 test('Belege: verknüpfte bleiben, verwaiste werden aufgeräumt', async () => {
   const keep = (await admin('POST', '/api/receipts', undefined, { raw: jpeg() })).data.id;
   const drop = (await admin('POST', '/api/receipts', undefined, { raw: jpeg() })).data.id;

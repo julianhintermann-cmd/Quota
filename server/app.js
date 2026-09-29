@@ -488,6 +488,10 @@ export function createApp({
         return res.end(body);
       }
       if (rm[2] && m === 'POST') {
+        // Optional schärferes Foto nur fürs Auslesen; abgelegt bleibt die kleine Fassung
+        const sharp = await readRaw(req, MAX_IMAGE);
+        const sharpMime = sharp.length ? imageType(sharp) : null;
+        if (sharp.length && !sharpMime) throw new HttpError(400, 'Das ist kein unterstütztes Bild (JPEG, PNG oder WebP).');
         if (r.analysis) return sendJson(res, 200, { result: r.analysis, ...aiStatus(user) });
         const key = ai.key();
         if (!key) throw new HttpError(409, 'Die KI-Belegerkennung ist nicht eingerichtet.');
@@ -497,7 +501,8 @@ export function createApp({
         aiBusy.add(user.id);
         try {
           const result = await analyzeReceipt({
-            apiKey: key, model: ai.model(), image: readFileSync(receiptFile(r.id, r.mime)), mime: r.mime,
+            apiKey: key, model: ai.model(),
+            image: sharpMime ? sharp : readFileSync(receiptFile(r.id, r.mime)), mime: sharpMime || r.mime,
             categories: userCategories(user.id), baseUrl: openrouterUrl,
           });
           db.aiCount(user.id, localDay());
