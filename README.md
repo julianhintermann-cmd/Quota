@@ -34,6 +34,30 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
 
+### Neu in Version 3.3
+
+- **Fremdwährungen**: Beim Erfassen auf die Währung neben dem Betrag tippen und z.B. EUR, USD oder THB wählen
+  (Suche auch nach Land, zuletzt verwendete oben). Der Betrag wird schon beim Eintippen live in die eigene
+  Währung (Einstellungen) umgerechnet; fürs Budget zählt der umgerechnete Betrag, Originalbetrag und Kurs
+  bleiben gespeichert und stehen in der Liste unter dem Betrag.
+- Kurs vom Tag der Ausgabe (EZB-Referenzkurs, für andere Währungen currency-api); eigener Kurs von Hand möglich,
+  ohne Verbindung wird der letzte bekannte Kurs verwendet.
+- KI-Belege in Fremdwährung stellen die Währung gleich mit ein; der **Bank-Import** rechnet Buchungen in anderer
+  Währung mit dem Kurs vom Buchungstag um.
+- CSV-Export mit den zusätzlichen Spalten *Originalbetrag*, *Originalwährung* und *Kurs*.
+
+### Wechselkurse
+
+Die Kurse holt der Server selbst (der Browser spricht nur mit deinem NAS), ohne Schlüssel und ohne Kosten:
+
+1. [Frankfurter](https://frankfurter.dev) mit den Referenzkursen der Europäischen Zentralbank (rund 30 Hauptwährungen,
+   an Werktagen aktualisiert; am Wochenende gilt der Kurs vom Freitag)
+2. für alle anderen Währungen oder wenn Frankfurter nicht antwortet:
+   [currency-api](https://github.com/fawazahmed0/exchange-api) (täglich, historische Kurse ab März 2024)
+
+Der Container braucht dafür Internetzugang zu `api.frankfurter.dev`, `cdn.jsdelivr.net` und `currency-api.pages.dev`.
+Abgefragte Kurse werden zwischengespeichert (aktuelle 3 Stunden, vergangene Tage dauerhaft bis zum Neustart).
+
 ### Neu in Version 3.2
 
 - Belegfotos werden **nicht mehr automatisch ausgelesen**: Nach dem Hochladen erscheint der Knopf
@@ -155,7 +179,7 @@ data/
 ```
 
 - Tabellen: `users`, `sessions`, `settings`, `months` (Einkommen/Budget pro Monat),
-  `expenses` (jede Ausgabe als eigene Zeile), `goals` und `goal_entries` (Sparziele), `receipts`
+  `expenses` (jede Ausgabe als eigene Zeile, bei Fremdwährung mit Originalbetrag und Kurs), `goals` und `goal_entries` (Sparziele), `receipts`
   (Belegfotos), `ai_usage` (Tageszähler der KI) und `passkeys`. Beträge werden in Rappen/Cent gespeichert.
 - Ältere Datenbanken werden beim Start automatisch auf den neuen Stand gebracht.
 - Belegfotos, die zu keiner Ausgabe mehr gehören, werden nach drei Tagen gelöscht.

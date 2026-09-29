@@ -421,6 +421,41 @@ button.tile:active{transform:scale(.965)}
   .sbar.on:hover,.sbar.drag{opacity:.45;width:8px}
 }
 
+/* ---------- Fremdwährung ---------- */
+.amount .cur-btn{display:inline-flex;align-items:center;gap:2px;font:inherit;font-size:22px;font-weight:600;color:var(--text-3);padding:4px 6px 4px 9px;margin:-4px -4px -4px -9px;border-radius:12px;transition:background-color .2s,color .2s,transform .3s var(--spring)}
+.amount .cur-btn svg.i{width:15px;height:15px;stroke-width:2.4;opacity:.8}
+.amount .cur-btn:active{transform:scale(.94)}
+.amount .cur-btn:disabled svg.i{display:none}
+.amount .cur-btn.fx{color:var(--text);background:var(--fill)}
+.amount .cur-btn[aria-expanded="true"]{background:var(--fill-2);color:var(--text)}
+@media (hover:hover){.amount .cur-btn:not(:disabled):hover{background:var(--fill)}}
+.fx-line{display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:-6px;text-align:center}
+.fx-v{font-size:18px;font-weight:600;letter-spacing:-.01em}
+.fx-v.ph{color:var(--text-3)}
+.fx-s{font-size:13px;color:var(--text-2);line-height:1.35}
+.fx-s button{font:inherit;color:var(--text);font-weight:600;text-decoration:underline;text-underline-offset:2px;padding:2px}
+.fx-s .warn{color:var(--danger)}
+.fx-edit{display:flex;align-items:center;gap:8px;font-size:15px;color:var(--text-2)}
+.fx-edit input{width:104px;height:36px;border-radius:10px;background:var(--fill);border:0;outline:0;text-align:center;font:inherit;font-size:16px;font-weight:600;color:var(--text)}
+.fx-edit input:focus{box-shadow:inset 0 0 0 1.5px var(--text-2)}
+.fx-edit .pill-btn{background:var(--ink);color:var(--on-ink)}
+.cur-pick{padding:8px;gap:6px}
+.cur-q{height:42px;background:var(--surface);border-radius:12px}
+.cur-q input{font-size:16px}
+.cur-list{max-height:272px;overflow-y:auto;display:flex;flex-direction:column;overscroll-behavior:contain;scrollbar-width:none}
+.cur-list::-webkit-scrollbar{display:none}
+.cur-sec{font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px 4px}
+.cur-it{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 10px;border-radius:12px;text-align:left;flex:none}
+.cur-it b{width:38px;flex:none;font-size:15px;font-weight:600}
+.cur-it span{flex:1;min-width:0;font-size:15px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cur-it svg.i{width:18px;height:18px;flex:none}
+.cur-it.on{background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.cur-it:focus-visible{outline:2px solid var(--text-2);outline-offset:-2px}
+.cur-none{padding:14px 10px;font-size:14px;color:var(--text-2)}
+@media (hover:hover){.cur-it:not(.on):hover{background:var(--fill-2)}}
+.fx-line.shake{animation:shake .38s var(--ease)}
+.row-a small{display:block;font-size:12px;font-weight:500;color:var(--text-3);letter-spacing:0;margin-top:2px}
+
 /* ---------- Datumswahl ---------- */
 .opt[aria-expanded="true"]{box-shadow:inset 0 0 0 1.5px var(--text-2)}
 .picker{background:var(--fill);border-radius:18px;padding:10px 8px 6px;display:flex;flex-direction:column;gap:4px;flex:none;animation:pkIn .35s var(--ease)}
@@ -726,6 +761,7 @@ a.list-row{color:inherit;text-decoration:none}
 @media (min-width:960px) and (hover:hover) and (pointer:fine){
   .keypad{display:none}
   .kbd-hint{display:block;text-align:center;font-size:13px;color:var(--text-3);margin-top:-6px}
+  .fx-line{margin-top:2px}
   .row-del{left:auto;right:12px;top:50%;bottom:auto;width:32px;height:32px;padding:0;border-radius:50%;justify-content:center;transform:translateY(-50%);z-index:2}
   .row-del .del-t{display:none}
   .row-del svg.i{display:block;width:16px;height:16px;stroke-width:2}
@@ -827,7 +863,8 @@ a.list-row{color:inherit;text-decoration:none}
     <span class="r"><label class="icon-btn" id="exRcBtn" for="exRcFile" role="button" tabindex="0" aria-label="Beleg hinzufügen" title="Beleg hinzufügen"><svg class="i"><use href="#i-camera"/></svg></label>
     <input class="file-in" type="file" id="exRcFile" accept="image/*" tabindex="-1"></span></div>
   <div class="sheet-body">
-    <div class="amount" id="exAmt" tabindex="0" role="textbox" aria-label="Betrag"><span class="cur">CHF</span><span class="val num ph">0</span><span class="caret"></span></div>
+    <div class="amount" id="exAmt" tabindex="0" role="textbox" aria-label="Betrag"><button class="cur cur-btn" id="exCur" type="button" aria-expanded="false" aria-controls="exCurPick" aria-label="Währung wählen"><span id="exCurL">CHF</span><svg class="i"><use href="#i-chev-d"/></svg></button><span class="val num ph">0</span><span class="caret"></span></div>
+    <div class="fx-line" id="exFx" aria-live="polite" hidden></div>
     <div class="kbd-hint">Betrag eintippen · Enter speichert</div>
     <label class="field"><svg class="i"><use href="#i-pen"/></svg><input id="exTitle" type="text" placeholder="Wofür?" maxlength="40" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>
     <div class="rc-card" id="exRc" hidden>
@@ -842,6 +879,10 @@ a.list-row{color:inherit;text-decoration:none}
     <div class="opts">
       <button class="opt" id="exDateOpt" type="button" aria-expanded="false" aria-controls="exPicker" aria-label="Datum wählen"><svg class="i"><use href="#i-cal"/></svg><span id="exDateLbl">Heute</span></button>
       <button class="opt" id="exRepeat" type="button" aria-pressed="false"><svg class="i"><use href="#i-repeat"/></svg><span>Jeden Monat</span></button>
+    </div>
+    <div class="picker cur-pick" id="exCurPick" role="group" aria-label="Währung wählen" hidden>
+      <label class="field cur-q"><svg class="i"><use href="#i-search"/></svg><input id="curQ" type="search" placeholder="Suchen, z.B. Euro oder Thailand" autocomplete="off" enterkeyhint="done" aria-label="Währung suchen"></label>
+      <div class="cur-list" id="curList" role="listbox" aria-label="Währungen"></div>
     </div>
     <div class="picker" id="exPicker" role="group" aria-label="Datum wählen" hidden>
       <div class="pk-quick" id="pkQuick"></div>
@@ -1095,6 +1136,7 @@ setCats(null);
 const catKey = id => (CAT[id] ? id : 'sonst');
 const catOf = id => CAT[catKey(id)];
 const SYM = { CHF: 'CHF', EUR: '€', USD: '$' };
+const CUR_RE = /^[A-Z]{3}$/;
 
 /* ---------- Datum ---------- */
 const pad = n => String(n).padStart(2, '0');
@@ -1124,6 +1166,12 @@ const sym = () => SYM[S.currency] || 'CHF';
 const fmt = n => nf.format(Math.abs(r2(n))).replace(/'/g, '’');
 const money = n => (n < 0 ? '−' : '') + sym() + ' ' + fmt(n);
 const moneyR = n => (n < 0 ? '−' : '') + sym() + ' ' + nf0.format(Math.abs(Math.round(n))).replace(/'/g, '’');
+// Fremdwährungen: Name vom Browser („Thailändischer Baht“), Nachkommastellen je Währung (JPY: keine)
+function curName(c) {
+  try { curName.dn = curName.dn || new Intl.DisplayNames(['de-CH', 'de'], { type: 'currency' }); return curName.dn.of(c) || c; } catch (e) { return c; }
+}
+function curDigits(c) { try { return new Intl.NumberFormat('de-CH', { style: 'currency', currency: c }).resolvedOptions().maximumFractionDigits; } catch (e) { return 2; } }
+function fmtCur(n, c) { return c + ' ' + new Intl.NumberFormat('de-CH', { minimumFractionDigits: Math.min(2, curDigits(c)), maximumFractionDigits: 2 }).format(n).replace(/'/g, '’'); }
 function splitMoney(n) { const s = fmt(n); const i = s.lastIndexOf('.'); return [s.slice(0, i), s.slice(i)]; }
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 9)).replace(/-/g, '').slice(0, 16);
 
@@ -1159,6 +1207,8 @@ function cleanMonth(d) {
       .map(e => {
         const o = { id: String(e.id || uid()), amt: r2(e.amt), title: String(e.title || '').slice(0, 40), cat: CAT_ID_RE.test(e.cat) ? e.cat : 'sonst', date: e.date, rep: !!e.rep, ts: Number(e.ts) || 0 };
         if (RC_RE.test(e.rc)) o.rc = e.rc;
+        const fx = e.fx;
+        if (fx && CUR_RE.test(fx.cur) && fx.amt > 0 && fx.rate > 0 && isFinite(fx.amt) && isFinite(fx.rate)) o.fx = { cur: fx.cur, amt: r2(fx.amt), rate: fx.rate };
         return o;
       }),
   };
@@ -1166,6 +1216,7 @@ function cleanMonth(d) {
 const toDoc = m => ({ income: m.income, budget: m.budget, expenses: m.expenses.map(e => {
   const o = { id: e.id, amt: e.amt, title: e.title, cat: e.cat, date: e.date, rep: e.rep, ts: e.ts };
   if (e.rc) o.rc = e.rc;
+  if (e.fx) o.fx = { cur: e.fx.cur, amt: e.fx.amt, rate: e.fx.rate };
   return o;
 }) });
 
@@ -1647,7 +1698,7 @@ function rowHTML(e) {
       <span class="row-ic">${ic('c-' + cat.ic)}</span>
       <span class="row-mid"><span class="row-t">${esc(e.title || cat.n)}</span>
       <span class="row-s">${e.title ? cn : ''}${e.rep ? `${e.title ? ' · ' : ''}${ic('i-repeat')}monatlich` : ''}${e.rc ? ` · ${ic('i-clip', 'i clip')}Beleg` : ''}</span></span>
-      <span class="row-a num">${money(e.amt)}</span>
+      <span class="row-a num">${money(e.amt)}${e.fx ? `<small>${fmtCur(e.fx.amt, e.fx.cur)}</small>` : ''}</span>
     </button></div>`;
 }
 
@@ -1660,7 +1711,7 @@ function searchHits() {
     if (view.qcat && catKey(e.cat) !== view.qcat) return;
     if (toks.length) {
       const d = parseD(e.date);
-      const hay = norm(`${e.title} ${catOf(e.cat).n} ${fmt(e.amt)} ${e.amt.toFixed(2)} ${e.amt.toFixed(2).replace('.', ',')} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${e.rep ? 'monatlich' : ''} ${e.rc ? 'beleg' : ''}`);
+      const hay = norm(`${e.title} ${catOf(e.cat).n} ${fmt(e.amt)} ${e.amt.toFixed(2)} ${e.amt.toFixed(2).replace('.', ',')} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${e.rep ? 'monatlich' : ''} ${e.rc ? 'beleg' : ''} ${e.fx ? `${e.fx.cur} ${curName(e.fx.cur)} ${e.fx.amt.toFixed(2)} ${e.fx.amt.toFixed(2).replace('.', ',')}` : ''}`);
       if (!toks.every(t => hay.includes(t))) return;
     }
     out.push(e);
@@ -1972,7 +2023,8 @@ function applyKey(buf, k) {
 }
 function showAmount(el, buf) {
   const val = $('.val', el);
-  $('.cur', el).textContent = sym();
+  const cur = $('.cur', el);
+  if (!cur.classList.contains('cur-btn')) cur.textContent = sym();
   if (!buf) { val.textContent = '0'; val.classList.add('ph'); val.style.fontSize = ''; return; }
   const [i, d] = buf.split('.');
   const txt = nf0.format(Number(i || 0)).replace(/'/g, '’') + (d !== undefined ? '.' + d : '');
@@ -2004,7 +2056,8 @@ function guessCat(title) {
 
 const shExp = $('#shExp'), exAmt = $('#exAmt'), exTitle = $('#exTitle'), exCats = $('#exCats'), exPad = $('#exPad');
 const exDateOpt = $('#exDateOpt'), exDateLbl = $('#exDateLbl'), exRepeat = $('#exRepeat'), exSave = $('#exSave'), exDelete = $('#exDelete');
-const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, rep: false, rc: null };
+const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, rep: false, rc: null,
+  cur: null, rate: null, rateSt: null, rateDate: null, rateSrc: null, rateErr: '', rateTok: 0, fxEdit: false, fxK: 1, fxPrev: null };
 
 function buildCatChips() {
   exCats.innerHTML = CATS.map(c => `<button type="button" class="chip" role="radio" aria-checked="false" data-cat="${c.id}">${ic('c-' + c.ic)}${esc(c.n)}</button>`).join('');
@@ -2027,6 +2080,199 @@ function paintDate() {
   exDateLbl.textContent = dayLabel(ex.date);
   if (pk.open) renderPicker();
 }
+
+/* ---------- Fremdwährung ----------
+   Betrag in der bezahlten Währung eintippen, die App rechnet live mit dem Tageskurs in die
+   Hauptwährung um (Kurse vom eigenen Server: EZB, sonst currency-api). Gespeichert werden der
+   umgerechnete Betrag (zählt fürs Budget) sowie Originalbetrag und Kurs. */
+const FX_CODES = ['AED', 'ALL', 'ARS', 'AUD', 'BAM', 'BRL', 'CAD', 'CHF', 'CLP', 'CNY', 'COP', 'CRC', 'CZK', 'DKK', 'DOP', 'EGP', 'EUR', 'GBP',
+  'GEL', 'HKD', 'HUF', 'IDR', 'ILS', 'INR', 'ISK', 'JOD', 'JPY', 'KES', 'KRW', 'KZT', 'LKR', 'MAD', 'MKD', 'MUR', 'MXN', 'MYR', 'NOK', 'NPR',
+  'NZD', 'PEN', 'PHP', 'PLN', 'QAR', 'RON', 'RSD', 'SAR', 'SEK', 'SGD', 'THB', 'TND', 'TRY', 'TWD', 'TZS', 'UAH', 'USD', 'UYU', 'VND', 'XOF', 'ZAR'];
+// Länder zum Suchen (die Namen der Währungen liefert der Browser)
+const FX_KW = {
+  EUR: 'Deutschland Frankreich Italien Österreich Spanien Portugal Niederlande Holland Belgien Griechenland Kroatien Irland Finnland Slowakei Slowenien Estland Lettland Litauen Luxemburg Malta Zypern Bulgarien Europa',
+  USD: 'USA Amerika Vereinigte Staaten Ecuador Panama', GBP: 'England Grossbritannien UK Vereinigtes Königreich Schottland Wales London',
+  CHF: 'Schweiz Liechtenstein', AED: 'Dubai Emirate VAE Abu Dhabi', TRY: 'Türkei', CZK: 'Tschechien Prag', HUF: 'Ungarn', PLN: 'Polen',
+  DKK: 'Dänemark', SEK: 'Schweden', NOK: 'Norwegen', ISK: 'Island', THB: 'Thailand', JPY: 'Japan', CNY: 'China', KRW: 'Korea', INR: 'Indien',
+  IDR: 'Indonesien Bali', MXN: 'Mexiko', BRL: 'Brasilien', ZAR: 'Südafrika', AUD: 'Australien', NZD: 'Neuseeland', CAD: 'Kanada',
+  MAD: 'Marokko', TND: 'Tunesien', EGP: 'Ägypten', XOF: 'Senegal Elfenbeinküste Westafrika', ALL: 'Albanien', BAM: 'Bosnien',
+  MKD: 'Nordmazedonien', RSD: 'Serbien', GEL: 'Georgien', VND: 'Vietnam', LKR: 'Sri Lanka', NPR: 'Nepal', KES: 'Kenia',
+  TZS: 'Tansania Sansibar', MUR: 'Mauritius', SAR: 'Saudi-Arabien', QAR: 'Katar', JOD: 'Jordanien', ILS: 'Israel', SGD: 'Singapur',
+  MYR: 'Malaysia', PHP: 'Philippinen', HKD: 'Hongkong', TWD: 'Taiwan', KZT: 'Kasachstan', UAH: 'Ukraine', RON: 'Rumänien',
+  CLP: 'Chile', COP: 'Kolumbien', PEN: 'Peru', ARS: 'Argentinien', UYU: 'Uruguay', CRC: 'Costa Rica', DOP: 'Dominikanische Republik',
+};
+const exCur = $('#exCur'), exCurL = $('#exCurL'), exFx = $('#exFx'), exCurPick = $('#exCurPick'), curQ = $('#curQ'), curList = $('#curList');
+const cp = { open: false };
+const fxOn = () => !!ex.cur && ex.cur !== S.currency;
+// „1 EUR = 0.9362 CHF“; bei kleinen Kursen „100 JPY = 0.5712 CHF“
+function rateParts(r) { let k = 1; while (r * k < 0.1 && k < 1e6) k *= 10; return k; }
+const fmtRate = v => new Intl.NumberFormat('de-CH', { maximumSignificantDigits: 5 }).format(v).replace(/'/g, '’');
+const rateLabel = (from, to, r) => { const k = rateParts(r); return `${nf0.format(k).replace(/'/g, '’')} ${from} = ${fmtRate(r * k)} ${to}`; };
+function shortDay(ds) { if (!ds) return ''; const d = parseD(ds); return `${d.getDate()}. ${MON_S[d.getMonth()]}${d.getFullYear() !== today().getFullYear() ? ' ' + d.getFullYear() : ''}`; }
+
+// Kurse: im Speicher (aktuelle 1 Stunde), letzter bekannter Kurs je Paar für unterwegs ohne Netz
+const fxMem = new Map();
+const FX_LS = 'mb.fx';
+function lastRate(from, to) { try { return (JSON.parse(localStorage.getItem(FX_LS)) || {})[from + '>' + to] || null; } catch (e) { return null; } }
+function keepRate(from, to, r) {
+  try { const all = JSON.parse(localStorage.getItem(FX_LS)) || {}; all[from + '>' + to] = { rate: r.rate, date: r.date }; localStorage.setItem(FX_LS, JSON.stringify(all)); } catch (e) { /* egal */ }
+}
+async function fetchRate(from, to, date) {
+  const day = !date || date >= dkey(today()) ? 'latest' : date;
+  const k = `${from}>${to}@${day}`, hit = fxMem.get(k);
+  if (hit && (day !== 'latest' || Date.now() - hit.at < 36e5)) return hit.r;
+  const r = await api('GET', `/api/fx?from=${from}&to=${to}${day === 'latest' ? '' : '&date=' + day}`);
+  fxMem.set(k, { r, at: Date.now() });
+  if (day === 'latest') keepRate(from, to, r);
+  return r;
+}
+async function loadRate() {
+  if (!fxOn()) return;
+  const tok = ++ex.rateTok, cur = ex.cur;
+  Object.assign(ex, { rateSt: 'load', fxEdit: false });
+  paintExAmount();
+  try {
+    const r = await fetchRate(cur, S.currency, ex.date);
+    if (tok !== ex.rateTok) return;
+    Object.assign(ex, { rate: r.rate, rateDate: r.date, rateSrc: r.source, rateSt: 'ok' });
+  } catch (e) {
+    if (tok !== ex.rateTok) return;
+    if (e.status === 401) return toLogin();
+    const last = lastRate(cur, S.currency);
+    if (last && e.status !== 404) Object.assign(ex, { rate: last.rate, rateDate: last.date, rateSrc: null, rateSt: 'stale' });
+    else Object.assign(ex, { rate: null, rateSt: 'err', rateErr: e.status === 0 ? 'Kein Kurs ohne Verbindung' : e.message });
+  }
+  paintExAmount();
+}
+function setCur(code) {
+  const c = code && code !== S.currency ? code : null;
+  if (c === ex.cur) return;
+  Object.assign(ex, { cur: c, rate: null, rateSt: null, fxEdit: false });
+  if (c) loadRate(); else { ex.rateTok++; paintExAmount(); }
+}
+// Neues Datum: gespeicherte oder selbst eingetragene Kurse bleiben, sonst Kurs dieses Tages holen
+function dateChangedFx() { if (fxOn() && ex.rateSt !== 'saved' && ex.rateSt !== 'man') loadRate(); }
+function rateNote() {
+  if (ex.rateSt === 'man') return 'eigener Kurs';
+  if (ex.rateSt === 'saved') return 'gespeicherter Kurs';
+  if (ex.rateSt === 'stale') return `offline, letzter Kurs vom ${shortDay(ex.rateDate)}`;
+  return `${ex.rateSrc ? ex.rateSrc + ', ' : ''}${shortDay(ex.rateDate)}`;
+}
+function paintFx() {
+  const on = fxOn();
+  exCurL.textContent = on ? ex.cur : sym();
+  exCur.classList.toggle('fx', on);
+  exCur.setAttribute('aria-label', `Währung: ${on ? curName(ex.cur) : curName(S.currency)}. Andere Währung wählen`);
+  exFx.hidden = !on;
+  if (!on) { ex.fxEdit = false; return; }
+  const v = parseFloat(ex.buf) || 0, ok = ex.rate > 0;
+  const conv = `<div class="fx-v num${v > 0 && ok ? '' : ' ph'}">= ${ok ? money(r2(v * ex.rate)) : sym() + ' –'}</div>`;
+  const inp = $('#fxRate', exFx);
+  if (ex.fxEdit && inp) { $('.fx-v', exFx).outerHTML = conv; return; }
+  if (ex.fxEdit) {
+    exFx.innerHTML = `${conv}<div class="fx-edit"><span>${nf0.format(ex.fxK).replace(/'/g, '’')} ${ex.cur} =</span>
+      <input id="fxRate" inputmode="decimal" autocomplete="off" enterkeyhint="done" aria-label="Kurs in ${S.currency}" value="${ok ? String(Number((ex.rate * ex.fxK).toPrecision(6))) : ''}">
+      <span>${S.currency}</span><button class="pill-btn" type="button" data-fx="ok">Fertig</button></div>
+      ${ex.fxPrev && ['man', 'saved', 'err'].includes(ex.fxPrev.rateSt) ? '<div class="fx-s"><button type="button" data-fx="day">Tageskurs verwenden</button></div>' : ''}`;
+    return;
+  }
+  let sub;
+  if (ex.rateSt === 'load') sub = '<span class="spin"></span>Kurs wird geladen …';
+  else if (ex.rateSt === 'err' || !ok) sub = `<span class="warn">${esc(ex.rateErr || 'Kein Kurs')}</span> · <button type="button" data-fx="edit">Kurs eingeben</button>`;
+  else sub = `${rateLabel(ex.cur, S.currency, ex.rate)} · ${esc(rateNote())} · <button type="button" data-fx="edit">Ändern</button>`;
+  exFx.innerHTML = `${conv}<div class="fx-s">${sub}</div>`;
+}
+function editRate(on, keep) {
+  if (on) {
+    ex.fxPrev = { rate: ex.rate, rateSt: ex.rateSt };
+    ex.fxK = ex.rate > 0 ? rateParts(ex.rate) : 1;
+    ex.fxEdit = true; paintExAmount();
+    const i = $('#fxRate', exFx); i.focus(); i.select();
+    return;
+  }
+  if (!(ex.rate > 0)) keep = false; // leeres oder ungültiges Feld: alten Kurs behalten
+  if (!keep && ex.fxPrev) Object.assign(ex, ex.fxPrev);
+  ex.fxEdit = false; ex.fxPrev = null; paintExAmount();
+}
+exFx.addEventListener('click', e => {
+  const b = e.target.closest('[data-fx]'); if (!b) return;
+  haptic();
+  if (b.dataset.fx === 'edit') editRate(true);
+  else if (b.dataset.fx === 'ok') editRate(false, true);
+  else if (b.dataset.fx === 'day') { ex.fxEdit = false; ex.fxPrev = null; loadRate(); }
+});
+exFx.addEventListener('input', e => {
+  if (e.target.id !== 'fxRate') return;
+  const v = parseFloat(e.target.value.replace(',', '.').replace(/[^\d.]/g, ''));
+  if (v > 0 && isFinite(v)) Object.assign(ex, { rate: Number((v / ex.fxK).toPrecision(8)), rateSt: 'man' });
+  else ex.rate = null;
+  paintExAmount();
+});
+exFx.addEventListener('keydown', e => {
+  if (e.target.id !== 'fxRate') return;
+  if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); editRate(false, true); }
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); editRate(false, false); }
+});
+// Knöpfe neben dem Kursfeld nehmen ihm den Fokus nicht weg
+exFx.addEventListener('mousedown', e => { if (ex.fxEdit && e.target.closest('[data-fx]')) e.preventDefault(); });
+exFx.addEventListener('focusout', e => {
+  // Feld verlassen: Eingabe übernehmen (verzögert, damit ein Tipp auf „Tageskurs“ noch ankommt)
+  if (e.target.id === 'fxRate' && ex.fxEdit && !exFx.contains(e.relatedTarget)) setTimeout(() => { if (ex.fxEdit && !exFx.contains(document.activeElement)) editRate(false, true); }, 180);
+});
+
+// Währungsauswahl: ersetzt wie der Kalender die Zifferntasten
+function recentCurs() {
+  const seen = new Set();
+  Object.values(S.months).flatMap(m => m.expenses).filter(e => e.fx).sort((a, b) => b.ts - a.ts)
+    .forEach(e => { if (seen.size < 4 && e.fx.cur !== S.currency) seen.add(e.fx.cur); });
+  return [...seen];
+}
+function curItem(c) {
+  const on = c === (ex.cur || S.currency);
+  return `<button type="button" class="cur-it${on ? ' on' : ''}" role="option" aria-selected="${on}" data-cur="${c}"><b>${c}</b><span>${esc(curName(c))}</span>${on ? ic('i-check') : ''}</button>`;
+}
+function renderCurList() {
+  const q = norm(curQ.value.trim());
+  const byName = (a, b) => curName(a).localeCompare(curName(b), 'de');
+  if (q) {
+    const hits = FX_CODES.filter(c => norm(`${c} ${curName(c)} ${FX_KW[c] || ''}`).includes(q))
+      .sort((a, b) => (norm(a).startsWith(q) ? 0 : 1) - (norm(b).startsWith(q) ? 0 : 1) || byName(a, b));
+    curList.innerHTML = hits.length ? hits.map(curItem).join('') : '<div class="cur-none">Keine passende Währung gefunden.</div>';
+    return;
+  }
+  const recent = recentCurs().filter(c => FX_CODES.includes(c));
+  const rest = FX_CODES.filter(c => c !== S.currency && !recent.includes(c)).sort(byName);
+  curList.innerHTML = `<div class="cur-sec">Deine Währung</div>${curItem(S.currency)}`
+    + (recent.length ? `<div class="cur-sec">Zuletzt verwendet</div>${recent.map(curItem).join('')}` : '')
+    + `<div class="cur-sec">Alle Währungen</div>${rest.map(curItem).join('')}`;
+}
+function openCurPick(open) {
+  cp.open = open;
+  if (open && pk.open) openPicker(false);
+  exCurPick.hidden = !open;
+  exCur.setAttribute('aria-expanded', String(open));
+  exPad.classList.toggle('pk-hide', open || pk.open);
+  if (!open) return;
+  curQ.value = ''; renderCurList(); curList.scrollTop = 0;
+  if (!coarse.matches) curQ.focus({ preventScroll: true });
+  requestAnimationFrame(() => exCurPick.scrollIntoView({ block: 'nearest', behavior: RM.matches ? 'auto' : 'smooth' }));
+}
+function pickCur(c) { haptic(); setCur(c); openCurPick(false); if (!coarse.matches) exAmt.focus({ preventScroll: true }); }
+exCur.addEventListener('click', e => { e.stopPropagation(); haptic(); if (document.activeElement === exTitle) exTitle.blur(); openCurPick(!cp.open); });
+curQ.addEventListener('input', () => { renderCurList(); curList.scrollTop = 0; });
+curQ.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); const f = $('.cur-it', curList); if (f) pickCur(f.dataset.cur); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); const f = $('.cur-it', curList); if (f) f.focus(); }
+});
+curList.addEventListener('click', e => { const b = e.target.closest('[data-cur]'); if (b) pickCur(b.dataset.cur); });
+curList.addEventListener('keydown', e => {
+  const items = $$('.cur-it', curList), i = items.indexOf(document.activeElement);
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); e.stopPropagation();
+    const n = i + (e.key === 'ArrowDown' ? 1 : -1);
+    if (n < 0) curQ.focus(); else if (items[n]) items[n].focus();
+  }
+});
 
 /* ---------- Datumswahl (eigener Kalender statt der Browser-Auswahl) ---------- */
 const exPicker = $('#exPicker'), pkGrid = $('#pkGrid'), pkQuick = $('#pkQuick');
@@ -2052,14 +2298,17 @@ function renderPicker() {
 }
 function openPicker(open) {
   pk.open = open;
+  if (open && cp.open) openCurPick(false);
   if (open) { const d = parseD(ex.date); pk.y = d.getFullYear(); pk.m = d.getMonth(); renderPicker(); }
   exPicker.hidden = !open;
   exDateOpt.setAttribute('aria-expanded', String(open));
-  exPad.classList.toggle('pk-hide', open);
+  exPad.classList.toggle('pk-hide', open || cp.open);
   if (open) requestAnimationFrame(() => exPicker.scrollIntoView({ block: 'nearest', behavior: RM.matches ? 'auto' : 'smooth' }));
 }
 function pickDate(ds, close) {
+  const changed = ds !== ex.date;
   ex.date = ds; ex.manualDate = true; haptic(); paintDate();
+  if (changed) dateChangedFx();
   if (close) openPicker(false);
 }
 exDateOpt.addEventListener('click', () => { haptic(); if (document.activeElement === exTitle) exTitle.blur(); openPicker(!pk.open); });
@@ -2088,7 +2337,11 @@ function pickerKey(e) {
   return true;
 }
 exRepeat.addEventListener('click', () => { ex.rep = !ex.rep; exRepeat.classList.toggle('on', ex.rep); exRepeat.setAttribute('aria-pressed', ex.rep); haptic(); });
-function paintExAmount() { showAmount(exAmt, ex.buf); exSave.disabled = !(parseFloat(ex.buf) > 0); }
+function paintExAmount() {
+  showAmount(exAmt, ex.buf);
+  paintFx();
+  exSave.disabled = !(parseFloat(ex.buf) > 0) || (fxOn() && !(ex.rate > 0));
+}
 buildPad(exPad, k => {
   const nb = applyKey(ex.buf, k);
   if (nb === null) { shake(exAmt); return; }
@@ -2099,13 +2352,14 @@ exTitle.addEventListener('input', () => {
   const g = guessCat(exTitle.value);
   if (g !== ex.cat) { ex.cat = g; paintCats(); if (g) scrollChip(g, true); }
 });
-exTitle.addEventListener('focus', () => { if (pk.open) openPicker(false); if (coarse.matches) exPad.classList.add('hidden'); exAmt.classList.add('inactive'); });
+exTitle.addEventListener('focus', () => { if (pk.open) openPicker(false); if (cp.open) openCurPick(false); if (coarse.matches) exPad.classList.add('hidden'); exAmt.classList.add('inactive'); });
 exTitle.addEventListener('blur', () => { exPad.classList.remove('hidden'); exAmt.classList.remove('inactive'); });
 // stopPropagation: sonst verarbeitet der Dialog dieselbe Enter-Taste nochmals und speichert doppelt
 exTitle.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (parseFloat(ex.buf) > 0) saveExpense(); else exTitle.blur(); } });
 exAmt.addEventListener('click', () => { if (document.activeElement === exTitle) exTitle.blur(); });
 shExp.addEventListener('keydown', e => {
-  if (document.activeElement === exTitle) return;
+  if (cp.open && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); openCurPick(false); exAmt.focus({ preventScroll: true }); return; }
+  if (document.activeElement === exTitle || e.target.closest('input')) return;
   if (pk.open && pickerKey(e)) return;
   let k = null;
   if (/^[0-9]$/.test(e.key)) k = e.key; else if (e.key === '.' || e.key === ',') k = '.'; else if (e.key === 'Backspace') k = 'back';
@@ -2128,6 +2382,10 @@ function openExpense(id) {
   const f = id ? findExpense(id) : null;
   Object.assign(ex, f ? { id, origKey: f.key, buf: bufOf(f.e.amt), cat: f.e.cat, manualCat: true, manualDate: true, date: f.e.date, rep: f.e.rep }
     : { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: defaultDate(), rep: false });
+  const fx = f && f.e.fx && f.e.fx.cur !== S.currency ? f.e.fx : null;
+  Object.assign(ex, { cur: fx ? fx.cur : null, rate: fx ? fx.rate : null, rateSt: fx ? 'saved' : null, rateErr: '', fxEdit: false, rateTok: ex.rateTok + 1 });
+  if (fx) ex.buf = bufOf(fx.amt);
+  exCur.disabled = !ME;
   resetRc(f ? f.e.rc : null);
   if (ME && (!f || f.e.rc)) loadAi().then(() => { if (openSheet === shExp && rc.state === 'ready') paintRc('ready', readyText()); });
   exTitle.value = f ? f.e.title : '';
@@ -2136,15 +2394,22 @@ function openExpense(id) {
   exDelete.hidden = !f;
   exRepeat.classList.toggle('on', ex.rep); exRepeat.setAttribute('aria-pressed', ex.rep);
   exPad.classList.remove('hidden'); exAmt.classList.remove('inactive');
-  openPicker(false);
+  openPicker(false); openCurPick(false);
   paintCats(); paintDate(); paintExAmount();
   exCats.scrollLeft = 0;
   if (ex.cat) scrollChip(ex.cat, false);
   showSheet(shExp);
 }
 function saveExpense() {
-  const amt = r2(parseFloat(ex.buf));
-  if (!(amt > 0)) { shake(exAmt); return; }
+  const typed = r2(parseFloat(ex.buf));
+  if (!(typed > 0)) { shake(exAmt); return; }
+  // Fremdwährung: gespeichert wird der umgerechnete Betrag, dazu Originalbetrag und Kurs
+  let amt = typed, fx = null;
+  if (fxOn()) {
+    if (!(ex.rate > 0)) { shake(exFx); return; }
+    amt = Math.max(0.01, r2(typed * ex.rate));
+    fx = { cur: ex.cur, amt: typed, rate: ex.rate };
+  }
   const title = exTitle.value.trim().slice(0, 40);
   const cat = ex.cat || guessCat(title) || 'sonst';
   const key = ex.date.slice(0, 7);
@@ -2155,6 +2420,7 @@ function saveExpense() {
   }
   if (!rec) { rec = { id: uid(), amt, title, cat, date: ex.date, rep: ex.rep, ts: Date.now() }; justAdded.add(rec.id); }
   if (ex.rc) rec.rc = ex.rc; else delete rec.rc;
+  if (fx) rec.fx = fx; else delete rec.fx;
   // Foto lädt noch: sobald es oben ist, an die gespeicherte Ausgabe hängen
   if (!ex.rc && rc.pending) {
     const recId = rec.id;
@@ -2167,7 +2433,7 @@ function saveExpense() {
   haptic('success');
   const pk = periodKeyOf(ex.date);
   if (pk !== view.key) toast(`Gespeichert unter ${monthName(pk)} ${pk.slice(0, 4)}`);
-  else if (!ex.id) toast(`${money(amt)} erfasst`);
+  else if (!ex.id) toast(fx ? `${fmtCur(fx.amt, fx.cur)} = ${money(amt)} erfasst` : `${money(amt)} erfasst`);
   render();
 }
 exSave.addEventListener('click', saveExpense);
@@ -2307,16 +2573,20 @@ async function analyzeReceipt(tok = rc.tok) {
   if (tok !== rc.tok) return;
   rc.sharp = null; // Ergebnis liegt jetzt auf dem Server, das scharfe Foto wird nicht mehr gebraucht
   const a = r.result || {}, got = [];
-  if (a.amount && !ex.buf) { ex.buf = bufOf(a.amount); paintExAmount(); got.push('Betrag'); }
+  const filled = !!(a.amount && !ex.buf);
+  if (filled) { ex.buf = bufOf(a.amount); paintExAmount(); got.push('Betrag'); }
   if (a.merchant && !exTitle.value.trim()) { exTitle.value = a.merchant.slice(0, 40); got.push('Händler'); }
   if (a.date && !ex.manualDate && !ex.id) {
     const d = parseD(a.date), diff = (today() - d) / 864e5;
-    if (diff >= -1 && diff <= 400 && a.date !== ex.date) { ex.date = a.date; paintDate(); got.push('Datum'); }
+    if (diff >= -1 && diff <= 400 && a.date !== ex.date) { ex.date = a.date; paintDate(); dateChangedFx(); got.push('Datum'); }
   }
+  // Beleg in Fremdwährung: Währung übernehmen und live umrechnen
+  const rcCur = a.currency && a.currency !== S.currency && FX_CODES.includes(a.currency) ? a.currency : null;
+  if (filled && rcCur && ex.cur !== rcCur && ME) { setCur(rcCur); got.push('Währung'); }
   const cat = a.category && CAT[a.category] ? a.category : a.merchant ? guessCat(a.merchant) : null;
   if (cat && !ex.manualCat) { ex.cat = cat; paintCats(); scrollChip(cat, true); got.push('Kategorie'); }
   let msg = got.length ? `Ausgefüllt: ${got.join(', ')}` : (a.amount || a.merchant ? 'Schon ausgefüllt, nichts überschrieben' : 'Auf dem Foto war kein Beleg zu erkennen');
-  if (a.currency && a.currency !== S.currency) msg += ` · Beleg in ${a.currency}`;
+  if (a.currency && a.currency !== S.currency && a.currency !== ex.cur) msg += ` · Beleg in ${a.currency}`;
   if (AI.remaining != null) msg += ` · ${AI.remaining === 1 ? 'noch 1 Analyse' : `noch ${AI.remaining} Analysen`} heute`;
   paintRc('done', msg, a.merchant || 'Beleg');
   haptic(got.length ? 'success' : 'heavy');
@@ -2631,12 +2901,16 @@ const dayDist = (a, b) => Math.abs(Math.round((parseD(a) - parseD(b)) / 864e5));
 function buildImport() {
   const res = imp.res = BankCSV.extract(imp.parsed, imp.map);
   const byAmt = new Map();
+  const put = (k, e) => { if (!byAmt.has(k)) byAmt.set(k, []); byAmt.get(k).push(e); };
+  // In Fremdwährung erfasste Ausgaben auch über den Originalbetrag finden
   if (!S.sample) Object.values(S.months).forEach(m => m.expenses.forEach(e => {
-    const k = Math.round(e.amt * 100); if (!byAmt.has(k)) byAmt.set(k, []); byAmt.get(k).push(e);
+    put(String(Math.round(e.amt * 100)), e);
+    if (e.fx) put(e.fx.cur + ':' + Math.round(e.fx.amt * 100), e);
   }));
   const used = new Set();
   imp.items = res.items.slice(0, IM_MAX).map((it, i) => {
-    const dup = (byAmt.get(Math.round(it.amount * 100)) || []).filter(e => !used.has(e.id) && dayDist(e.date, it.date) <= 3)
+    const k = (imForeign(it) ? it.currency + ':' : '') + Math.round(it.amount * 100);
+    const dup = (byAmt.get(k) || []).filter(e => !used.has(e.id) && dayDist(e.date, it.date) <= 3)
       .sort((a, b) => dayDist(a.date, it.date) - dayDist(b.date, it.date))[0];
     if (dup) used.add(dup.id);
     return { ...it, i, cat: guessCat(it.text) || 'sonst', manual: false, dup: !!dup, on: !dup && !it.pending };
@@ -2667,8 +2941,9 @@ function paintImStats() {
   imAll.hidden = !imp.items.length;
   imAll.textContent = sel.length === imp.items.length ? 'Keine' : 'Alle';
   imGo.disabled = !sel.length;
-  const sum = sel.filter(it => !it.currency || it.currency === S.currency).reduce((a, it) => a + it.amount, 0);
-  imGo.textContent = !sel.length ? 'Importieren' : `${sel.length === 1 ? '1 Ausgabe' : sel.length + ' Ausgaben'} importieren · ${money(sum)}`;
+  const own = sel.filter(it => !imForeign(it)), sum = own.reduce((a, it) => a + it.amount, 0);
+  imGo.textContent = !sel.length ? 'Importieren' : `${sel.length === 1 ? '1 Ausgabe' : sel.length + ' Ausgaben'} importieren`
+    + (own.length ? ` · ${money(sum)}${own.length < sel.length ? ' + Fremdwährung' : ''}` : ` · in ${S.currency} umgerechnet`);
 }
 function paintImport() {
   paintImStats();
@@ -2739,14 +3014,38 @@ $('#imMapBody').addEventListener('click', e => {
   haptic(); buildImport(); renderImMap();
 });
 
-imGo.addEventListener('click', () => {
+// Buchungen in anderer Währung als der eigenen: mit dem Kurs vom Buchungstag umrechnen
+const imForeign = it => !!it.currency && it.currency !== S.currency && CUR_RE.test(it.currency);
+async function imRates(list) {
+  const pairs = [...new Set(list.map(it => it.currency + '@' + it.date))], rates = new Map();
+  for (let i = 0; i < pairs.length; i += 4) {
+    await Promise.all(pairs.slice(i, i + 4).map(async k => {
+      const [cur, date] = k.split('@');
+      rates.set(k, (await fetchRate(cur, S.currency, date)).rate);
+    }));
+  }
+  return rates;
+}
+imGo.addEventListener('click', async () => {
   const sel = imp.items.filter(it => it.on);
-  if (!sel.length) return;
+  if (!sel.length || imGo.dataset.busy) return;
+  let rates = new Map();
+  const foreign = sel.filter(imForeign);
+  if (foreign.length) {
+    imGo.dataset.busy = '1'; imGo.disabled = true; imGo.textContent = 'Kurse werden geladen …';
+    try { rates = await imRates(foreign); }
+    catch (e) {
+      if (e.status === 401) return toLogin();
+      toast(`Umrechnen ging nicht: ${e.status === 0 ? 'keine Verbindung' : e.message}`);
+      return;
+    } finally { delete imGo.dataset.busy; paintImStats(); }
+  }
   if (S.sample) exitSample(true);
   const touched = new Set(), ids = new Set(), now = Date.now();
   sel.forEach((it, n) => {
-    const key = it.date.slice(0, 7);
-    const rec = { id: uid(), amt: r2(it.amount), title: it.text.slice(0, 40), cat: it.cat, date: it.date, rep: false, ts: now - n };
+    const key = it.date.slice(0, 7), rate = imForeign(it) ? rates.get(it.currency + '@' + it.date) : null;
+    const rec = { id: uid(), amt: rate ? Math.max(0.01, r2(it.amount * rate)) : r2(it.amount), title: it.text.slice(0, 40), cat: it.cat, date: it.date, rep: false, ts: now - n };
+    if (rate) rec.fx = { cur: it.currency, amt: r2(it.amount), rate };
     ensureM(key).expenses.push(rec); touched.add(key); ids.add(rec.id);
   });
   touched.forEach(k => Store.touch(k));
@@ -3320,8 +3619,14 @@ $('#pkList').addEventListener('click', async e => {
 
 /* ---------- Neuigkeiten ----------
    Öffnet sich beim ersten Start nach einem Update von selbst (gemerkt pro Gerät), danach über die Einstellungen. */
-const APP_VERSION = '3.2';
+const APP_VERSION = '3.3';
 const CHANGELOG = [
+  { v: '3.3', title: 'Bezahlt in Euro, Dollar oder Baht', sub: 'Wähle die Währung, in der du bezahlt hast. Quota rechnet sofort in deine Währung um.', items: [
+    ['i-coins', 'Andere Währung wählen', 'Tippe beim Erfassen auf die Währung neben dem Betrag. Suche nach Namen oder Land, zum Beispiel „Thailand“. Zuletzt verwendete Währungen stehen oben.'],
+    ['i-repeat', 'Live umgerechnet', 'Schon beim Eintippen siehst du den Betrag in deiner Währung, mit dem Tageskurs der EZB. Für Ausgaben in der Vergangenheit gilt der Kurs dieses Tages.'],
+    ['i-pen', 'Eigener Kurs', 'Hat deine Bank anders gerechnet, trage ihren Kurs von Hand ein. Ohne Verbindung nimmt Quota den letzten bekannten Kurs.'],
+    ['i-receipt', 'Belege und Bank-Import', 'Liest die KI einen Beleg in Euro, stellt sie die Währung gleich mit ein. Beim Bank-Import werden Buchungen in anderer Währung umgerechnet.'],
+  ] },
   { v: '3.2', title: 'Belege auf Knopfdruck', sub: 'Foto hochladen, bei der Ausgabe ablegen und nur auslesen lassen, wenn du willst.', items: [
     ['i-spark', 'Auslesen, wenn du willst', 'Nach dem Foto liest die KI erst, wenn du auf „Mit KI auslesen“ tippst. So geht keine Analyse aus Versehen weg.'],
     ['i-receipt', 'Beleg ablegen und wieder ansehen', 'Das Foto wird platzsparend in kleinerer Auflösung bei der Ausgabe abgelegt. Tippe später auf die Ausgabe und dann auf den Beleg. Nochmals Tippen vergrössert ihn.'],

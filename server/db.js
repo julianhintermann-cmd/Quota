@@ -117,6 +117,7 @@ export function openDatabase(dataDir) {
   const cols = t => db.prepare(`PRAGMA table_info(${t})`).all().map(c => c.name);
   if (!cols('settings').includes('categories')) db.exec('ALTER TABLE settings ADD COLUMN categories TEXT');
   if (!cols('expenses').includes('receipt')) db.exec('ALTER TABLE expenses ADD COLUMN receipt TEXT');
+  if (!cols('expenses').includes('fx_cur')) db.exec('ALTER TABLE expenses ADD COLUMN fx_cur TEXT; ALTER TABLE expenses ADD COLUMN fx_amount INTEGER; ALTER TABLE expenses ADD COLUMN fx_rate REAL;');
 
   const q = {
     countUsers: db.prepare('SELECT COUNT(*) AS n FROM users'),
@@ -145,8 +146,8 @@ export function openDatabase(dataDir) {
 
     months: db.prepare('SELECT month, income, budget FROM months WHERE user_id = ? ORDER BY month'),
     month: db.prepare('SELECT month, income, budget FROM months WHERE user_id = ? AND month = ?'),
-    expenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt FROM expenses WHERE user_id = ? ORDER BY month, ts, id'),
-    monthExpenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt FROM expenses WHERE user_id = ? AND month = ? ORDER BY ts, id'),
+    expenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate FROM expenses WHERE user_id = ? ORDER BY month, ts, id'),
+    monthExpenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate FROM expenses WHERE user_id = ? AND month = ? ORDER BY ts, id'),
     upsertMonth: db.prepare(`INSERT INTO months (user_id, month, income, budget, updated_at) VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(user_id, month) DO UPDATE SET income = excluded.income, budget = excluded.budget, updated_at = excluded.updated_at`),
     movedFrom: db.prepare(`SELECT DISTINCT month FROM expenses
@@ -154,8 +155,8 @@ export function openDatabase(dataDir) {
     deleteMoved: db.prepare(`DELETE FROM expenses
       WHERE user_id = ? AND month <> ? AND id IN (SELECT value FROM json_each(?))`),
     deleteMonthExpenses: db.prepare('DELETE FROM expenses WHERE user_id = ? AND month = ?'),
-    insertExpense: db.prepare(`INSERT INTO expenses (user_id, id, month, date, amount, title, category, monthly, ts, receipt)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`),
+    insertExpense: db.prepare(`INSERT INTO expenses (user_id, id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`),
     deleteMonth: db.prepare('DELETE FROM months WHERE user_id = ? AND month = ?'),
 
     getConfig: db.prepare('SELECT value FROM config WHERE key = ?'),
@@ -201,6 +202,7 @@ export function openDatabase(dataDir) {
   const expenseOut = e => {
     const o = { id: e.id, amt: fromCents(e.amount), title: e.title, cat: e.category, date: e.date, rep: !!e.monthly, ts: e.ts };
     if (e.receipt) o.rc = e.receipt;
+    if (e.fx_cur) o.fx = { cur: e.fx_cur, amt: fromCents(e.fx_amount), rate: e.fx_rate };
     return o;
   };
   const parseJson = (t, fallback = null) => { try { return t ? JSON.parse(t) : fallback; } catch { return fallback; } };
@@ -274,7 +276,8 @@ export function openDatabase(dataDir) {
         q.upsertMonth.run(userId, key, toCents(doc.income), toCents(doc.budget), now);
         q.deleteMonthExpenses.run(userId, key);
         for (const e of doc.expenses) {
-          q.insertExpense.run(userId, e.id, key, e.date, toCents(e.amt), e.title, e.cat, e.rep ? 1 : 0, e.ts, e.rc || null);
+          q.insertExpense.run(userId, e.id, key, e.date, toCents(e.amt), e.title, e.cat, e.rep ? 1 : 0, e.ts, e.rc || null,
+            e.fx ? e.fx.cur : null, e.fx ? toCents(e.fx.amt) : null, e.fx ? e.fx.rate : null);
         }
         return moved;
       });

@@ -9,6 +9,7 @@ import {
 } from './auth.js';
 import { analyzeReceipt, listVisionModels, AiError, DEFAULT_MODEL } from './ai.js';
 import { verifyRegistration, verifyAssertion, ChallengeStore, challengeOf, WebAuthnError } from './webauthn.js';
+import { createFx, FxError, FX_SOURCES } from './fx.js';
 
 const DAY = 864e5;
 const SESSION_DAYS = 90;
@@ -38,6 +39,7 @@ export const ICONS = [
 const CAT_ID_RE = /^[a-z0-9_]{1,24}$/;
 const RECEIPT_RE = /^[a-f0-9]{24}$/;
 const GOAL_ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+const CUR_RE = /^[A-Z]{3}$/;
 const IMAGE_TYPES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
 const MAX_IMAGE = 6 * 1024 * 1024;
 
@@ -83,9 +85,18 @@ function parseMonthDoc(body) {
       rep: !!e.rep,
       ts: Number.isFinite(e.ts) ? Math.max(0, Math.trunc(e.ts)) : 0,
       rc: typeof e.rc === 'string' && RECEIPT_RE.test(e.rc) ? e.rc : null,
+      fx: parseFx(e.fx),
     });
   }
   return { income, budget, expenses: [...byId.values()] };
+}
+// Bezahlt in Fremdwährung: Originalbetrag und Kurs (amt ist bereits umgerechnet)
+function parseFx(fx) {
+  if (!fx || typeof fx !== 'object' || typeof fx.cur !== 'string' || !CUR_RE.test(fx.cur)) return null;
+  const amt = money(fx.amt);
+  const rate = fx.rate;
+  if (amt === undefined || typeof rate !== 'number' || !Number.isFinite(rate) || rate <= 0 || rate > 1e7) return null;
+  return { cur: fx.cur, amt, rate: Number(rate.toPrecision(8)) };
 }
 function parseCategories(list) {
   if (list === null) return null;
@@ -193,7 +204,7 @@ const publicUser = u => ({ id: u.id, username: u.username, admin: !!u.is_admin }
 export function createApp({
   dataDir, publicDir, backupDir = join(dataDir, 'backups'), backupKeep = 14,
   cookieSecure = 'auto', trustProxy = false, log = console,
-  appUrl = null, aiKey = null, aiModel = null, openrouterUrl = 'https://openrouter.ai/api/v1',
+  appUrl = null, aiKey = null, aiModel = null, openrouterUrl = 'https://openrouter.ai/api/v1', fxSources = FX_SOURCES,
 }) {
   const db = openDatabase(dataDir);
   const receiptDir = join(dataDir, 'receipts');
@@ -225,6 +236,7 @@ export function createApp({
   const uploadLimiter = new RateLimiter({ max: 60, windowMs: 60 * 60 * 1000 });
   const challenges = new ChallengeStore();
   const aiBusy = new Set();
+  const fx = createFx({ sources: fxSources, today: () => localDay(), log });
 
   /* KI-Einstellungen: Umgebungsvariable hat Vorrang vor dem in der App hinterlegten Schlüssel */
   const ai = {
@@ -465,6 +477,18 @@ export function createApp({
       return sendJson(res, 200, { goals });
     }
 
+    /* Wechselkurse (für Ausgaben in Fremdwährung) */
+    if (p === '/api/fx' && m === 'GET') {
+      const qp = url.searchParams;
+      try {
+        const r = await fx.rate(String(qp.get('from') || '').toUpperCase(), String(qp.get('to') || '').toUpperCase(), qp.get('date') || null);
+        return sendJson(res, 200, r, { 'Cache-Control': 'private, max-age=600' });
+      } catch (e) {
+        if (e instanceof FxError) throw new HttpError(e.status, e.message);
+        throw e;
+      }
+    }
+
     /* Belegfotos und KI-Erkennung */
     if (p === '/api/ai' && m === 'GET') return sendJson(res, 200, aiStatus(user));
     if (p === '/api/receipts' && m === 'POST') {
@@ -529,8 +553,9 @@ export function createApp({
       const currency = (data.settings && data.settings.currency) || 'CHF';
       const rows = Object.values(data.months).flatMap(mo => mo.expenses)
         .sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts)
-        .map(e => [e.date, e.title, names[e.cat] || names.sonst || 'Sonstiges', e.amt.toFixed(2), currency, e.rep ? 'ja' : 'nein'].map(csvCell).join(';'));
-      const csv = '\ufeff' + ['Datum;Titel;Kategorie;Betrag;Währung;Monatlich', ...rows].join('\r\n') + '\r\n';
+        .map(e => [e.date, e.title, names[e.cat] || names.sonst || 'Sonstiges', e.amt.toFixed(2), currency, e.rep ? 'ja' : 'nein',
+          e.fx ? e.fx.amt.toFixed(2) : '', e.fx ? e.fx.cur : '', e.fx ? String(e.fx.rate) : ''].map(csvCell).join(';'));
+      const csv = '\ufeff' + ['Datum;Titel;Kategorie;Betrag;Währung;Monatlich;Originalbetrag;Originalwährung;Kurs', ...rows].join('\r\n') + '\r\n';
       res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Cache-Control': 'no-store',
         'Content-Disposition': `attachment; filename="quota-ausgaben-${day}.csv"` });
       return res.end(csv);

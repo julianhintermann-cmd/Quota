@@ -12,7 +12,14 @@ import { openDatabase } from '../server/db.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const quiet = { info() {}, error() {} };
-let app, base, dir, fake, fakeUrl;
+let app, base, dir, fake, fakeUrl, fxFake;
+const fxState = { calls: 0, ecbDown: false, altDown: false };
+const FX_TABLES = {
+  'ecb/latest': { amount: 1, base: 'EUR', date: '2026-09-28', rates: { CHF: 0.94, USD: 1.17, GBP: 0.87 } },
+  'ecb/2024-08-15': { amount: 1, base: 'EUR', date: '2024-08-14', rates: { CHF: 0.95, USD: 1.1 } },
+  'alt/latest': { date: '2026-09-29', eur: { chf: 0.941, usd: 1.171, aed: 4.3, btc: 0.00001 } },
+  'alt/2024-07-01': { date: '2024-07-01', eur: { chf: 0.96, usd: 1.07 } },
+};
 const fakeState = { status: 200, content: null, calls: 0, lastBody: null };
 
 before(async () => {
@@ -40,14 +47,31 @@ before(async () => {
   await new Promise(r => fake.listen(0, '127.0.0.1', r));
   fakeUrl = `http://127.0.0.1:${fake.address().port}`;
 
+  // Nachgebaute Kursquellen: /ecb/<tag>?base=EUR (Frankfurter) und /alt/<tag>/v1/currencies/eur.json
+  fxFake = http.createServer((req, res) => {
+    fxState.calls++;
+    const u = new URL(req.url, 'http://x');
+    let key = null;
+    if (u.pathname.startsWith('/ecb/') && u.searchParams.get('base') === 'EUR' && !fxState.ecbDown) key = 'ecb/' + u.pathname.slice(5);
+    const alt = u.pathname.match(/^\/alt\/([^/]+)\/v1\/currencies\/eur\.json$/);
+    if (alt && !fxState.altDown) key = 'alt/' + alt[1];
+    const body = key && FX_TABLES[key];
+    res.writeHead(body ? 200 : (fxState.ecbDown || fxState.altDown ? 503 : 404), { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(body || { message: 'not found' }));
+  });
+  await new Promise(r => fxFake.listen(0, '127.0.0.1', r));
+  const fxUrl = `http://127.0.0.1:${fxFake.address().port}`;
+
   dir = mkdtempSync(join(tmpdir(), 'monatsbudget-features-'));
-  app = createApp({ dataDir: dir, publicDir: join(root, 'public'), backupKeep: 0, log: quiet, openrouterUrl: fakeUrl });
+  app = createApp({ dataDir: dir, publicDir: join(root, 'public'), backupKeep: 0, log: quiet, openrouterUrl: fakeUrl,
+    fxSources: { ecb: fxUrl + '/ecb', alt: [fxUrl + '/kaputt/{day}/v1', fxUrl + '/alt/{day}/v1'] } });
   await new Promise(r => app.server.listen(0, '127.0.0.1', r));
   base = `http://127.0.0.1:${app.server.address().port}`;
 });
 after(async () => {
   await app.close();
   await new Promise(r => fake.close(r));
+  await new Promise(r => fxFake.close(r));
   rmSync(dir, { recursive: true, force: true });
 });
 
@@ -249,6 +273,47 @@ test('Belege: verknüpfte bleiben, verwaiste werden aufgeräumt', async () => {
   assert.ok(!readdirSync(join(dir, 'receipts')).some(f => f.startsWith(drop)));
 });
 
+test('Wechselkurse: EZB zuerst, sonst currency-api, zwischengespeichert und geprüft', async () => {
+  assert.equal((await client()('GET', '/api/fx?from=EUR&to=CHF')).status, 401);
+  let r = await anna('GET', '/api/fx?from=EUR&to=CHF');
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.data, { from: 'EUR', to: 'CHF', rate: 0.94, date: '2026-09-28', source: 'EZB' });
+  const calls = fxState.calls;
+  r = await anna('GET', '/api/fx?from=usd&to=CHF');
+  assert.equal(r.data.rate, Number((0.94 / 1.17).toPrecision(6)), 'über Kreuz gerechnet');
+  assert.equal(fxState.calls, calls, 'aus dem Zwischenspeicher');
+  r = await anna('GET', '/api/fx?from=AED&to=CHF&date=2999-01-01');
+  assert.deepEqual([r.data.source, r.data.rate, r.data.date], ['currency-api', Number((0.941 / 4.3).toPrecision(6)), '2026-09-29'], 'nicht bei der EZB, Zukunft = aktuell');
+  r = await anna('GET', '/api/fx?from=EUR&to=CHF&date=2024-08-15');
+  assert.deepEqual([r.data.rate, r.data.date, r.data.source], [0.95, '2024-08-14', 'EZB'], 'Kurs vom letzten Werktag davor');
+  fxState.ecbDown = true;
+  r = await anna('GET', '/api/fx?from=EUR&to=USD&date=2024-07-01');
+  assert.deepEqual([r.data.rate, r.data.source], [1.07, 'currency-api'], 'EZB nicht erreichbar');
+  fxState.ecbDown = false;
+  let x = await anna('GET', '/api/fx?from=XYZ&to=CHF');
+  assert.deepEqual([x.status, x.data.error], [404, 'Für XYZ gibt es keinen Kurs.']);
+  fxState.altDown = true;
+  x = await anna('GET', '/api/fx?from=AED&to=CHF&date=2024-06-03');
+  assert.equal(x.status, 502, 'Quelle weg heisst nicht „Währung unbekannt“');
+  fxState.altDown = false;
+  assert.equal((await anna('GET', '/api/fx?from=EURO&to=CHF')).status, 400);
+  assert.equal((await anna('GET', '/api/fx?from=EUR&to=CHF&date=1990-01-01')).status, 400);
+  assert.equal((await anna('GET', '/api/fx?from=EUR&to=CHF&date=2024-01-01')).status, 502, 'keine Quelle hat den Tag');
+  assert.equal((await anna('GET', '/api/fx?from=CHF&to=CHF')).data.rate, 1);
+});
+
+test('Ausgaben in Fremdwährung: Originalbetrag und Kurs bleiben erhalten', async () => {
+  const r = await admin('PUT', '/api/months/2026-08', { income: null, budget: null, expenses: [
+    { id: 'fx1', amt: 42.3, title: 'Paris', cat: 'essen', date: '2026-08-10', rep: false, ts: 1, fx: { cur: 'EUR', amt: 45, rate: 0.94 } },
+    { id: 'fx2', amt: 5, title: 'Kaputt', cat: 'essen', date: '2026-08-11', rep: false, ts: 2, fx: { cur: 'euro', amt: 5, rate: -1 } },
+  ] });
+  assert.equal(r.status, 200);
+  const list = (await admin('GET', '/api/data')).data.months['2026-08'].expenses;
+  assert.deepEqual(list.find(e => e.id === 'fx1').fx, { cur: 'EUR', amt: 45, rate: 0.94 });
+  assert.equal(list.find(e => e.id === 'fx1').amt, 42.3);
+  assert.equal(list.find(e => e.id === 'fx2').fx, undefined, 'ungültige Angaben werden verworfen');
+});
+
 test('Export: CSV für Excel und JSON-Sicherung', async () => {
   let r = await admin('GET', '/api/export.csv');
   assert.equal(r.status, 200);
@@ -256,8 +321,9 @@ test('Export: CSV für Excel und JSON-Sicherung', async () => {
   const text = r.buf.toString('utf8');
   assert.equal(text.charCodeAt(0), 0xfeff, 'BOM für Excel');
   const lines = text.slice(1).trim().split('\r\n');
-  assert.equal(lines[0], 'Datum;Titel;Kategorie;Betrag;Währung;Monatlich');
-  assert.ok(lines.includes('2026-09-27;Mit Beleg;Essen;12.00;CHF;nein'), lines.join('\n'));
+  assert.equal(lines[0], 'Datum;Titel;Kategorie;Betrag;Währung;Monatlich;Originalbetrag;Originalwährung;Kurs');
+  assert.ok(lines.includes('2026-09-27;Mit Beleg;Essen;12.00;CHF;nein;;;'), lines.join('\n'));
+  assert.ok(lines.some(l => /^2026-08-10;Paris;[^;]+;42\.30;CHF;nein;45\.00;EUR;0\.94$/.test(l)), lines.join('\n'));
   r = await admin('GET', '/api/export.json');
   assert.equal(r.data.app, 'Quota');
   assert.equal(r.data.months['2026-09'].income, 5000);
