@@ -10,6 +10,10 @@ import {
 import { analyzeReceipt, listVisionModels, AiError, DEFAULT_MODEL } from './ai.js';
 import { verifyRegistration, verifyAssertion, ChallengeStore, challengeOf, WebAuthnError } from './webauthn.js';
 import { createFx, FxError, FX_SOURCES } from './fx.js';
+import { loadVapid, sendPush, okEndpoint } from './push.js';
+import { createNotifier, parsePrefs, DEFAULT_PREFS } from './notify.js';
+import { periodKeyOf, periodStats, addMonths, money as fmtMoney, monthName, dayLabel } from './period.js';
+import { systemPrompt, listFreeModels, openChat, parseMessages } from './assistant.js';
 
 const DAY = 864e5;
 const SESSION_DAYS = 90;
@@ -32,6 +36,7 @@ const DEFAULT_CATS = [
   { id: 'freizeit', n: 'Freizeit', ic: 'freizeit' }, { id: 'gesund', n: 'Gesundheit', ic: 'gesund' },
   { id: 'abos', n: 'Abos', ic: 'abos' }, { id: 'sonst', n: 'Sonstiges', ic: 'sonst' },
 ];
+export const APP_VERSION = '4.0';
 export const ICONS = [
   ...CATEGORIES, 'geschenk', 'reisen', 'auto', 'kind', 'tier', 'sport', 'bildung', 'technik', 'kleidung', 'haushalt',
   'versicherung', 'steuern', 'spende', 'sparen', 'handy', 'musik', 'pflanze', 'bar', 'werkzeug', 'arbeit', 'ziel',
@@ -86,6 +91,8 @@ function parseMonthDoc(body) {
       ts: Number.isFinite(e.ts) ? Math.max(0, Math.trunc(e.ts)) : 0,
       rc: typeof e.rc === 'string' && RECEIPT_RE.test(e.rc) ? e.rc : null,
       fx: parseFx(e.fx),
+      every: e.rep && (e.every === 3 || e.every === 12) ? e.every : undefined,
+      trip: typeof e.trip === 'string' && GOAL_ID_RE.test(e.trip) ? e.trip : null,
     });
   }
   return { income, budget, expenses: [...byId.values()] };
@@ -110,6 +117,22 @@ function parseCategories(list) {
   }
   return seen.has('sonst') ? out : undefined;
 }
+// Favoriten fürs Erfassen: Text, Betrag, Kategorie, optional Währung
+function parseFavorites(list) {
+  if (list === null) return null;
+  if (!Array.isArray(list) || list.length > 12) return undefined;
+  const out = [];
+  for (const f of list) {
+    if (!f || typeof f !== 'object') return undefined;
+    const t = typeof f.t === 'string' ? f.t.trim().slice(0, 40) : '';
+    const a = money(f.a);
+    if (!t || !a || typeof f.id !== 'string' || !ID_RE.test(f.id)) return undefined;
+    const o = { id: f.id, t, a, c: typeof f.c === 'string' && CAT_ID_RE.test(f.c) ? f.c : 'sonst' };
+    if (typeof f.cur === 'string' && CUR_RE.test(f.cur)) o.cur = f.cur;
+    out.push(o);
+  }
+  return out.length ? out : null;
+}
 function parseSettings(body) {
   if (!body || !CURRENCIES.includes(body.currency)) return null;
   if (!Number.isInteger(body.startDay) || body.startDay < 1 || body.startDay > 28) return null;
@@ -119,7 +142,33 @@ function parseSettings(body) {
     if (cats === undefined) return null;
     s.categories = cats;
   }
+  if ('favorites' in body) {
+    const favs = parseFavorites(body.favorites);
+    if (favs === undefined) return null;
+    s.favorites = favs;
+  }
   return s;
+}
+// Reise: Name, Zeitraum (höchstens ein Jahr), optional Budget in der Reisewährung
+function parseTrip(body, id) {
+  if (!body || !GOAL_ID_RE.test(id)) return null;
+  const name = typeof body.name === 'string' ? body.name.trim().slice(0, 40) : '';
+  if (!name || typeof body.start !== 'string' || !DATE_RE.test(body.start) || typeof body.end !== 'string' || !DATE_RE.test(body.end)) return null;
+  if (body.end < body.start || (new Date(body.end) - new Date(body.start)) / DAY > 366) return null;
+  const budget = body.budget == null ? null : money(body.budget);
+  if (budget === undefined || budget === 0) return null;
+  if (typeof body.cur !== 'string' || !CUR_RE.test(body.cur)) return null;
+  const rate = typeof body.rate === 'number' && Number.isFinite(body.rate) && body.rate > 0 && body.rate < 1e7 ? Number(body.rate.toPrecision(8)) : null;
+  return { id, name, start: body.start, end: body.end, budget, cur: body.cur, rate, icon: ICONS.includes(body.icon) ? body.icon : 'reisen' };
+}
+// Kurzer Gerätename aus dem User-Agent, z.B. „iPhone · Safari“
+export function deviceLabel(ua) {
+  const s = String(ua || '');
+  const os = /iPhone/.test(s) ? 'iPhone' : /iPad/.test(s) ? 'iPad' : /Android/.test(s) ? (/Mobile/.test(s) ? 'Android-Handy' : 'Android-Tablet')
+    : /Macintosh|Mac OS X/.test(s) ? 'Mac' : /Windows/.test(s) ? 'Windows' : /CrOS/.test(s) ? 'Chromebook' : /Linux/.test(s) ? 'Linux' : '';
+  const br = /Edg\//.test(s) ? 'Edge' : /OPR\/|Opera/.test(s) ? 'Opera' : /Firefox\/|FxiOS/.test(s) ? 'Firefox' : /CriOS|Chrome\//.test(s) ? 'Chrome'
+    : /Safari\//.test(s) ? 'Safari' : /node|curl|undici/i.test(s) ? 'Programm' : '';
+  return [os, br].filter(Boolean).join(' · ') || 'Unbekanntes Gerät';
 }
 function parseGoal(body, id) {
   if (!body || !GOAL_ID_RE.test(id)) return null;
@@ -205,6 +254,7 @@ export function createApp({
   dataDir, publicDir, backupDir = join(dataDir, 'backups'), backupKeep = 14,
   cookieSecure = 'auto', trustProxy = false, log = console,
   appUrl = null, aiKey = null, aiModel = null, openrouterUrl = 'https://openrouter.ai/api/v1', fxSources = FX_SOURCES,
+  pushContact = null, pushEndpointOk = okEndpoint, pushFetch = fetch,
 }) {
   const db = openDatabase(dataDir);
   const receiptDir = join(dataDir, 'receipts');
@@ -237,6 +287,74 @@ export function createApp({
   const challenges = new ChallengeStore();
   const aiBusy = new Set();
   const fx = createFx({ sources: fxSources, today: () => localDay(), log });
+  const chatBusy = new Set();
+
+  /* Push-Mitteilungen */
+  const vapid = loadVapid(db);
+  const pushSubject = pushContact || (appUrl && appUrl.startsWith('https://') ? appUrl : 'https://github.com/julianhintermann-cmd/Quota');
+  // Schickt an alle Geräte der Person; gibt die Anzahl zugestellter zurück (Gründe fürs Scheitern in .why)
+  async function sendToUser(userId, message) {
+    let ok = 0;
+    sendToUser.why = null;
+    for (const sub of db.pushSubs(userId)) {
+      try {
+        const status = await sendPush(sub, message, { vapid, subject: pushSubject, fetchImpl: pushFetch, topic: message.topic || null });
+        if (status === 404 || status === 410) { db.deletePushSub(sub.endpoint); sendToUser.why = 'gone'; log.info(`Push-Abo abgelaufen (${sub.device || 'Gerät'}), entfernt`); }
+        else if (status >= 200 && status < 300) ok++;
+        else { sendToUser.why = 'rejected'; log.error(`Push an ${new URL(sub.endpoint).host}: HTTP ${status}`); }
+      } catch (e) { sendToUser.why = 'network'; log.error(`Push fehlgeschlagen: ${e.message}`); }
+    }
+    return ok;
+  }
+  const notifier = createNotifier({ db, sendToUser, log });
+
+  /* Quota-Assistent: Gratis-Modelle von OpenRouter, Liste 6 Stunden zwischengespeichert */
+  const chat = {
+    model: () => db.getConfig('chat_model', ''),
+    limit: () => Number(db.getConfig('chat_daily_limit', '30')),
+    cache: { at: 0, list: null },
+    async models() {
+      if (!this.cache.list || Date.now() - this.cache.at > 6 * 3600e3) {
+        try { this.cache = { at: Date.now(), list: (await listFreeModels({ baseUrl: openrouterUrl })).map(m => m.id) }; }
+        catch (e) { if (!this.cache.list) throw e; }
+      }
+      const pick = this.model();
+      return pick ? [pick, ...this.cache.list.filter(id => id !== pick)] : this.cache.list;
+    },
+  };
+  function chatStatus(user) {
+    const used = db.chatUsage(user.id, localDay());
+    const limit = user.is_admin ? null : chat.limit();
+    return { enabled: !!ai.key(), limit, used, remaining: limit == null ? null : Math.max(0, limit - used) };
+  }
+  // Kurzfassung der eigenen Zahlen für den Assistenten (nur wenn die Person das einschaltet)
+  function financeSummary(userId) {
+    const data = db.getData(userId), st0 = data.settings || {};
+    const sd = st0.startDay || 25, cur = st0.currency || 'CHF', m = v => fmtMoney(v, cur);
+    const names = Object.fromEntries(userCategories(userId).map(c => [c.id, c.n]));
+    const catLine = byCat => Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([c, v]) => `${names[c] || 'Sonstiges'} ${m(v)}`).join(', ') || 'keine';
+    const day = localDay(), key = periodKeyOf(day, sd), now = periodStats(data, key, sd), prev = periodStats(data, addMonths(key, -1), sd);
+    const lines = [
+      `Heute: ${day}. Laufende Periode ${monthName(key)} (${now.start} bis ${now.end}).`,
+      `Einkommen: ${now.income != null ? m(now.income) : 'nicht eingetragen'}. Budget: ${now.budget != null ? m(now.budget) : 'nicht eingetragen'}.`,
+      `Ausgegeben (inkl. geplanter Fixkosten): ${m(now.spent)} in ${now.count} Ausgaben, davon Fixkosten ${m(now.fixed)}.`
+        + (now.limit != null ? ` Verbleibend: ${m(now.limit - now.spent)}.` : ''),
+      `Nach Kategorie: ${catLine(now.byCat)}.`,
+      `Vorperiode ${monthName(prev.key)}: ausgegeben ${m(prev.spent)}${prev.limit != null ? ` bei Grenze ${m(prev.limit)}` : ''}; nach Kategorie: ${catLine(prev.byCat)}.`,
+    ];
+    const fixed = new Map();
+    for (const mo of Object.values(data.months)) for (const e of mo.expenses) if (e.rep) {
+      const k = `${(e.title || '').toLowerCase()}|${e.cat}|${e.every || 1}`;
+      if (!fixed.has(k) || fixed.get(k).date < e.date) fixed.set(k, e);
+    }
+    const every = { 1: 'monatlich', 3: 'vierteljährlich', 12: 'jährlich' };
+    if (fixed.size) lines.push(`Fixkosten: ${[...fixed.values()].slice(0, 15).map(e => `${e.title || names[e.cat]} ${m(e.amt)} ${every[e.every || 1]}`).join(', ')}.`);
+    if (data.goals.length) lines.push(`Sparziele: ${data.goals.map(g => `${g.name} ${m(g.entries.reduce((a, x) => a + x.amt, 0))} von ${m(g.target)}${g.deadline ? ` bis ${g.deadline}` : ''}`).join('; ')}.`);
+    if (data.trips.length) lines.push(`Reisen: ${data.trips.slice(0, 5).map(t => `${t.name} ${t.start} bis ${t.end}${t.budget ? `, Budget ${fmtMoney(t.budget, t.cur)}` : ''}`).join('; ')}.`);
+    const recent = Object.values(data.months).flatMap(mo => mo.expenses).filter(e => e.date <= day).sort((a, b) => b.date.localeCompare(a.date) || b.ts - a.ts).slice(0, 12);
+    if (recent.length) lines.push(`Letzte Ausgaben: ${recent.map(e => `${e.date} ${e.title || names[e.cat]} ${m(e.amt)}${e.fx ? ` (${fmtMoney(e.fx.amt, e.fx.cur)})` : ''}`).join('; ')}.`);
+    return lines.join('\n');
+  }
 
   /* KI-Einstellungen: Umgebungsvariable hat Vorrang vor dem in der App hinterlegten Schlüssel */
   const ai = {
@@ -293,6 +411,7 @@ export function createApp({
       db.extendSession(sid, now + SESSION_DAYS * DAY);
       res.setHeader('Set-Cookie', sessionCookie(req, token, SESSION_DAYS * 86400));
     }
+    if (!row.last_seen || now - row.last_seen > 5 * 60e3) db.seenSession(sid, deviceLabel(req.headers['user-agent']));
     return { id: row.id, username: row.username, is_admin: row.is_admin, sid };
   }
 
@@ -306,7 +425,7 @@ export function createApp({
 
   function startSession(req, res, userId) {
     const token = newToken();
-    db.createSession(hashToken(token), userId, Date.now() + SESSION_DAYS * DAY);
+    db.createSession(hashToken(token), userId, Date.now() + SESSION_DAYS * DAY, deviceLabel(req.headers['user-agent']));
     res.setHeader('Set-Cookie', sessionCookie(req, token, SESSION_DAYS * 86400));
   }
 
@@ -441,6 +560,25 @@ export function createApp({
       return sendJson(res, 200, { ok: true });
     }
 
+    /* Angemeldete Geräte */
+    if (p === '/api/sessions' && m === 'GET') {
+      return sendJson(res, 200, { sessions: db.listSessions(user.id).map(s => ({
+        id: s.id, device: s.device, createdAt: s.createdAt, lastSeen: s.lastSeen, current: s.hash === user.sid,
+      })) });
+    }
+    if (p === '/api/sessions' && m === 'DELETE') {
+      db.deleteOtherSessions(user.id, user.sid);
+      closeStreams(user.id, s => s.sid !== user.sid);
+      return sendJson(res, 200, { ok: true });
+    }
+    const sm = p.match(/^\/api\/sessions\/([a-f0-9]{16})$/);
+    if (sm && m === 'DELETE') {
+      if (user.sid.startsWith(sm[1])) throw new HttpError(400, 'Dieses Gerät meldest du über „Abmelden“ ab.');
+      const gone = db.deleteSessionById(user.id, sm[1]);
+      closeStreams(user.id, s => gone.includes(s.sid));
+      return sendJson(res, 200, { ok: true, removed: gone.length });
+    }
+
     if (p === '/api/events' && m === 'GET') return openStream(req, res, user, url);
     if (p === '/api/data' && m === 'GET') return sendJson(res, 200, db.getData(user.id));
     if (p === '/api/settings' && m === 'PUT') {
@@ -475,6 +613,101 @@ export function createApp({
       const goals = db.listGoals(user.id);
       broadcast(user.id, cid, { kind: 'goals', data: goals });
       return sendJson(res, 200, { goals });
+    }
+
+    /* Reisen */
+    const tm = p.match(/^\/api\/trips\/([^/]+)$/);
+    if (tm) {
+      const tid = tm[1];
+      if (m === 'PUT') {
+        const t = parseTrip(await readJson(req), tid);
+        if (!t) throw new HttpError(400, 'Ungültige Reise.');
+        if (!db.hasTrip(user.id, tid) && db.listTrips(user.id).length >= 100) throw new HttpError(400, 'Höchstens 100 Reisen.');
+        db.putTrip(user.id, t);
+      } else if (m === 'DELETE') {
+        for (const k of db.deleteTrip(user.id, tid)) broadcast(user.id, null, { kind: 'month', key: k, data: db.getMonth(user.id, k) });
+      } else throw new HttpError(405, 'Methode nicht erlaubt.');
+      const trips = db.listTrips(user.id);
+      broadcast(user.id, cid, { kind: 'trips', data: trips });
+      return sendJson(res, 200, { trips });
+    }
+
+    /* Push-Mitteilungen */
+    if (p === '/api/push' && m === 'GET') {
+      return sendJson(res, 200, { key: vapid.publicKey, prefs: notifier.prefsOf(user.id), devices: db.pushSubs(user.id).length });
+    }
+    if (p === '/api/push/subscribe' && m === 'POST') {
+      const body = await readJson(req);
+      const endpoint = typeof body.endpoint === 'string' ? body.endpoint : '';
+      const keys = body.keys || {};
+      if (endpoint.length > 1000 || !pushEndpointOk(endpoint)) throw new HttpError(400, 'Dieser Push-Dienst wird nicht unterstützt.');
+      const ok = k => typeof k === 'string' && /^[A-Za-z0-9_-]+={0,2}$/.test(k);
+      if (!ok(keys.p256dh) || !ok(keys.auth) || Buffer.from(keys.p256dh, 'base64url').length !== 65 || Buffer.from(keys.auth, 'base64url').length !== 16) {
+        throw new HttpError(400, 'Ungültiges Push-Abo.');
+      }
+      if (db.pushSubs(user.id).length >= 20) throw new HttpError(400, 'Höchstens 20 Geräte mit Mitteilungen.');
+      db.addPushSub(user.id, { endpoint, p256dh: keys.p256dh, auth: keys.auth, device: deviceLabel(req.headers['user-agent']) });
+      if (!db.getPushPrefs(user.id)) db.putPushPrefs(user.id, DEFAULT_PREFS);
+      return sendJson(res, 201, { prefs: notifier.prefsOf(user.id), devices: db.pushSubs(user.id).length });
+    }
+    if (p === '/api/push/unsubscribe' && m === 'POST') {
+      const body = await readJson(req);
+      if (typeof body.endpoint === 'string') db.deleteUserPushSub(user.id, body.endpoint);
+      return sendJson(res, 200, { devices: db.pushSubs(user.id).length });
+    }
+    if (p === '/api/push/prefs' && m === 'PUT') {
+      const prefs = parsePrefs(await readJson(req));
+      if (!prefs) throw new HttpError(400, 'Ungültige Einstellung.');
+      db.putPushPrefs(user.id, { ...notifier.prefsOf(user.id), ...prefs });
+      return sendJson(res, 200, { prefs: notifier.prefsOf(user.id) });
+    }
+    if (p === '/api/push/test' && m === 'POST') {
+      if (uploadLimiter.blocked('push:' + user.id)) throw new HttpError(429, 'Bitte kurz warten.');
+      uploadLimiter.fail('push:' + user.id);
+      const sent = await sendToUser(user.id, { title: 'Quota', body: 'So sehen Mitteilungen von Quota aus. 👋', url: '/', tag: 'test' });
+      if (!sent) {
+        const why = sendToUser.why;
+        throw new HttpError(502, why === 'network' ? 'Der Server erreicht den Push-Dienst nicht. Hat der Container Internetzugang?'
+          : why === 'rejected' ? 'Der Push-Dienst hat die Mitteilung abgelehnt. Details stehen im Log des Containers.'
+            : 'Das Abo ist abgelaufen. Schalte Mitteilungen auf diesem Gerät aus und wieder ein.');
+      }
+      return sendJson(res, 200, { sent });
+    }
+
+    /* Quota-Assistent */
+    if (p === '/api/assistant' && m === 'GET') return sendJson(res, 200, chatStatus(user));
+    if (p === '/api/assistant' && m === 'POST') {
+      const body = await readJson(req);
+      const messages = parseMessages(body.messages);
+      if (!messages) throw new HttpError(400, 'Ungültige Nachricht.');
+      const key = ai.key();
+      if (!key) throw new HttpError(409, 'Der Assistent ist noch nicht eingerichtet. Ein Admin trägt dafür unter Einstellungen → KI einen OpenRouter-Schlüssel ein.');
+      const st = chatStatus(user);
+      if (st.remaining === 0) throw new HttpError(429, `Heute sind keine Nachrichten mehr übrig (${st.limit} pro Tag).`);
+      if (chatBusy.has(user.id)) throw new HttpError(429, 'Der Assistent antwortet gerade noch.');
+      chatBusy.add(user.id);
+      const abort = new AbortController();
+      res.on('close', () => abort.abort());
+      try {
+        const settings = db.getSettings(user.id) || {};
+        const system = systemPrompt({
+          version: APP_VERSION, username: user.username, isAdmin: !!user.is_admin,
+          currency: settings.currency || 'CHF', startDay: settings.startDay || 25, summary: body.withData === true ? financeSummary(user.id) : null,
+        });
+        let open;
+        try { open = await openChat({ apiKey: key, models: await chat.models(), system, messages, baseUrl: openrouterUrl, signal: abort.signal }); }
+        catch (e) { if (e instanceof AiError) throw new HttpError(e.status === 499 ? 400 : e.status, e.message); throw e; }
+        db.chatCount(user.id, localDay());
+        res.writeHead(200, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
+        res.write(JSON.stringify({ model: open.model }) + '\n');
+        try {
+          for await (const d of open.stream) res.write(JSON.stringify({ d }) + '\n');
+          res.end(JSON.stringify({ done: true, ...chatStatus(user) }) + '\n');
+        } catch (e) {
+          res.end(JSON.stringify({ error: e instanceof AiError ? e.message : 'Die Antwort wurde unterbrochen.' }) + '\n');
+        }
+        return;
+      } finally { chatBusy.delete(user.id); }
     }
 
     /* Wechselkurse (für Ausgaben in Fremdwährung) */
@@ -601,6 +834,7 @@ export function createApp({
         const moved = db.putMonth(user.id, key, doc);
         broadcast(user.id, cid, { kind: 'month', key, data: db.getMonth(user.id, key) });
         for (const k of moved) broadcast(user.id, cid, { kind: 'month', key: k, data: db.getMonth(user.id, k) });
+        notifier.budgetCheck(user.id).catch(e => log.error('Budgetwarnung:', e.message || e));
         return sendJson(res, 200, { ok: true });
       }
       if (m === 'DELETE') {
@@ -666,12 +900,26 @@ export function createApp({
             if (!Number.isInteger(body.limit) || body.limit < 0 || body.limit > 50) throw new HttpError(400, 'Das Tageslimit muss zwischen 0 und 50 liegen.');
             db.setConfig('ai_daily_limit', body.limit);
           }
+          if ('chatModel' in body) {
+            if (!body.chatModel) db.delConfig('chat_model');
+            else if (typeof body.chatModel === 'string' && /^[A-Za-z0-9._\-\/:]{3,120}:free$/.test(body.chatModel.trim())) db.setConfig('chat_model', body.chatModel.trim());
+            else throw new HttpError(400, 'Für den Assistenten gehen nur Gratis-Modelle (Name endet auf „:free“).');
+          }
+          if ('chatLimit' in body) {
+            if (!Number.isInteger(body.chatLimit) || body.chatLimit < 0 || body.chatLimit > 500) throw new HttpError(400, 'Das Tageslimit muss zwischen 0 und 500 liegen.');
+            db.setConfig('chat_daily_limit', body.chatLimit);
+          }
         } else if (m !== 'GET') throw new HttpError(405, 'Methode nicht erlaubt.');
         const key = ai.key();
         return sendJson(res, 200, {
           hasKey: !!key, keyHint: key ? `…${key.slice(-4)}` : null, fromEnv: !!aiKey,
           model: ai.model(), modelFromEnv: !!aiModel, defaultModel: DEFAULT_MODEL, limit: ai.limit(),
+          chatModel: chat.model() || null, chatLimit: chat.limit(),
         });
+      }
+      if (p === '/api/admin/ai/free-models' && m === 'GET') {
+        try { return sendJson(res, 200, { models: await listFreeModels({ baseUrl: openrouterUrl }) }); }
+        catch (e) { if (e instanceof AiError) throw new HttpError(e.status, e.message); throw e; }
       }
       if (p === '/api/admin/ai/models' && m === 'GET') {
         try { return sendJson(res, 200, { models: await listVisionModels({ baseUrl: openrouterUrl }) }); }
@@ -769,9 +1017,11 @@ export function createApp({
     setInterval(() => { for (const set of streams.values()) for (const s of set) s.res.write(': ping\n\n'); }, 25_000),
     setInterval(() => {
       db.purgeSessions(); loginLimiter.prune(); ipLimiter.prune(); uploadLimiter.prune(); challenges.prune();
+      db.purgeSent(Date.now() - 400 * DAY); db.chatPurge(localDay(new Date(Date.now() - 7 * DAY)));
       try { cleanReceipts(); } catch (e) { log.error('Aufräumen der Belege fehlgeschlagen:', e); }
     }, 60 * 60 * 1000),
   ];
+  timers.push(setInterval(() => { notifier.tick().catch(e => log.error('Mitteilungen:', e)); }, 60_000));
   if (backupKeep > 0) { timers.push(setInterval(runBackup, 60 * 60 * 1000)); runBackup(); }
   timers.forEach(t => t.unref());
 
@@ -784,5 +1034,5 @@ export function createApp({
     });
   }
 
-  return { server, db, close, runBackup, cleanReceipts };
+  return { server, db, close, runBackup, cleanReceipts, notifier, sendToUser, vapid };
 }

@@ -1,6 +1,6 @@
 {
   "name": "monatsbudget",
-  "version": "3.3.0",
+  "version": "4.0.0",
   "private": true,
   "description": "Persönliche Budget-App mit Benutzerkonten und SQLite-Datenbank",
   "type": "module",

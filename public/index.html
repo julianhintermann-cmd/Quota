@@ -421,6 +421,95 @@ button.tile:active{transform:scale(.965)}
   .sbar.on:hover,.sbar.drag{opacity:.45;width:8px}
 }
 
+/* ---------- Quota-Assistent ---------- */
+.chat-sheet{height:calc(100% - var(--kb,0px) - env(safe-area-inset-top,0px) - 18px)}
+.chat-body{flex:1;gap:10px;padding-bottom:12px}
+.chat-msg{max-width:86%;padding:10px 14px;border-radius:18px;font-size:16px;line-height:1.42;overflow-wrap:anywhere;flex-shrink:0}
+.chat-msg.me{align-self:flex-end;background:var(--ink);color:var(--on-ink);border-bottom-right-radius:6px;white-space:pre-wrap}
+.chat-msg.bot{align-self:flex-start;background:var(--fill);border-bottom-left-radius:6px}
+.chat-msg.bot p{margin:0}
+.chat-msg.bot p + p,.chat-msg.bot ul + p,.chat-msg.bot p + ul{margin-top:8px}
+.chat-msg.bot ul{margin:0;padding-left:20px}
+.chat-msg.bot li + li{margin-top:3px}
+.chat-msg.err{background:var(--danger-soft);color:var(--danger)}
+.chat-typing{display:inline-flex;gap:4px;padding:4px 0}
+.chat-typing i{width:7px;height:7px;border-radius:50%;background:var(--text-3);animation:blink 1.1s infinite}
+.chat-typing i:nth-child(2){animation-delay:.2s}
+.chat-typing i:nth-child(3){animation-delay:.4s}
+.chat-hello{align-self:stretch;display:flex;flex-direction:column;gap:10px;padding:6px 2px 4px}
+.chat-hello .ch-ic{width:44px;height:44px;border-radius:14px;background:var(--fill);display:grid;place-items:center}
+.chat-hello .ch-ic svg.i{width:24px;height:24px}
+.chat-hello b{font-size:18px}
+.chat-hello p{margin:0;color:var(--text-2);font-size:15px;line-height:1.45}
+.chat-sugs{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.chat-sugs button{padding:8px 13px;border-radius:14px;background:var(--fill);font-size:15px;text-align:left;transition:transform .3s var(--spring)}
+.chat-sugs button:active{transform:scale(.97)}
+.chat-foot{flex:none;padding:8px 16px 0;border-top:1px solid var(--hair);display:flex;flex-direction:column;gap:6px}
+.chat-in{display:flex;align-items:flex-end;gap:8px;background:var(--fill);border-radius:22px;padding:5px 5px 5px 14px}
+.chat-in textarea{flex:1;min-width:0;border:0;outline:0;background:none;resize:none;font:inherit;font-size:16px;line-height:1.4;padding:7px 0;max-height:120px;color:var(--text)}
+.chat-send{width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--on-ink);display:grid;place-items:center;flex:none;transition:opacity .2s,transform .3s var(--spring)}
+.chat-send:disabled{opacity:.25}
+.chat-send:active{transform:scale(.9)}
+.chat-send svg.i{width:18px;height:18px;stroke-width:2.4}
+.chat-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:var(--text-3);min-height:28px}
+.chat-data{display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-2);font-size:13px}
+.switch.sm{width:38px;height:23px}
+.switch.sm i::after{width:19px;height:19px}
+.switch.sm input:checked + i::after{transform:translateX(15px)}
+#chatNote{text-align:right}
+
+/* ---------- Reisen ---------- */
+.pk-day.in span{background:var(--fill-2);border-radius:10px}
+.tp-cal .pk-day.sel span{border-radius:50%}
+.trip-old{border-top:1px solid var(--hair);padding:10px 0 2px}
+.trip-old summary{font-size:14px;font-weight:600;color:var(--text-2);cursor:pointer;list-style:none;padding:4px 0}
+.trip-old summary::-webkit-details-marker{display:none}
+.goal-track i.over{background:var(--danger)}
+.g-hero .bar-fill.over{background:var(--danger)}
+.tp-add{display:flex;flex-direction:column;gap:8px}
+.tp-tag{background:var(--fill);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text-2)}
+.tp-tag .pill-btn{margin-left:auto;flex:none;background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.08);color:var(--text)}
+.g-entry .a small{display:block;font-size:12px;font-weight:500;color:var(--text-3);text-align:right}
+.opts .opt#exTrip.on{background:var(--ink);color:var(--on-ink)}
+
+/* ---------- Monatsrückblick ---------- */
+.rv-hero{text-align:center;padding:6px 0 4px}
+.rv-hero .rv-k{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em}
+.rv-hero .rv-v{font-family:var(--fd);font-size:44px;font-weight:600;letter-spacing:-.03em;line-height:1.1;margin-top:6px}
+.rv-hero .rv-v.over{color:var(--danger)}
+.rv-hero .rv-s{font-size:15px;color:var(--text-2);margin-top:4px}
+.rv-cats{display:flex;flex-direction:column;gap:10px;background:var(--fill);border-radius:16px;padding:14px}
+.rv-cat{display:grid;grid-template-columns:30px 1fr auto;gap:4px 10px;align-items:center}
+.rv-cat .cat-ic{grid-row:span 2;width:30px;height:30px}
+.rv-cat .rv-n{font-size:15px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-cat .rv-a{font-size:15px;font-weight:600}
+.rv-cat .rv-bar{grid-column:2/4;height:6px;border-radius:3px;background:var(--fill-2);overflow:hidden}
+.rv-cat .rv-bar i{display:block;height:100%;border-radius:3px;background:var(--ink)}
+.rv-cat .rv-d{grid-column:2/4;font-size:12px;color:var(--text-2);margin-top:-2px}
+.rv-save{display:flex;flex-direction:column;gap:10px;background:var(--fill);border-radius:16px;padding:14px}
+.rv-save .rv-t{font-size:16px;font-weight:600}
+.rv-save .chips{margin:0 -14px;padding:2px 14px}
+.rv-done{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600}
+.rv-done svg.i{width:18px;height:18px}
+
+/* ---------- Fixkosten ---------- */
+.cal-fix{display:inline-flex;align-items:center;gap:4px;font:inherit;color:inherit;padding:4px 0 4px 6px;border-radius:8px}
+.cal-fix svg.i{width:13px;height:13px;color:var(--text-3)}
+@media (hover:hover){.cal-fix:hover{color:var(--text)}}
+.fix-row{padding-right:14px}
+.fix-a{font-size:16px;font-weight:600;flex:none;letter-spacing:-.01em}
+.st-links{display:flex;flex-direction:column;gap:8px}
+
+/* ---------- Favoriten ---------- */
+.fav-star{width:36px;height:36px;margin-right:-8px;border-radius:10px;display:grid;place-items:center;color:var(--text-3);flex:none;transition:color .2s,transform .3s var(--spring)}
+.fav-star:active{transform:scale(.85)}
+.fav-star svg.i{width:20px;height:20px}
+.fav-star[aria-pressed="true"]{color:#e8a400}
+.fav-chips .chip{gap:6px;padding-right:12px}
+.fav-chips .chip b{font-weight:600;font-variant-numeric:tabular-nums}
+.fav-chips .chip.sug{background:transparent;box-shadow:inset 0 0 0 1.5px var(--fill-2)}
+.fav-chips .chip .fx-c{font-size:12px;color:var(--text-3);font-weight:600}
+
 /* ---------- Fremdwährung ---------- */
 .amount .cur-btn{display:inline-flex;align-items:center;gap:2px;font:inherit;font-size:22px;font-weight:600;color:var(--text-3);padding:4px 6px 4px 9px;margin:-4px -4px -4px -9px;border-radius:12px;transition:background-color .2s,color .2s,transform .3s var(--spring)}
 .amount .cur-btn svg.i{width:15px;height:15px;stroke-width:2.4;opacity:.8}
@@ -749,6 +838,7 @@ a.list-row{color:inherit;text-decoration:none}
   .sheet-h{touch-action:auto}
   .sheet .chips{flex-wrap:wrap;overflow:visible;margin-inline:0;padding:2px 0}
   .sheet.wide{width:min(680px,calc(100% - 48px))}
+  .chat-sheet{height:min(760px,calc(100% - 64px));width:min(560px,calc(100% - 48px))}
   .col-side .chips{flex-wrap:wrap;overflow:visible;margin-inline:0;padding:2px 0}
   .pk-day{height:34px}
   .pk-day span{width:30px;height:30px;font-size:14px}
@@ -807,6 +897,12 @@ a.list-row{color:inherit;text-decoration:none}
     <symbol id="i-clip" viewBox="0 0 24 24"><path d="m16.5 9-6.8 6.8a2 2 0 0 1-2.8-2.8l7.4-7.4a3.5 3.5 0 0 1 5 5L11.5 18.4a5 5 0 0 1-7-7L11 5"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A8 8 0 1 1 9.4 4.5a6.5 6.5 0 0 0 10.1 10.1z"/></symbol>
     <symbol id="i-offline" viewBox="0 0 24 24"><path d="M8.5 18.5H17a4 4 0 0 0 1.9-7.5M15.3 7.1A6 6 0 0 0 6.2 10 4.3 4.3 0 0 0 5 18.2"/><path d="M4 4l16 16"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.2 5.6.7-4.1 3.9 1 5.6L12 16.5l-5 2.7 1-5.6-4.1-3.9 5.6-.7z"/></symbol>
+    <symbol id="i-star-f" viewBox="0 0 24 24"><path fill="currentColor" d="m12 3.8 2.5 5.2 5.6.7-4.1 3.9 1 5.6L12 16.5l-5 2.7 1-5.6-4.1-3.9 5.6-.7z"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 2h-14z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5.5h14A1.5 1.5 0 0 1 20.5 7v8.5A1.5 1.5 0 0 1 19 17h-8l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/><path d="M8 10h8M8 13h5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5.5M6 11l6-6 6 6"/></symbol>
+    <symbol id="i-devices" viewBox="0 0 24 24"><rect x="3" y="5" width="13" height="10" rx="1.5"/><path d="M1.5 18.5h14"/><rect x="17.5" y="9" width="5" height="10" rx="1.2"/></symbol>
     <symbol id="i-face" viewBox="0 0 24 24"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16M9 9.5v1.5M15 9.5v1.5M12 9.5v3.5h-1M9.5 15.5c1.4 1.2 3.6 1.2 5 0"/></symbol>
     <symbol id="c-geschenk" viewBox="0 0 24 24"><rect x="3.5" y="8.5" width="17" height="4" rx="1.4"/><path d="M5 12.5h14V19a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19zM12 8.5v12M12 8.5c-1.3-2.7-5-3.5-5.2-1.2-.1 1.6 2.8 1.2 5.2 1.2zm0 0c1.3-2.7 5-3.5 5.2-1.2.1 1.6-2.8 1.2-5.2 1.2z"/></symbol>
     <symbol id="c-reisen" viewBox="0 0 24 24"><path d="M20.5 14.5 13 10.2V5.5a1.5 1.5 0 0 0-3 0v4.7l-7 4.3V16l7-2v4l-2 1.4v1.1l3.5-.9 3.5.9v-1.1L13 18v-4l7.5 2z"/></symbol>
@@ -846,7 +942,7 @@ a.list-row{color:inherit;text-decoration:none}
   <header class="nav" id="nav">
     <div class="nav-l"><div class="brand"><span class="brand-ic"><svg class="i"><use href="#i-wallet"/></svg></span>Quota</div><button class="pill-btn" id="navToday" type="button" hidden>Heute</button></div>
     <div class="nav-title num" id="navTitle">Budget</div>
-    <div class="nav-r"><button class="btn-ink nav-add" id="navAdd" type="button"><svg class="i"><use href="#i-plus"/></svg>Ausgabe erfassen</button><button class="icon-btn" id="btnStats" type="button" aria-label="Statistik"><svg class="i"><use href="#i-chart"/></svg></button><button class="icon-btn" id="btnSettings" type="button" aria-label="Einstellungen"><svg class="i"><use href="#i-more"/></svg></button></div>
+    <div class="nav-r"><button class="btn-ink nav-add" id="navAdd" type="button"><svg class="i"><use href="#i-plus"/></svg>Ausgabe erfassen</button><button class="icon-btn" id="btnChat" type="button" aria-label="Quota-Assistent fragen" title="Quota-Assistent" hidden><svg class="i"><use href="#i-chat"/></svg></button><button class="icon-btn" id="btnStats" type="button" aria-label="Statistik"><svg class="i"><use href="#i-chart"/></svg></button><button class="icon-btn" id="btnSettings" type="button" aria-label="Einstellungen"><svg class="i"><use href="#i-more"/></svg></button></div>
   </header>
   <main id="scroller">
     <div id="content" class="intro"></div>
@@ -866,7 +962,9 @@ a.list-row{color:inherit;text-decoration:none}
     <div class="amount" id="exAmt" tabindex="0" role="textbox" aria-label="Betrag"><button class="cur cur-btn" id="exCur" type="button" aria-expanded="false" aria-controls="exCurPick" aria-label="Währung wählen"><span id="exCurL">CHF</span><svg class="i"><use href="#i-chev-d"/></svg></button><span class="val num ph">0</span><span class="caret"></span></div>
     <div class="fx-line" id="exFx" aria-live="polite" hidden></div>
     <div class="kbd-hint">Betrag eintippen · Enter speichert</div>
-    <label class="field"><svg class="i"><use href="#i-pen"/></svg><input id="exTitle" type="text" placeholder="Wofür?" maxlength="40" autocomplete="off" autocapitalize="sentences" enterkeyhint="done"></label>
+    <label class="field"><svg class="i"><use href="#i-pen"/></svg><input id="exTitle" type="text" placeholder="Wofür?" maxlength="40" autocomplete="off" autocapitalize="sentences" enterkeyhint="done">
+      <button class="fav-star" id="exStar" type="button" aria-pressed="false" aria-label="Als Favorit merken" hidden><svg class="i"><use href="#i-star"/></svg></button></label>
+    <div class="chips fav-chips" id="exFavs" aria-label="Favoriten und Vorschläge" hidden></div>
     <div class="rc-card" id="exRc" hidden>
       <div class="rc-strip">
         <button class="rc-open" id="exRcOpen" type="button" title="Beleg ansehen"><span class="rc-thumb"><img id="exRcImg" alt=""></span>
@@ -878,7 +976,8 @@ a.list-row{color:inherit;text-decoration:none}
     <div class="chips" id="exCats" role="radiogroup" aria-label="Kategorie"></div>
     <div class="opts">
       <button class="opt" id="exDateOpt" type="button" aria-expanded="false" aria-controls="exPicker" aria-label="Datum wählen"><svg class="i"><use href="#i-cal"/></svg><span id="exDateLbl">Heute</span></button>
-      <button class="opt" id="exRepeat" type="button" aria-pressed="false"><svg class="i"><use href="#i-repeat"/></svg><span>Jeden Monat</span></button>
+      <button class="opt" id="exRepeat" type="button" aria-pressed="false"><svg class="i"><use href="#i-repeat"/></svg><span>Wiederholen</span></button>
+      <button class="opt" id="exTrip" type="button" aria-pressed="false" hidden><svg class="i"><use href="#c-reisen"/></svg><span id="exTripLbl">Reise</span></button>
     </div>
     <div class="picker cur-pick" id="exCurPick" role="group" aria-label="Währung wählen" hidden>
       <label class="field cur-q"><svg class="i"><use href="#i-search"/></svg><input id="curQ" type="search" placeholder="Suchen, z.B. Euro oder Thailand" autocomplete="off" enterkeyhint="done" aria-label="Währung suchen"></label>
@@ -949,6 +1048,26 @@ a.list-row{color:inherit;text-decoration:none}
       <div class="list-row"><div class="lr-main"><div class="lr-t">Face ID / Passkey</div><div class="lr-s" id="pkNote">Ohne Passwort anmelden</div></div>
         <button class="pill-btn" id="pkAdd" type="button">Einrichten</button></div>
       <div class="users" id="pkList"></div>
+      <button class="list-row lr-btn" id="btnDevs" type="button" aria-expanded="false" aria-controls="devList"><div class="lr-main"><div class="lr-t">Angemeldete Geräte</div><div class="lr-s" id="devNote">Wo du gerade angemeldet bist</div></div><svg class="i"><use href="#i-chev-d"/></svg></button>
+      <div class="users" id="devList" hidden></div>
+    </div>
+    <div class="set-group" id="grpPush" hidden>
+      <div class="set-label">Mitteilungen</div>
+      <div class="list-row"><div class="lr-main"><div class="lr-t">Auf diesem Gerät</div><div class="lr-s" id="pushNote">Budgetwarnungen, Erinnerungen und Rückblick</div></div>
+        <label class="switch"><input type="checkbox" id="pushToggle" aria-label="Mitteilungen auf diesem Gerät"><i></i></label></div>
+      <div class="set-form" id="pushPrefs" hidden>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Budgetwarnung</div><div class="lr-s">bei 80 % und 100 % des Budgets</div></div>
+          <label class="switch"><input type="checkbox" data-pref="budget" aria-label="Budgetwarnung"><i></i></label></div>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Erinnerung am Abend</div><div class="lr-s">nur wenn heute noch nichts erfasst ist</div></div>
+          <label class="switch"><input type="checkbox" data-pref="remind" aria-label="Erinnerung am Abend"><i></i></label></div>
+        <div class="list-row" id="remindRow" hidden><div class="lr-main"><div class="lr-t">Uhrzeit</div></div>
+          <div class="stepper"><button type="button" id="remDown" aria-label="30 Minuten früher">−</button><span id="remVal" class="num" aria-live="polite">20:00</span><button type="button" id="remUp" aria-label="30 Minuten später">+</button></div></div>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Monatsrückblick</div><div class="lr-s">am Lohntag ab 9 Uhr</div></div>
+          <label class="switch"><input type="checkbox" data-pref="review" aria-label="Monatsrückblick"><i></i></label></div>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Fixkosten fällig</div><div class="lr-s">am Vortag, vierteljährliche und jährliche</div></div>
+          <label class="switch"><input type="checkbox" data-pref="due" aria-label="Fixkosten fällig"><i></i></label></div>
+        <button class="txt-btn left" id="pushTest" type="button">Test-Mitteilung senden</button>
+      </div>
     </div>
     <div class="set-group">
       <div class="set-label">Darstellung</div>
@@ -967,6 +1086,11 @@ a.list-row{color:inherit;text-decoration:none}
       <div class="set-label">Kategorien</div>
       <button class="list-row lr-btn" id="btnCats" type="button"><div class="lr-main"><div class="lr-t">Kategorien bearbeiten</div><div class="lr-s" id="catsNote"></div></div><svg class="i"><use href="#i-chev-r"/></svg></button>
     </div>
+    <div class="set-group" id="grpFavs">
+      <div class="set-label">Favoriten</div>
+      <div class="users" id="favList"></div>
+      <p class="set-note" id="favNote">Tippe beim Erfassen auf den Stern im Feld „Wofür?“, um eine Ausgabe als Favorit zu merken. Favoriten erscheinen dann mit einem Tipp zum Ausfüllen.</p>
+    </div>
     <div class="set-group" id="grpData">
       <div class="set-label">Daten</div>
       <a class="list-row lr-btn" id="expCsv" href="/api/export.csv" download><div class="lr-main"><div class="lr-t">Ausgaben exportieren</div><div class="lr-s">CSV für Excel oder Numbers</div></div><svg class="i"><use href="#i-download"/></svg></a>
@@ -978,7 +1102,7 @@ a.list-row{color:inherit;text-decoration:none}
       <div class="list-row"><div><div class="lr-t" id="storeT">Nur auf diesem Gerät</div><div class="lr-s" id="storeS">Daten bleiben in diesem Browser.</div></div></div>
     </div>
     <div class="set-group" id="grpAi" hidden>
-      <div class="set-label">KI-Belegerkennung</div>
+      <div class="set-label">KI: Belege und Assistent</div>
       <div class="list-row"><div class="lr-main"><div class="lr-t" id="aiState">Nicht eingerichtet</div><div class="lr-s" id="aiStateS"></div></div></div>
       <div class="set-form">
         <label class="field"><svg class="i"><use href="#i-lock"/></svg><input id="aiKey" type="password" placeholder="OpenRouter-Schlüssel (sk-or-…)" autocomplete="off" spellcheck="false" autocapitalize="none"></label>
@@ -987,11 +1111,16 @@ a.list-row{color:inherit;text-decoration:none}
         <div class="model-list" id="aiModels" hidden></div>
         <div class="list-row"><div class="lr-main"><div class="lr-t">Analysen pro Tag</div><div class="lr-s">für Personen ohne Admin-Rechte</div></div>
           <div class="stepper"><button type="button" id="aiDown" aria-label="Weniger">−</button><span id="aiLimit" class="num">3</span><button type="button" id="aiUp" aria-label="Mehr">+</button></div></div>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Modell für den Assistenten</div><div class="lr-s" id="chatModelLbl">Automatisch: bestes Gratis-Modell</div></div>
+          <button class="pill-btn" id="chatModelLoad" type="button">Wählen</button></div>
+        <div class="model-list" id="chatModels" hidden></div>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Assistent: Nachrichten pro Tag</div><div class="lr-s">für Personen ohne Admin-Rechte</div></div>
+          <div class="stepper"><button type="button" id="chatDown" aria-label="Weniger">−</button><span id="chatLimit" class="num">30</span><button type="button" id="chatUp" aria-label="Mehr">+</button></div></div>
         <div class="form-err" id="aiErr" role="alert"></div>
         <button class="btn-primary" id="aiSave" type="button">Sichern</button>
         <button class="btn-danger" id="aiRemove" type="button" hidden>Schlüssel entfernen</button>
       </div>
-      <p class="set-note">Den Schlüssel erstellst du auf openrouter.ai unter <b>Keys</b>. Er bleibt auf deinem Server; Belegfotos werden nur zum Auslesen an OpenRouter geschickt.</p>
+      <p class="set-note">Den Schlüssel erstellst du auf openrouter.ai unter <b>Keys</b>. Er bleibt auf deinem Server; Belegfotos werden nur zum Auslesen an OpenRouter geschickt. Der Assistent nutzt nur kostenlose Modelle.</p>
     </div>
     <div class="set-group" id="grpUsers" hidden>
       <div class="set-label">Benutzer</div>
@@ -1007,6 +1136,7 @@ a.list-row{color:inherit;text-decoration:none}
     </div>
     <div class="set-group">
       <div class="set-label">App</div>
+      <button class="list-row lr-btn" id="btnChatSet" type="button" hidden><div class="lr-main"><div class="lr-t">Quota-Assistent</div><div class="lr-s">Fragen zur App stellen</div></div><svg class="i"><use href="#i-chev-r"/></svg></button>
       <button class="list-row lr-btn" id="btnNews" type="button"><div class="lr-main"><div class="lr-t">Neuigkeiten</div><div class="lr-s" id="newsNote">Was ist neu?</div></div><svg class="i"><use href="#i-chev-r"/></svg></button>
     </div>
     <div class="set-group">
@@ -1060,6 +1190,57 @@ a.list-row{color:inherit;text-decoration:none}
   <div class="grab"></div>
   <div class="sheet-h"><span class="l"></span><h3 id="shStatsT">Statistik</h3><button class="txt-btn r strong" type="button" data-close>Fertig</button></div>
   <div class="sheet-body" id="stBody"></div>
+</section>
+
+<!-- Quota-Assistent -->
+<section class="sheet chat-sheet" id="shChat" role="dialog" aria-modal="true" aria-labelledby="shChatT">
+  <div class="grab"></div>
+  <div class="sheet-h"><button class="txt-btn l" type="button" id="chatNew">Neu</button><h3 id="shChatT">Quota-Assistent</h3><button class="txt-btn r strong" type="button" data-close>Fertig</button></div>
+  <div class="sheet-body chat-body" id="chatBody"></div>
+  <div class="chat-foot">
+    <form class="chat-in" id="chatForm"><textarea id="chatQ" rows="1" placeholder="Frag etwas zu Quota …" maxlength="2000" enterkeyhint="send" aria-label="Frage an den Assistenten"></textarea>
+      <button class="chat-send" id="chatSend" type="submit" aria-label="Senden" disabled><svg class="i"><use href="#i-send"/></svg></button></form>
+    <div class="chat-meta"><label class="chat-data"><span class="switch sm"><input type="checkbox" id="chatData"><i></i></span>Meine Zahlen einbeziehen</label><span id="chatNote"></span></div>
+  </div>
+</section>
+
+<!-- Reise -->
+<section class="sheet" id="shTrip" role="dialog" aria-modal="true" aria-labelledby="shTripT">
+  <div class="grab"></div>
+  <div class="sheet-h"><button class="txt-btn l" type="button" data-close>Schliessen</button><h3 id="shTripT">Reise</h3><button class="txt-btn r" id="tripEdit" type="button">Bearbeiten</button></div>
+  <div class="sheet-body" id="tripBody"></div>
+</section>
+<section class="sheet" id="shTripEd" role="dialog" aria-modal="true" aria-labelledby="shTripEdT">
+  <div class="grab"></div>
+  <div class="sheet-h"><button class="txt-btn l" type="button" data-close>Abbrechen</button><h3 id="shTripEdT">Neue Reise</h3><span class="r"></span></div>
+  <div class="sheet-body">
+    <label class="field"><svg class="i"><use href="#c-reisen"/></svg><input id="tpName" type="text" placeholder="Wohin geht die Reise?" maxlength="40" autocomplete="off" enterkeyhint="next"></label>
+    <div class="set-label" id="tpRangeLbl" aria-live="polite">Zeitraum</div>
+    <div class="picker tp-cal" id="tpCal" role="group" aria-label="Zeitraum wählen"></div>
+    <button class="list-row lr-btn" id="tpCurBtn" type="button" aria-expanded="false" aria-controls="tpCurPick"><div class="lr-main"><div class="lr-t">Währung der Reise</div><div class="lr-s" id="tpCurLbl">EUR · Euro</div></div><svg class="i"><use href="#i-chev-d"/></svg></button>
+    <div class="picker cur-pick" id="tpCurPick" hidden>
+      <label class="field cur-q"><svg class="i"><use href="#i-search"/></svg><input id="tpCurQ" type="search" placeholder="Suchen, z.B. Euro oder Thailand" autocomplete="off" aria-label="Währung suchen"></label>
+      <div class="cur-list" id="tpCurList" role="listbox" aria-label="Währungen"></div>
+    </div>
+    <label class="field"><span class="field-cur" id="tpBudCur">EUR</span><input id="tpBudget" type="text" inputmode="decimal" placeholder="Reisebudget (optional)" autocomplete="off" enterkeyhint="done"></label>
+    <div class="form-err" id="tpErr" role="alert"></div>
+    <button class="btn-primary" id="tpSave" type="button">Reise anlegen</button>
+    <button class="btn-danger" id="tpDelete" type="button" hidden>Reise löschen</button>
+  </div>
+</section>
+
+<!-- Monatsrückblick -->
+<section class="sheet" id="shReview" role="dialog" aria-modal="true" aria-labelledby="shReviewT">
+  <div class="grab"></div>
+  <div class="sheet-h"><span class="l"></span><h3 id="shReviewT">Rückblick</h3><button class="txt-btn r strong" type="button" data-close>Fertig</button></div>
+  <div class="sheet-body" id="reviewBody"></div>
+</section>
+
+<!-- Fixkosten & Abos -->
+<section class="sheet" id="shFix" role="dialog" aria-modal="true" aria-labelledby="shFixT">
+  <div class="grab"></div>
+  <div class="sheet-h"><span class="l"></span><h3 id="shFixT">Fixkosten &amp; Abos</h3><button class="txt-btn r strong" type="button" data-close>Fertig</button></div>
+  <div class="sheet-body" id="fixBody"></div>
 </section>
 
 <!-- Sparziel -->
@@ -1136,7 +1317,7 @@ setCats(null);
 const catKey = id => (CAT[id] ? id : 'sonst');
 const catOf = id => CAT[catKey(id)];
 const SYM = { CHF: 'CHF', EUR: '€', USD: '$' };
-const CUR_RE = /^[A-Z]{3}$/;
+const CUR_RE = /^[A-Z]{3}$/, TRIP_ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
 
 /* ---------- Datum ---------- */
 const pad = n => String(n).padStart(2, '0');
@@ -1185,7 +1366,7 @@ function haptic(kind) {
 }
 
 /* ---------- Zustand ---------- */
-const S = { currency: 'CHF', startDay: 25, months: {}, sample: false, categories: null, goals: [] };
+const S = { currency: 'CHF', startDay: 25, months: {}, sample: false, categories: null, goals: [], favorites: [], trips: [] };
 const view = { key: todayKey(), day: null, qopen: false, q: '', qcat: null };
 const okStart = v => Number.isInteger(v) && v >= 1 && v <= 28;
 const EMPTY = Object.freeze({ income: null, budget: null, expenses: [] });
@@ -1206,6 +1387,8 @@ function cleanMonth(d) {
     expenses: ex.filter(e => e && typeof e.amt === 'number' && isFinite(e.amt) && typeof e.date === 'string' && /^\d{4}-\d\d-\d\d$/.test(e.date))
       .map(e => {
         const o = { id: String(e.id || uid()), amt: r2(e.amt), title: String(e.title || '').slice(0, 40), cat: CAT_ID_RE.test(e.cat) ? e.cat : 'sonst', date: e.date, rep: !!e.rep, ts: Number(e.ts) || 0 };
+        if (o.rep && (e.every === 3 || e.every === 12)) o.every = e.every;
+        if (typeof e.trip === 'string' && TRIP_ID_RE.test(e.trip)) o.trip = e.trip;
         if (RC_RE.test(e.rc)) o.rc = e.rc;
         const fx = e.fx;
         if (fx && CUR_RE.test(fx.cur) && fx.amt > 0 && fx.rate > 0 && isFinite(fx.amt) && isFinite(fx.rate)) o.fx = { cur: fx.cur, amt: r2(fx.amt), rate: fx.rate };
@@ -1217,6 +1400,8 @@ const toDoc = m => ({ income: m.income, budget: m.budget, expenses: m.expenses.m
   const o = { id: e.id, amt: e.amt, title: e.title, cat: e.cat, date: e.date, rep: e.rep, ts: e.ts };
   if (e.rc) o.rc = e.rc;
   if (e.fx) o.fx = { cur: e.fx.cur, amt: e.fx.amt, rate: e.fx.rate };
+  if (e.every) o.every = e.every;
+  if (e.trip) o.trip = e.trip;
   return o;
 }) });
 
@@ -1245,6 +1430,31 @@ function dateInPeriod(key, dom) {
   return dkey(new Date(d.getFullYear(), d.getMonth(), Math.min(dom, dim(d.getFullYear(), d.getMonth()))));
 }
 const fmtD = d => `${d.getDate()}. ${MON_S[d.getMonth()]}`;
+const EVERY_LBL = { 1: 'monatlich', 3: 'vierteljährlich', 12: 'jährlich' };
+const everyOf = e => (e.rep ? e.every || 1 : 0);
+// Datum plus n Monate, Tag auf das Monatsende begrenzt (31. Jan. + 1 Monat = 28. Feb.)
+function addMonthsDate(ds, n) {
+  const d = parseD(ds), t = new Date(d.getFullYear(), d.getMonth() + n, 1);
+  return dkey(new Date(t.getFullYear(), t.getMonth(), Math.min(d.getDate(), dim(t.getFullYear(), t.getMonth()))));
+}
+// Fixkosten als Reihen (gleicher Text, gleiche Kategorie, gleicher Rhythmus); massgebend ist die jüngste Buchung
+const seriesKey = e => norm(String(e.title || catOf(e.cat).n).trim()) + '|' + e.cat + '|' + (e.every || 1);
+function fixedSeries() {
+  const map = new Map();
+  Object.values(S.months).forEach(m => m.expenses.forEach(e => {
+    if (!e.rep) return;
+    const k = seriesKey(e), cur = map.get(k);
+    if (!cur || e.date > cur.e.date || (e.date === cur.e.date && e.ts > cur.e.ts)) map.set(k, { k, e, every: e.every || 1 });
+  }));
+  return [...map.values()];
+}
+// Vierteljährliche und jährliche Fixkosten, die im Zeitraum fällig werden (nächster Termin nach der letzten Buchung)
+function dueInPeriod(key) {
+  const [s, e] = periodBounds(key), sk = dkey(s), ek = dkey(e);
+  const present = new Set(periodExpenses(key).filter(x => x.rep).map(seriesKey));
+  return fixedSeries().filter(x => x.every > 1 && !present.has(x.k) && x.e.date < sk)
+    .map(x => ({ x, date: addMonthsDate(x.e.date, x.every) })).filter(d => d.date >= sk && d.date <= ek);
+}
 const fmtDL = d => `${d.getDate()}. ${MONTHS[d.getMonth()]}`;
 function rangeLabel(key) {
   const [s, e] = periodBounds(key), sy = s.getFullYear(), ey = e.getFullYear();
@@ -1348,7 +1558,7 @@ const Store = {
   },
   writeLocal() {
     if (S.sample) return;
-    try { localStorage.setItem(LS, JSON.stringify({ currency: S.currency, startDay: S.startDay, categories: S.categories, goals: S.goals, months: S.months, pending: [...this.pending] })); } catch (e) { /* kein Speicher */ }
+    try { localStorage.setItem(LS, JSON.stringify({ currency: S.currency, startDay: S.startDay, categories: S.categories, favorites: S.favorites, goals: S.goals, trips: S.trips, months: S.months, pending: [...this.pending] })); } catch (e) { /* kein Speicher */ }
   },
   clearLocal() { try { localStorage.removeItem(LS); } catch (e) { /* egal */ } },
   touch(key) {
@@ -1366,7 +1576,7 @@ const Store = {
     clearTimeout(this.timers[key]);
     this.writing.add(key); this.dirty.delete(key);
     try {
-      if (key === 'settings') await api('PUT', '/api/settings', { currency: S.currency, startDay: S.startDay, categories: S.categories });
+      if (key === 'settings') await api('PUT', '/api/settings', { currency: S.currency, startDay: S.startDay, categories: S.categories, favorites: S.favorites });
       else if (isEmptyM(S.months[key])) await api('DELETE', '/api/months/' + key);
       else await api('PUT', '/api/months/' + key, toDoc(S.months[key]));
       if (!this.dirty.has(key) && !this.again.has(key)) { this.pending.delete(key); this.writeLocal(); }
@@ -1445,6 +1655,7 @@ const Store = {
     if (imported) Object.keys(local).forEach(k => { if (!server[k] && !isEmptyM(local[k])) { merged[k] = local[k]; upload.add(k); } });
     this.mode = 'server'; this.loaded = true;
     S.goals = Array.isArray(d.goals) ? d.goals : [];
+    S.trips = Array.isArray(d.trips) ? d.trips : [];
     if (Object.keys(merged).length) { S.sample = false; S.months = merged; }
     else if (!S.sample) S.months = merged;
     const st = d.settings;
@@ -1461,7 +1672,7 @@ const Store = {
     this.settled = true;
     updateStoreInfo();
     render({ anim: 'swap' });
-    maybeShowNews();
+    maybeShowNews(); maybeShowReview(); openFromUrl();
   },
   // Späterer Abgleich (Neuverbindung, App wieder im Vordergrund)
   apply(d) {
@@ -1479,6 +1690,7 @@ const Store = {
     });
     if (this.applySettings(d.settings)) touched = true;
     if (Array.isArray(d.goals) && JSON.stringify(d.goals) !== JSON.stringify(S.goals)) { S.goals = d.goals; touched = true; refreshGoalSheet(); }
+    if (Array.isArray(d.trips) && JSON.stringify(d.trips) !== JSON.stringify(S.trips)) { S.trips = d.trips; touched = true; refreshTripSheet(); }
     if (touched) { this.writeLocal(); updateStoreInfo(); render({ anim: 'none' }); }
   },
   applySettings(st) {
@@ -1488,13 +1700,16 @@ const Store = {
     if (okStart(st.startDay) && st.startDay !== S.startDay) { this.applyStart(st.startDay); t = true; }
     const cats = Array.isArray(st.categories) ? st.categories : null;
     if (JSON.stringify(cats) !== JSON.stringify(S.categories)) { S.categories = cats; setCats(cats); buildCatChips(); t = true; }
+    const favs = Array.isArray(st.favorites) ? st.favorites : [];
+    if (JSON.stringify(favs) !== JSON.stringify(S.favorites)) { S.favorites = favs; t = true; }
     return t;
   },
   change(ev) {
     if (!ev || ev.origin === CID || !this.loaded) return;
-    if (S.sample && ev.kind !== 'goals') { this.sync(); return; }
+    if (S.sample && ev.kind !== 'goals' && ev.kind !== 'trips') { this.sync(); return; }
     let touched = false;
     if (ev.kind === 'goals' && Array.isArray(ev.data)) { S.goals = ev.data; this.writeLocal(); render({ anim: 'none' }); refreshGoalSheet(); return; }
+    if (ev.kind === 'trips' && Array.isArray(ev.data)) { S.trips = ev.data; this.writeLocal(); render({ anim: 'none' }); refreshTripSheet(); return; }
     if (ev.kind === 'settings') touched = this.applySettings(ev.data);
     else if (ev.kind === 'month' && /^\d{4}-\d\d$/.test(ev.key) && !this.busy(ev.key)) {
       const k = ev.key;
@@ -1516,7 +1731,7 @@ const Store = {
     this.settled = true;
     if (!hasData() && !S.sample) { S.sample = true; S.months = sampleData(); render({ anim: 'swap' }); }
     updateStoreInfo();
-    maybeShowNews();
+    maybeShowNews(); maybeShowReview(); openFromUrl();
   },
 };
 
@@ -1559,7 +1774,7 @@ function bannerHTML(c) {
   const pm = getM(from), parts = [];
   if (pm.income != null) parts.push('Einkommen');
   if (pm.budget != null) parts.push('Budget');
-  const n = periodExpenses(from).filter(e => e.rep).length;
+  const n = periodExpenses(from).filter(e => e.rep && !(e.every > 1)).length + dueInPeriod(view.key).length;
   if (n) parts.push(n === 1 ? '1 fixe Ausgabe' : `${n} fixe Ausgaben`);
   const list = parts.length > 1 ? parts.slice(0, -1).join(', ') + ' und ' + parts[parts.length - 1] : parts[0];
   return `<div class="banner"><div class="b-ic">${ic('i-carry')}</div>
@@ -1667,7 +1882,7 @@ function calHTML(c) {
   const varSpent = r2(c.exps.filter(e => !e.rep && e.date <= tks).reduce((a, e) => a + e.amt, 0));
   const avg = c.dayIdx ? varSpent / c.dayIdx : null;
   const activeDays = Object.keys(byDay).length;
-  const foot = `<div class="cal-foot num"><span>${avg != null ? `Ø <b>${money(avg)}</b> pro Tag` : 'Noch keine Tage vergangen'}</span>${c.fixed ? `<span>Fixkosten <b>${money(c.fixed)}</b></span>` : ''}</div>`;
+  const foot = `<div class="cal-foot num"><span>${avg != null ? `Ø <b>${money(avg)}</b> pro Tag` : 'Noch keine Tage vergangen'}</span>${c.fixed ? `<button class="cal-fix" type="button" data-act="fix">Fixkosten <b>${money(c.fixed)}</b>${ic('i-chev-r')}</button>` : ''}</div>`;
   return `<div class="sec-h"><h2>Kalender</h2><span class="aside num">${activeDays ? activeDays + (activeDays === 1 ? ' Tag' : ' Tage') + ' mit Ausgaben' : ''}</span></div>
   <section class="card cal${twoMonths ? ' two' : ''}" id="cal" aria-label="Kalender ${rangeLabel(view.key)}">
     <div class="cal-wd" aria-hidden="true"><span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span></div>
@@ -1697,7 +1912,8 @@ function rowHTML(e) {
     <button class="row-in" type="button" data-act="row" data-id="${e.id}">
       <span class="row-ic">${ic('c-' + cat.ic)}</span>
       <span class="row-mid"><span class="row-t">${esc(e.title || cat.n)}</span>
-      <span class="row-s">${e.title ? cn : ''}${e.rep ? `${e.title ? ' · ' : ''}${ic('i-repeat')}monatlich` : ''}${e.rc ? ` · ${ic('i-clip', 'i clip')}Beleg` : ''}</span></span>
+      <span class="row-s">${[e.title ? cn : '', e.rep ? ic('i-repeat') + EVERY_LBL[e.every || 1] : '', e.rc ? ic('i-clip', 'i clip') + 'Beleg' : '',
+        e.trip && tripOf(e.trip) ? ic('c-reisen') + esc(tripOf(e.trip).name) : ''].filter(Boolean).join(' · ')}</span></span>
       <span class="row-a num">${money(e.amt)}${e.fx ? `<small>${fmtCur(e.fx.amt, e.fx.cur)}</small>` : ''}</span>
     </button></div>`;
 }
@@ -1711,7 +1927,7 @@ function searchHits() {
     if (view.qcat && catKey(e.cat) !== view.qcat) return;
     if (toks.length) {
       const d = parseD(e.date);
-      const hay = norm(`${e.title} ${catOf(e.cat).n} ${fmt(e.amt)} ${e.amt.toFixed(2)} ${e.amt.toFixed(2).replace('.', ',')} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${e.rep ? 'monatlich' : ''} ${e.rc ? 'beleg' : ''} ${e.fx ? `${e.fx.cur} ${curName(e.fx.cur)} ${e.fx.amt.toFixed(2)} ${e.fx.amt.toFixed(2).replace('.', ',')}` : ''}`);
+      const hay = norm(`${e.title} ${catOf(e.cat).n} ${fmt(e.amt)} ${e.amt.toFixed(2)} ${e.amt.toFixed(2).replace('.', ',')} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${e.rep ? 'fixkosten ' + EVERY_LBL[e.every || 1] : ''} ${e.rc ? 'beleg' : ''} ${e.trip && tripOf(e.trip) ? 'reise ' + tripOf(e.trip).name : ''} ${e.fx ? `${e.fx.cur} ${curName(e.fx.cur)} ${e.fx.amt.toFixed(2)} ${e.fx.amt.toFixed(2).replace('.', ',')}` : ''}`);
       if (!toks.every(t => hay.includes(t))) return;
     }
     out.push(e);
@@ -1798,7 +2014,7 @@ function footHTML() {
 
 // Handy: alles untereinander (die Container sind dort unsichtbar). Desktop: Hauptspalte + Ausgabenliste rechts.
 function html() {
-  const c = calc(view.key), cats = catsHTML(c), goals = goalsHTML();
+  const c = calc(view.key), cats = catsHTML(c), goals = goalsHTML() + tripsHTML();
   return `<div class="col col-main">${titleHTML(c)}${bannerHTML(c)}<div class="top">${heroHTML(c)}${tilesHTML(c)}</div>`
     + `<div class="duo"><div class="blk">${calHTML(c)}</div>${cats || goals ? `<div class="blk">${cats}${goals}</div>` : ''}</div></div>`
     + `<div class="col col-side">${listHTML(c)}${footHTML()}</div>`;
@@ -2056,7 +2272,7 @@ function guessCat(title) {
 
 const shExp = $('#shExp'), exAmt = $('#exAmt'), exTitle = $('#exTitle'), exCats = $('#exCats'), exPad = $('#exPad');
 const exDateOpt = $('#exDateOpt'), exDateLbl = $('#exDateLbl'), exRepeat = $('#exRepeat'), exSave = $('#exSave'), exDelete = $('#exDelete');
-const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, rep: false, rc: null,
+const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, every: 0, rc: null,
   cur: null, rate: null, rateSt: null, rateDate: null, rateSrc: null, rateErr: '', rateTok: 0, fxEdit: false, fxK: 1, fxPrev: null };
 
 function buildCatChips() {
@@ -2069,7 +2285,7 @@ function paintCats() {
 exCats.addEventListener('click', e => {
   const ch = e.target.closest('.chip'); if (!ch) return;
   ex.cat = ex.cat === ch.dataset.cat ? null : ch.dataset.cat; ex.manualCat = !!ex.cat;
-  haptic(); paintCats();
+  haptic(); paintCats(); paintFavStar();
 });
 function scrollChip(id, smooth) {
   const ch = $(`[data-cat="${id}"]`, exCats); if (!ch) return;
@@ -2080,6 +2296,459 @@ function paintDate() {
   exDateLbl.textContent = dayLabel(ex.date);
   if (pk.open) renderPicker();
 }
+
+/* ---------- Reisen ----------
+   Eine Reise hat Zeitraum, Währung und optional ein Budget in dieser Währung. Ausgaben werden ihr zugeordnet
+   (bei neuen Ausgaben im Reisezeitraum automatisch) und zählen weiterhin normal zum Monatsbudget. */
+const shTrip = $('#shTrip'), tripBody = $('#tripBody'), shTripEd = $('#shTripEd'), exTrip = $('#exTrip');
+const tripOf = id => S.trips.find(t => t.id === id);
+const tripAt = ds => S.trips.filter(t => t.start <= ds && ds <= t.end).sort((a, b) => b.start.localeCompare(a.start))[0] || null;
+const addD = (ds, n) => { const d = parseD(ds); return dkey(new Date(d.getFullYear(), d.getMonth(), d.getDate() + n)); };
+const dayDiff = (a, b) => Math.round((parseD(b) - parseD(a)) / 864e5);
+const tripDays = t => dayDiff(t.start, t.end) + 1;
+const tripPhase = t => { const d = dkey(today()); return d < t.start ? 'future' : d > t.end ? 'past' : 'now'; };
+const fmtT = (v, t) => (t.cur === S.currency ? money(v) : fmtCur(v, t.cur));
+function rangeTxt(a, b) {
+  const x = parseD(a), y = parseD(b);
+  if (a === b) return fmtD(x);
+  return x.getMonth() === y.getMonth() && x.getFullYear() === y.getFullYear() ? `${x.getDate()}.–${fmtD(y)}` : `${fmtD(x)} – ${fmtD(y)}`;
+}
+function tripStats(t) {
+  const list = Object.values(S.months).flatMap(m => m.expenses).filter(e => e.trip === t.id)
+    .sort((a, b) => b.date.localeCompare(a.date) || b.ts - a.ts);
+  // Kurs der Reise; sonst Mittel aus den Ausgaben in Reisewährung
+  const fxs = list.filter(e => e.fx && e.fx.cur === t.cur);
+  const rate = t.cur === S.currency ? 1 : t.rate || (fxs.length ? fxs.reduce((a, e) => a + e.fx.rate, 0) / fxs.length : null);
+  const inCur = e => (e.fx && e.fx.cur === t.cur ? e.fx.amt : rate ? e.amt / rate : null);
+  const byCat = {};
+  let cur = 0, exact = true;
+  list.forEach(e => { const v = inCur(e); if (v == null) { exact = false; return; } cur += v; byCat[e.cat] = (byCat[e.cat] || 0) + v; });
+  return { list, base: r2(list.reduce((a, e) => a + e.amt, 0)), cur: r2(cur), rate, exact, byCat, inCur };
+}
+function tripSub(t, st) {
+  const ph = tripPhase(t), d = dkey(today());
+  if (ph === 'future') { const n = dayDiff(d, t.start); return `${n === 1 ? 'morgen' : `in ${n} Tagen`} · ${rangeTxt(t.start, t.end)}`; }
+  if (ph === 'past') return `${rangeTxt(t.start, t.end)} · ${st.list.length === 1 ? '1 Ausgabe' : st.list.length + ' Ausgaben'}`;
+  const left = t.budget ? r2(t.budget - st.cur) : null;
+  return `Tag ${dayDiff(t.start, d) + 1} von ${tripDays(t)}${left != null ? (left >= 0 ? ` · noch ${fmtT(left, t)}` : ` · ${fmtT(-left, t)} drüber`) : ''}`;
+}
+function tripRow(t) {
+  const st = tripStats(t), p = t.budget ? Math.max(0, Math.min(1, st.cur / t.budget)) : 0;
+  return `<button class="goal-row" type="button" data-act="trip" data-id="${esc(t.id)}"><span class="goal-ic">${ic('c-' + (t.icon || 'reisen'))}</span><span class="goal-main">
+    <span class="goal-top"><span class="goal-n">${esc(t.name)}</span><span class="goal-v num">${fmtT(st.cur, t)}</span></span>
+    ${t.budget ? `<span class="goal-track"><i class="${st.cur > t.budget ? 'over' : ''}" data-goal="trip:${esc(t.id)}" data-scale="${p}"></i></span>` : ''}
+    <span class="goal-s num">${esc(tripSub(t, st))}</span></span></button>`;
+}
+function tripsHTML() {
+  if (!ME || S.sample) return '';
+  const d = dkey(today()), order = { now: 0, future: 1, past: 2 };
+  const list = S.trips.slice().sort((a, b) => order[tripPhase(a)] - order[tripPhase(b)] || (tripPhase(a) === 'past' ? b.end.localeCompare(a.end) : a.start.localeCompare(b.start)));
+  const head = `<div class="sec-h"><h2>Reisen</h2><span class="sec-r"><button class="icon-btn sm" type="button" data-act="trip-new" aria-label="Reise anlegen">${ic('i-plus')}</button></span></div>`;
+  if (!list.length) {
+    return head + `<section class="card"><button class="goal-empty" type="button" data-act="trip-new"><span class="b-ic">${ic('c-reisen')}</span>
+      <span class="goal-main"><span class="b-t">Verreist du bald?</span><span class="b-s">Lege ein Reisebudget in der Landeswährung an. Ausgaben unterwegs zählen automatisch dazu.</span></span></button></section>`;
+  }
+  const recent = list.filter(t => t.end >= addD(d, -14)), older = list.filter(t => t.end < addD(d, -14));
+  return head + `<section class="card goals">${recent.map(tripRow).join('')}${older.length ? `<details class="trip-old"${recent.length ? '' : ' open'}><summary>Frühere Reisen (${older.length})</summary>${older.map(tripRow).join('')}</details>` : ''}</section>`;
+}
+
+// Erfassen: Schalter „Reise“
+function paintTripOpt() {
+  const t = ex.trip ? tripOf(ex.trip) : tripAt(ex.date);
+  exTrip.hidden = !t || !ME;
+  if (!t) return;
+  const on = ex.trip === t.id;
+  $('#exTripLbl').textContent = t.name;
+  exTrip.classList.toggle('on', on); exTrip.setAttribute('aria-pressed', String(on));
+  exTrip.setAttribute('aria-label', `Zur Reise ${t.name} zählen`);
+}
+function dateChangedTrip() {
+  if (ex.tripMan || ex.id) { paintTripOpt(); return; }
+  const t = tripAt(ex.date);
+  ex.trip = t ? t.id : null;
+  paintTripOpt();
+}
+exTrip.addEventListener('click', () => {
+  const t = ex.trip ? tripOf(ex.trip) : tripAt(ex.date); if (!t) return;
+  ex.trip = ex.trip ? null : t.id; ex.tripMan = true; haptic(); paintTripOpt();
+});
+
+// Detailansicht
+const tsv = { id: null, busy: false };
+function renderTrip() {
+  const t = tripOf(tsv.id);
+  if (!t) { hideSheet(shTrip); return; }
+  const st = tripStats(t), ph = tripPhase(t), d = dkey(today());
+  $('#shTripT').textContent = t.name;
+  const p = t.budget ? Math.max(0, Math.min(1, st.cur / t.budget)) : 0, over = t.budget && st.cur > t.budget;
+  const elapsed = ph === 'future' ? 0 : ph === 'past' ? tripDays(t) : dayDiff(t.start, d) + 1;
+  const daysLeft = ph === 'now' ? dayDiff(d, t.end) + 1 : ph === 'future' ? tripDays(t) : 0;
+  const left = t.budget ? r2(t.budget - st.cur) : null;
+  const facts = [['Dauer', `${tripDays(t)} ${tripDays(t) === 1 ? 'Tag' : 'Tage'}${ph === 'now' ? ` · noch ${daysLeft}` : ''}`]];
+  if (elapsed) facts.push(['Ø pro Tag', fmtT(st.cur / elapsed, t)]);
+  if (left != null) facts.push([left >= 0 ? 'Noch übrig' : 'Über Budget', fmtT(Math.abs(left), t)]);
+  if (left != null && left > 0 && daysLeft) facts.push(['Pro Tag noch', fmtT(left / daysLeft, t)]);
+  if (t.cur !== S.currency && st.rate) facts.push(['Kurs', rateLabel(t.cur, S.currency, st.rate)]);
+  const untagged = Object.values(S.months).flatMap(m => m.expenses).filter(e => !e.trip && !e.rep && e.date >= t.start && e.date <= t.end);
+  const cats = Object.entries(st.byCat).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  tripBody.innerHTML = `<div class="g-hero">
+      <div class="g-l">${ph === 'future' ? 'Geplant' : ph === 'now' ? 'Unterwegs' : 'Vorbei'} · ${esc(rangeTxt(t.start, t.end))}</div>
+      <div class="g-v num">${fmtT(st.cur, t)}</div>
+      <div class="g-s num">${t.budget ? `von ${fmtT(t.budget, t)} · ${Math.floor(st.cur / t.budget * 100)} %` : 'ohne Budget'}${t.cur !== S.currency ? ` · ${money(st.base)}` : ''}</div>
+      ${t.budget ? `<div class="bar" role="img" aria-label="${Math.floor(p * 100)} Prozent des Reisebudgets"><div class="bar-fill${over ? ' over' : ''}" style="transform:scaleX(${p})"></div></div>` : ''}
+    </div>
+    <div class="g-facts">${facts.map(([k, v]) => `<div><span>${k}</span><b class="num">${v}</b></div>`).join('')}</div>
+    ${!st.exact ? `<p class="set-note">Einige Ausgaben in ${esc(S.currency)} liessen sich ohne Kurs nicht in ${esc(t.cur)} umrechnen.</p>` : ''}
+    <div class="tp-add"><button class="btn-primary" type="button" data-tp="add">Ausgabe für diese Reise erfassen</button></div>
+    ${untagged.length ? `<div class="tp-tag"><span>${untagged.length === 1 ? '1 Ausgabe' : untagged.length + ' Ausgaben'} aus diesem Zeitraum gehören noch zu keiner Reise.</span><button class="pill-btn" type="button" data-tp="tag">Zuordnen</button></div>` : ''}
+    ${cats.length ? `<div class="set-label">Kategorien</div><div class="rv-cats">${cats.map(([id, v]) => {
+      const cat = catOf(id), share = st.cur ? v / st.cur : 0;
+      return `<div class="rv-cat"><span class="cat-ic">${ic('c-' + cat.ic)}</span><span class="rv-n">${esc(cat.n)}</span><span class="rv-a num">${fmtT(v, t)}</span>
+        <span class="rv-bar"><i style="width:${Math.max(2, share * 100).toFixed(1)}%"></i></span></div>`;
+    }).join('')}</div>` : ''}
+    ${st.list.length ? `<div class="set-label">Ausgaben</div><div class="g-entries">${st.list.map(e => {
+      const v = st.inCur(e);
+      return `<button class="g-entry tp-e" type="button" data-tp-e="${esc(e.id)}"><div class="lr-main"><div class="t">${esc(e.title || catOf(e.cat).n)}</div><div class="s num">${imDate(e.date)} · ${esc(catOf(e.cat).n)}</div></div>
+        <div class="a num">${v != null ? fmtT(v, t) : money(e.amt)}${t.cur !== S.currency ? `<small>${money(e.amt)}</small>` : ''}</div><span></span></button>`;
+    }).join('')}</div>` : '<p class="set-note">Noch keine Ausgaben auf dieser Reise.</p>'}`;
+}
+function openTrip(id) { tsv.id = id; renderTrip(); showSheet(shTrip); $('.sheet-body', shTrip).scrollTop = 0; }
+function refreshTripSheet() { if (openSheet === shTrip) renderTrip(); }
+tripBody.addEventListener('click', e => {
+  const t = tripOf(tsv.id); if (!t) return;
+  const row = e.target.closest('[data-tp-e]');
+  if (row) { haptic(); openExpense(row.dataset.tpE); shExp._back = () => openTrip(t.id); return; }
+  const b = e.target.closest('[data-tp]'); if (!b) return;
+  haptic();
+  if (b.dataset.tp === 'add') {
+    openExpense(null);
+    const d = dkey(today());
+    ex.date = d >= t.start && d <= t.end ? d : t.start; ex.manualDate = true; paintDate();
+    ex.trip = t.id; ex.tripMan = true; paintTripOpt();
+    if (t.cur !== S.currency) setCur(t.cur);
+    shExp._back = () => openTrip(t.id);
+  } else if (b.dataset.tp === 'tag') {
+    const touched = new Set();
+    Object.entries(S.months).forEach(([k, m]) => m.expenses.forEach(x => { if (!x.trip && !x.rep && x.date >= t.start && x.date <= t.end) { x.trip = t.id; touched.add(k); } }));
+    touched.forEach(k => Store.touch(k));
+    haptic('success'); render(); renderTrip();
+  }
+});
+$('#tripEdit').addEventListener('click', () => { haptic(); const id = tsv.id; openTripEd(id); shTripEd._back = () => openTrip(id); });
+
+// Anlegen und bearbeiten
+const te = { id: null, start: null, end: null, cur: 'EUR', y: 0, m: 0, armed: false, busy: false, curOpen: false };
+const tpName = $('#tpName'), tpBudget = $('#tpBudget'), tpCal = $('#tpCal'), tpCurQ = $('#tpCurQ'), tpCurList = $('#tpCurList');
+function renderTpCal() {
+  const t = today(), tks = dkey(t), offset = (new Date(te.y, te.m, 1).getDay() + 6) % 7, n = dim(te.y, te.m);
+  let cells = '';
+  for (let i = 0; i < offset; i++) cells += '<span></span>';
+  for (let d = 1; d <= n; d++) {
+    const ds = dkey(new Date(te.y, te.m, d)), cls = ['pk-day'];
+    if (ds === tks) cls.push('today');
+    if (ds === te.start || ds === te.end) cls.push('sel');
+    else if (te.start && te.end && ds > te.start && ds < te.end) cls.push('in');
+    cells += `<button type="button" class="${cls.join(' ')}" data-d="${ds}" aria-pressed="${ds === te.start || ds === te.end}" aria-label="${fmtDL(new Date(te.y, te.m, d))} ${te.y}"><span class="num">${d}</span></button>`;
+  }
+  tpCal.innerHTML = `<div class="pk-head"><button class="icon-btn" type="button" data-tpm="-1" aria-label="Vorheriger Monat">${ic('i-chev-l')}</button>
+    <div class="pk-title num">${MONTHS[te.m]} ${te.y}</div><button class="icon-btn" type="button" data-tpm="1" aria-label="Nächster Monat">${ic('i-chev-r')}</button></div>
+    <div class="pk-wd">${['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map(w => `<span>${w}</span>`).join('')}</div><div class="pk-grid">${cells}</div>`;
+  $('#tpRangeLbl').textContent = !te.start ? 'Zeitraum: Anfang und Ende antippen'
+    : !te.end ? `Ab ${fmtD(parseD(te.start))} · jetzt das Ende antippen` : `${rangeTxt(te.start, te.end)} · ${dayDiff(te.start, te.end) + 1} Tage`;
+}
+tpCal.addEventListener('click', e => {
+  const nav = e.target.closest('[data-tpm]');
+  if (nav) { const d = new Date(te.y, te.m + Number(nav.dataset.tpm), 1); te.y = d.getFullYear(); te.m = d.getMonth(); haptic(); renderTpCal(); return; }
+  const day = e.target.closest('[data-d]'); if (!day) return;
+  const ds = day.dataset.d;
+  if (!te.start || te.end) { te.start = ds; te.end = null; }
+  else if (ds < te.start) { te.end = te.start; te.start = ds; }
+  else te.end = ds;
+  haptic(); renderTpCal(); $('#tpErr').textContent = '';
+});
+function paintTpCur() {
+  $('#tpCurLbl').textContent = `${te.cur} · ${curName(te.cur)}`;
+  $('#tpBudCur').textContent = te.cur;
+  $('#tpCurBtn').setAttribute('aria-expanded', String(te.curOpen));
+  $('#tpCurPick').hidden = !te.curOpen;
+  if (te.curOpen) tpCurList.innerHTML = curListHTML(tpCurQ.value, te.cur);
+}
+$('#tpCurBtn').addEventListener('click', () => { te.curOpen = !te.curOpen; tpCurQ.value = ''; haptic(); paintTpCur(); if (te.curOpen && !coarse.matches) tpCurQ.focus(); });
+tpCurQ.addEventListener('input', () => { tpCurList.innerHTML = curListHTML(tpCurQ.value, te.cur); tpCurList.scrollTop = 0; });
+tpCurQ.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); const f = $('.cur-it', tpCurList); if (f) { te.cur = f.dataset.cur; te.curOpen = false; paintTpCur(); } }
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); te.curOpen = false; paintTpCur(); }
+});
+tpCurList.addEventListener('click', e => { const b = e.target.closest('[data-cur]'); if (!b) return; te.cur = b.dataset.cur; te.curOpen = false; haptic(); paintTpCur(); });
+function openTripEd(id) {
+  const t = id ? tripOf(id) : null;
+  const guess = recentCurs().find(c => c !== S.currency) || (S.currency === 'EUR' ? 'USD' : 'EUR');
+  Object.assign(te, { id: t ? t.id : null, start: t ? t.start : null, end: t ? t.end : null, cur: t ? t.cur : guess, armed: false, busy: false, curOpen: false });
+  const d = parseD(te.start || dkey(today())); te.y = d.getFullYear(); te.m = d.getMonth();
+  tpName.value = t ? t.name : ''; tpBudget.value = t && t.budget ? String(t.budget) : '';
+  $('#shTripEdT').textContent = t ? 'Reise bearbeiten' : 'Neue Reise';
+  $('#tpSave').textContent = t ? 'Sichern' : 'Reise anlegen';
+  $('#tpDelete').hidden = !t; $('#tpDelete').textContent = 'Reise löschen';
+  $('#tpErr').textContent = '';
+  renderTpCal(); paintTpCur();
+  showSheet(shTripEd);
+  $('.sheet-body', shTripEd).scrollTop = 0;
+  if (!t && !coarse.matches) setTimeout(() => tpName.focus(), 80);
+}
+async function tripApi(method, id, body) {
+  const r = await api(method, `/api/trips/${encodeURIComponent(id)}`, body);
+  S.trips = r.trips || []; Store.writeLocal(); render();
+}
+$('#tpSave').addEventListener('click', async () => {
+  const err = $('#tpErr'), name = tpName.value.trim().replace(/\s+/g, ' ');
+  if (!name) { err.textContent = 'Gib der Reise einen Namen.'; shake(tpName.closest('.field')); return; }
+  if (!te.start) { err.textContent = 'Wähle im Kalender Anfang und Ende der Reise.'; haptic('heavy'); return; }
+  const end = te.end || te.start;
+  if (dayDiff(te.start, end) > 365) { err.textContent = 'Eine Reise dauert höchstens ein Jahr.'; haptic('heavy'); return; }
+  const budget = tpBudget.value.trim() ? parseMoneyIn(tpBudget.value) : null;
+  if (tpBudget.value.trim() && !(budget > 0)) { err.textContent = 'Das Budget sieht nicht nach einem Betrag aus.'; shake(tpBudget.closest('.field')); return; }
+  if (te.busy) return;
+  te.busy = true; $('#tpSave').disabled = true;
+  const old = te.id ? tripOf(te.id) : null;
+  let rate = old && old.cur === te.cur ? old.rate : null;
+  if (te.cur !== S.currency) {
+    const d = dkey(today());
+    try { rate = (await fetchRate(te.cur, S.currency, te.start < d ? te.start : d)).rate; } catch (e) { const l = lastRate(te.cur, S.currency); if (l) rate = l.rate; }
+  } else rate = 1;
+  const id = te.id || 't' + uid().slice(0, 12);
+  try {
+    await tripApi('PUT', id, { name, start: te.start, end, budget, cur: te.cur, rate, icon: 'reisen' });
+    haptic('success');
+    shTripEd._back = null;
+    hideSheet(shTripEd, true);
+    openTrip(id);
+    if (!old) toast(`Reise „${name}“ angelegt`);
+  } catch (e) {
+    if (e.status === 401) return toLogin();
+    err.textContent = e.status ? e.message : 'Keine Verbindung. Reisen lassen sich nur online ändern.'; haptic('heavy');
+  } finally { te.busy = false; $('#tpSave').disabled = false; }
+});
+$('#tpDelete').addEventListener('click', async () => {
+  const b = $('#tpDelete');
+  if (!te.armed) { te.armed = true; b.textContent = 'Wirklich löschen? Die Ausgaben bleiben.'; haptic('heavy'); setTimeout(() => { te.armed = false; b.textContent = 'Reise löschen'; }, 4000); return; }
+  const id = te.id;
+  try {
+    await tripApi('DELETE', id);
+    Object.values(S.months).forEach(m => m.expenses.forEach(x => { if (x.trip === id) delete x.trip; }));
+    Store.writeLocal();
+    shTripEd._back = null; hideSheet(shTripEd); render(); haptic('success'); toast('Reise gelöscht');
+  } catch (e) { if (e.status === 401) return toLogin(); $('#tpErr').textContent = e.status ? e.message : 'Keine Verbindung.'; }
+});
+tpName.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); tpName.blur(); } });
+
+/* ---------- Monatsrückblick ----------
+   Öffnet sich zu Beginn einer neuen Lohnperiode einmal pro Gerät (in der ersten Woche), sonst über die Statistik
+   oder die Push-Mitteilung am Lohntag. Ein Überschuss lässt sich direkt auf ein Sparziel buchen. */
+const shReview = $('#shReview'), reviewBody = $('#reviewBody');
+const rv = { key: null, goal: null, busy: false };
+const hasReview = key => { const c = calc(key); return c.count > 0 || c.limit != null; };
+const reviewNote = key => `Rest ${monthName(key)} ${kParts(key)[0]}`;
+function reviewBooked(key) {
+  const note = reviewNote(key);
+  for (const g of S.goals || []) { const e = (g.entries || []).find(x => x.note === note); if (e) return { g, e }; }
+  return null;
+}
+function renderReview() {
+  const key = rv.key, c = calc(key), p = calc(addM(key, -1)), mn = monthName(key), yr = kParts(key)[0];
+  $('#shReviewT').textContent = `Rückblick ${mn}`;
+  const rest = c.limit != null ? r2(c.limit - c.spent) : null;
+  let h = `<div class="rv-hero"><div class="rv-k">${rangeLabel(key)}</div>`;
+  if (rest == null) h += `<div class="rv-v num">${money(c.spent)}</div><div class="rv-s">ausgegeben im ${mn} ${yr}</div>`;
+  else if (rest >= 0) h += `<div class="rv-v num">${money(rest)}</div><div class="rv-s">${rest > 0 ? 'sind übrig geblieben' : 'Punktlandung: genau im Budget'}</div>`;
+  else h += `<div class="rv-v num over">${money(-rest)}</div><div class="rv-s">über ${c.limitIs === 'budget' ? 'dem Budget' : 'dem Einkommen'}</div>`;
+  h += '</div>';
+  const facts = [[`Ausgegeben · ${c.count === 1 ? '1 Ausgabe' : c.count + ' Ausgaben'}`, money(c.spent)], ['davon Fixkosten', money(c.fixed)]];
+  if (c.budget != null) facts.push(['Budget', money(c.budget)]);
+  if (c.income != null) facts.push(['Einkommen', money(c.income)]);
+  if (c.income) facts.push(['Sparquote', `${Math.round((c.income - c.spent) / c.income * 100)} %`]);
+  facts.push(['Ø pro Tag', money(c.spent / c.days)]);
+  h += `<div class="g-facts">${facts.map(([k, v]) => `<div><span>${k}</span><b class="num">${v}</b></div>`).join('')}</div>`;
+  if (p.spent > 0) {
+    const d = r2(c.spent - p.spent);
+    h += `<p class="set-note">${Math.abs(d) < 1 ? `Etwa gleich viel wie im ${monthName(p.key)}.` : `${money(Math.abs(d))} ${d < 0 ? 'weniger' : 'mehr'} ausgegeben als im ${monthName(p.key)}.`}</p>`;
+  }
+  const rows = catCompare(c, p).filter(r => r.now > 0).slice(0, 4);
+  if (rows.length) {
+    h += `<div class="set-label">Wohin das Geld ging</div><div class="rv-cats">${rows.map(r => {
+      const cat = catOf(r.id), share = c.spent ? r.now / c.spent : 0, diff = r2(r.now - r.before);
+      return `<div class="rv-cat"><span class="cat-ic">${ic('c-' + cat.ic)}</span><span class="rv-n">${esc(cat.n)}</span><span class="rv-a num">${money(r.now)}</span>
+        <span class="rv-bar"><i style="width:${Math.max(2, share * 100).toFixed(1)}%"></i></span>
+        <span class="rv-d num">${Math.round(share * 100)} %${r.before > 0 && Math.abs(diff) >= 1 ? ` · ${diff > 0 ? '+' : '−'}${money(Math.abs(diff)).replace(sym() + ' ', '')} zum Vormonat` : ''}</span></div>`;
+    }).join('')}</div>`;
+  }
+  const big = c.exps.filter(e => !e.rep).sort((a, b) => b.amt - a.amt)[0];
+  if (big) h += `<p class="set-note">Grösste einzelne Ausgabe: <b>${esc(big.title || catOf(big.cat).n)}</b>, ${money(big.amt)} am ${fmtD(parseD(big.date))}</p>`;
+  // Überschuss aufs Sparziel
+  if (ME && rest > 0 && !S.sample) {
+    const booked = reviewBooked(key);
+    if (booked) h += `<div class="rv-save"><div class="rv-done">${ic('i-check')}${money(booked.e.amt)} auf „${esc(booked.g.name)}“ gebucht</div></div>`;
+    else if (S.goals.length) {
+      if (!goalOf(rv.goal)) rv.goal = S.goals[0].id;
+      h += `<div class="rv-save"><div class="rv-t">Rest aufs Sparziel legen?</div>
+        <div class="chips" role="radiogroup" aria-label="Sparziel">${S.goals.map(g => `<button type="button" class="chip${g.id === rv.goal ? ' on' : ''}" role="radio" aria-checked="${g.id === rv.goal}" data-rv-goal="${esc(g.id)}">${ic('c-' + g.icon)}${esc(g.name)}</button>`).join('')}</div>
+        <label class="field"><span class="field-cur">${sym()}</span><input id="rvAmt" inputmode="decimal" autocomplete="off" value="${rest.toFixed(2)}" aria-label="Betrag"></label>
+        <button class="btn-primary" id="rvBook" type="button">Aufs Sparziel buchen</button></div>`;
+    } else h += `<div class="rv-save"><div class="rv-t">${money(rest)} übrig – worauf sparst du?</div><button class="btn-primary" type="button" data-rv="goal-new">Sparziel anlegen</button></div>`;
+  }
+  reviewBody.innerHTML = h;
+}
+function openReview(key, auto) {
+  rv.key = key; rv.goal = null;
+  try { localStorage.setItem('mb.review', key); } catch (e) { /* egal */ }
+  renderReview();
+  showSheet(shReview);
+  $('.sheet-body', shReview).scrollTop = 0;
+  if (auto) haptic('success');
+}
+reviewBody.addEventListener('click', async e => {
+  const g = e.target.closest('[data-rv-goal]');
+  if (g) { rv.goal = g.dataset.rvGoal; haptic(); $$('[data-rv-goal]', reviewBody).forEach(b => { const on = b === g; b.classList.toggle('on', on); b.setAttribute('aria-checked', String(on)); }); return; }
+  if (e.target.closest('[data-rv="goal-new"]')) { haptic(); openGoalEd(null); shGoalEd._back = () => openReview(rv.key); return; }
+  if (!e.target.closest('#rvBook') || rv.busy) return;
+  const amt = parseMoneyIn($('#rvAmt').value), goal = goalOf(rv.goal);
+  if (!(amt > 0) || !goal) { shake($('#rvAmt').closest('.field')); return; }
+  rv.busy = true;
+  const ok = await goalApi('POST', `/api/goals/${encodeURIComponent(goal.id)}/entries`, { id: uid(), amt, date: dkey(today()), note: reviewNote(rv.key) });
+  rv.busy = false;
+  if (ok) { haptic('success'); toast(`${money(amt)} auf „${goal.name}“ gebucht`); renderReview(); }
+});
+// Automatisch: in der ersten Woche einer neuen Periode, einmal pro Gerät, nach den Neuigkeiten
+let reviewWait = false;
+function reviewDue() {
+  if (S.sample || !hasData()) return null;
+  const key = addM(curKey(), -1);
+  let seen = null;
+  try { seen = localStorage.getItem('mb.review'); } catch (e) { return null; }
+  if (seen && seen >= key) return null;
+  if ((today() - periodBounds(curKey())[0]) / 864e5 > 6 || !hasReview(key)) return null;
+  return key;
+}
+function maybeShowReview() {
+  if (!reviewDue()) return;
+  setTimeout(() => {
+    const key = reviewDue();
+    if (!key) return;
+    if (openSheet) reviewWait = true; else openReview(key, true);
+  }, 1500);
+}
+
+/* ---------- Fixkosten & Abos ---------- */
+const shFix = $('#shFix'), fixBody = $('#fixBody');
+function nextDue(x, from) {
+  let k = 0, d = x.e.date;
+  while (d < from && k < 400) { k++; d = addMonthsDate(x.e.date, k * x.every); }
+  return d;
+}
+function renderFix() {
+  const t = dkey(today());
+  // Nur laufende Fixkosten: letzte Buchung höchstens einen Rhythmus plus einen Monat her
+  const list = fixedSeries().filter(x => x.e.date >= addMonthsDate(t, -(x.every + 1)));
+  if (!list.length) {
+    fixBody.innerHTML = `<div class="card empty"><div class="e-ic">${ic('i-repeat')}</div><b>Noch keine Fixkosten</b>Tippe beim Erfassen auf „Wiederholen“, um Miete, Abos oder Versicherungen als monatlich, vierteljährlich oder jährlich zu markieren.</div>`;
+    return;
+  }
+  const perMonth = list.reduce((a, x) => a + x.e.amt / x.every, 0);
+  let h = `<div class="g-facts"><div><span>Pro Monat im Schnitt</span><b class="num">${money(perMonth)}</b></div><div><span>Pro Jahr</span><b class="num">${money(perMonth * 12)}</b></div></div>`;
+  for (const [ev, label] of [[1, 'Monatlich'], [3, 'Vierteljährlich'], [12, 'Jährlich']]) {
+    const g = list.filter(x => x.every === ev).sort((a, b) => b.e.amt - a.e.amt);
+    if (!g.length) continue;
+    h += `<div class="set-group"><div class="set-label">${label} · ${money(g.reduce((a, x) => a + x.e.amt * 12 / ev, 0))} pro Jahr</div><div class="users">${g.map(x => {
+      const cat = catOf(x.e.cat), next = nextDue(x, t);
+      return `<button class="list-row lr-btn fix-row" type="button" data-fix="${esc(x.e.id)}"><span class="cat-ic">${ic('c-' + cat.ic)}</span>
+        <div class="lr-main"><div class="lr-t">${esc(x.e.title || cat.n)}</div><div class="lr-s num">${next === t ? 'heute fällig' : 'nächste ' + fmtD(parseD(next))}${x.e.fx ? ' · ' + fmtCur(x.e.fx.amt, x.e.fx.cur) : ''}</div></div>
+        <span class="fix-a num">${money(x.e.amt)}</span></button>`;
+    }).join('')}</div></div>`;
+  }
+  fixBody.innerHTML = h + `<p class="set-note">Antippen zum Ändern. Vierteljährliche und jährliche Fixkosten trägt Quota beim Übernehmen eines neuen Monats nur ein, wenn sie fällig sind.</p>`;
+}
+function openFix() { renderFix(); showSheet(shFix); $('.sheet-body', shFix).scrollTop = 0; }
+fixBody.addEventListener('click', e => {
+  const b = e.target.closest('[data-fix]'); if (!b) return;
+  haptic(); openExpense(b.dataset.fix); shExp._back = openFix;
+});
+
+/* ---------- Favoriten ----------
+   Angeheftete Favoriten (Stern im Feld „Wofür?“) und Vorschläge aus häufigen Ausgaben der letzten 4 Monate.
+   Ein Tipp füllt Betrag, Text, Kategorie und Währung aus. */
+const exFavs = $('#exFavs'), exStar = $('#exStar');
+const favKey = (t, c) => norm(String(t).trim()) + '|' + c;
+function favSuggestions() {
+  const since = dkey(new Date(today().getFullYear(), today().getMonth() - 4, today().getDate())), cnt = new Map();
+  const pinned = new Set(S.favorites.map(f => favKey(f.t, f.c)));
+  Object.values(S.months).forEach(m => m.expenses.forEach(e => {
+    if (e.rep || !e.title || e.date < since || pinned.has(favKey(e.title, e.cat))) return;
+    const a = e.fx ? e.fx.amt : e.amt, cur = e.fx ? e.fx.cur : null;
+    const k = `${favKey(e.title, e.cat)}|${a}|${cur}`;
+    const o = cnt.get(k) || { t: e.title.trim(), a, c: e.cat, cur, n: 0, last: '' };
+    o.n++; if (e.date > o.last) o.last = e.date; cnt.set(k, o);
+  }));
+  return [...cnt.values()].filter(o => o.n >= 3).sort((a, b) => b.n - a.n || b.last.localeCompare(a.last)).slice(0, 4);
+}
+function favChip(f, i, sug) {
+  const amount = f.cur && f.cur !== S.currency ? `<span class="fx-c">${f.cur}</span><b>${fmt(f.a)}</b>` : `<b>${fmt(f.a)}</b>`;
+  return `<button type="button" class="chip${sug ? ' sug' : ''}" data-fav="${sug ? 's' : 'p'}${i}" title="${sug ? 'Vorschlag: oft erfasst' : 'Favorit'}">${ic('c-' + catOf(f.c).ic)}${esc(f.t)} ${amount}</button>`;
+}
+let favSug = [];
+function renderFavs() {
+  favSug = ex.id || S.sample ? [] : favSuggestions();
+  const show = !ex.id && !S.sample && (S.favorites.length || favSug.length);
+  exFavs.hidden = !show;
+  if (!show) return;
+  exFavs.innerHTML = S.favorites.map((f, i) => favChip(f, i, false)).join('') + favSug.map((f, i) => favChip(f, i, true)).join('');
+  exFavs.scrollLeft = 0;
+}
+function useFav(f) {
+  haptic();
+  ex.buf = bufOf(f.a);
+  exTitle.value = f.t;
+  ex.cat = CAT[f.c] ? f.c : 'sonst'; ex.manualCat = true;
+  paintCats(); scrollChip(ex.cat, true);
+  setCur(f.cur && f.cur !== S.currency ? f.cur : null);
+  paintExAmount(); paintFavStar();
+}
+exFavs.addEventListener('click', e => {
+  const b = e.target.closest('[data-fav]'); if (!b) return;
+  const i = Number(b.dataset.fav.slice(1)), f = b.dataset.fav[0] === 's' ? favSug[i] : S.favorites[i];
+  if (f) useFav(f);
+});
+const curFav = () => { const t = exTitle.value.trim(); return t ? S.favorites.find(f => favKey(f.t, f.c) === favKey(t, ex.cat || guessCat(t) || 'sonst')) : null; };
+function paintFavStar() {
+  const t = exTitle.value.trim(), on = !!curFav();
+  exStar.hidden = !t || S.sample;
+  exStar.setAttribute('aria-pressed', String(on));
+  exStar.setAttribute('aria-label', on ? 'Favorit entfernen' : 'Als Favorit merken');
+  $('use', exStar).setAttribute('href', on ? '#i-star-f' : '#i-star');
+}
+function saveFavs(msg) { Store.touch('settings'); paintFavStar(); renderFavList(); if (msg) toast(msg); }
+exStar.addEventListener('click', e => {
+  e.preventDefault(); e.stopPropagation();
+  const f = curFav();
+  if (f) { S.favorites = S.favorites.filter(x => x !== f); haptic(); saveFavs(`„${f.t}“ ist kein Favorit mehr`); return; }
+  const a = r2(parseFloat(ex.buf));
+  if (!(a > 0)) { shake(exAmt); toast('Erst den Betrag eintippen, dann merken'); return; }
+  if (S.favorites.length >= 12) { haptic('heavy'); toast('Höchstens 12 Favoriten. Entferne zuerst einen in den Einstellungen.'); return; }
+  const t = exTitle.value.trim().slice(0, 40), fav = { id: uid(), t, a, c: ex.cat || guessCat(t) || 'sonst' };
+  if (fxOn()) fav.cur = ex.cur;
+  S.favorites = [...S.favorites, fav];
+  haptic('success'); saveFavs(`„${t}“ als Favorit gemerkt`);
+});
+function renderFavList() {
+  $('#favList').innerHTML = S.favorites.map((f, i) => `<div class="list-row"><span class="cat-ic">${ic('c-' + catOf(f.c).ic)}</span>
+    <div class="lr-main"><div class="lr-t">${esc(f.t)}</div><div class="lr-s num">${f.cur && f.cur !== S.currency ? fmtCur(f.a, f.cur) : money(f.a)} · ${esc(catOf(f.c).n)}</div></div>
+    <button class="pill-btn danger" type="button" data-fav-del="${i}">Entfernen</button></div>`).join('');
+  $('#favNote').hidden = S.favorites.length > 0;
+}
+$('#favList').addEventListener('click', e => {
+  const b = e.target.closest('[data-fav-del]'); if (!b) return;
+  const f = S.favorites[Number(b.dataset.favDel)]; if (!f) return;
+  S.favorites = S.favorites.filter(x => x !== f); haptic();
+  saveFavs(); toast(`„${f.t}“ entfernt`, 'Rückgängig', () => { S.favorites = [...S.favorites, f].slice(0, 12); saveFavs(); });
+});
 
 /* ---------- Fremdwährung ----------
    Betrag in der bezahlten Währung eintippen, die App rechnet live mit dem Tageskurs in die
@@ -2227,25 +2896,25 @@ function recentCurs() {
     .forEach(e => { if (seen.size < 4 && e.fx.cur !== S.currency) seen.add(e.fx.cur); });
   return [...seen];
 }
-function curItem(c) {
-  const on = c === (ex.cur || S.currency);
+function curItem(c, sel) {
+  const on = c === sel;
   return `<button type="button" class="cur-it${on ? ' on' : ''}" role="option" aria-selected="${on}" data-cur="${c}"><b>${c}</b><span>${esc(curName(c))}</span>${on ? ic('i-check') : ''}</button>`;
 }
-function renderCurList() {
-  const q = norm(curQ.value.trim());
+function curListHTML(query, sel) {
+  const q = norm(query.trim()), item = c => curItem(c, sel);
   const byName = (a, b) => curName(a).localeCompare(curName(b), 'de');
   if (q) {
     const hits = FX_CODES.filter(c => norm(`${c} ${curName(c)} ${FX_KW[c] || ''}`).includes(q))
       .sort((a, b) => (norm(a).startsWith(q) ? 0 : 1) - (norm(b).startsWith(q) ? 0 : 1) || byName(a, b));
-    curList.innerHTML = hits.length ? hits.map(curItem).join('') : '<div class="cur-none">Keine passende Währung gefunden.</div>';
-    return;
+    return hits.length ? hits.map(item).join('') : '<div class="cur-none">Keine passende Währung gefunden.</div>';
   }
-  const recent = recentCurs().filter(c => FX_CODES.includes(c));
+  const recent = [...new Set([...recentCurs(), ...S.trips.map(t => t.cur)])].filter(c => FX_CODES.includes(c) && c !== S.currency).slice(0, 5);
   const rest = FX_CODES.filter(c => c !== S.currency && !recent.includes(c)).sort(byName);
-  curList.innerHTML = `<div class="cur-sec">Deine Währung</div>${curItem(S.currency)}`
-    + (recent.length ? `<div class="cur-sec">Zuletzt verwendet</div>${recent.map(curItem).join('')}` : '')
-    + `<div class="cur-sec">Alle Währungen</div>${rest.map(curItem).join('')}`;
+  return `<div class="cur-sec">Deine Währung</div>${item(S.currency)}`
+    + (recent.length ? `<div class="cur-sec">Zuletzt verwendet</div>${recent.map(item).join('')}` : '')
+    + `<div class="cur-sec">Alle Währungen</div>${rest.map(item).join('')}`;
 }
+function renderCurList() { curList.innerHTML = curListHTML(curQ.value, ex.cur || S.currency); }
 function openCurPick(open) {
   cp.open = open;
   if (open && pk.open) openPicker(false);
@@ -2308,7 +2977,7 @@ function openPicker(open) {
 function pickDate(ds, close) {
   const changed = ds !== ex.date;
   ex.date = ds; ex.manualDate = true; haptic(); paintDate();
-  if (changed) dateChangedFx();
+  if (changed) { dateChangedFx(); dateChangedTrip(); }
   if (close) openPicker(false);
 }
 exDateOpt.addEventListener('click', () => { haptic(); if (document.activeElement === exTitle) exTitle.blur(); openPicker(!pk.open); });
@@ -2336,7 +3005,15 @@ function pickerKey(e) {
   e.preventDefault(); e.stopPropagation();
   return true;
 }
-exRepeat.addEventListener('click', () => { ex.rep = !ex.rep; exRepeat.classList.toggle('on', ex.rep); exRepeat.setAttribute('aria-pressed', ex.rep); haptic(); });
+// Wiederholen: aus → jeden Monat → alle 3 Monate → jedes Jahr → aus
+const REP_CYCLE = [0, 1, 3, 12], REP_LBL = { 0: 'Wiederholen', 1: 'Jeden Monat', 3: 'Alle 3 Monate', 12: 'Jedes Jahr' };
+function paintRepeat() {
+  const on = ex.every > 0;
+  exRepeat.classList.toggle('on', on); exRepeat.setAttribute('aria-pressed', String(on));
+  $('span', exRepeat).textContent = REP_LBL[ex.every];
+  exRepeat.setAttribute('aria-label', `Wiederholung: ${on ? REP_LBL[ex.every] : 'keine'}. Antippen wechselt den Rhythmus.`);
+}
+exRepeat.addEventListener('click', () => { ex.every = REP_CYCLE[(REP_CYCLE.indexOf(ex.every) + 1) % REP_CYCLE.length]; paintRepeat(); haptic(); });
 function paintExAmount() {
   showAmount(exAmt, ex.buf);
   paintFx();
@@ -2348,6 +3025,7 @@ buildPad(exPad, k => {
   ex.buf = nb; haptic(); paintExAmount();
 });
 exTitle.addEventListener('input', () => {
+  paintFavStar();
   if (ex.manualCat) return;
   const g = guessCat(exTitle.value);
   if (g !== ex.cat) { ex.cat = g; paintCats(); if (g) scrollChip(g, true); }
@@ -2380,22 +3058,26 @@ function findExpense(id) {
 }
 function openExpense(id) {
   const f = id ? findExpense(id) : null;
-  Object.assign(ex, f ? { id, origKey: f.key, buf: bufOf(f.e.amt), cat: f.e.cat, manualCat: true, manualDate: true, date: f.e.date, rep: f.e.rep }
-    : { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: defaultDate(), rep: false });
+  Object.assign(ex, f ? { id, origKey: f.key, buf: bufOf(f.e.amt), cat: f.e.cat, manualCat: true, manualDate: true, date: f.e.date, every: everyOf(f.e) }
+    : { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: defaultDate(), every: 0 });
   const fx = f && f.e.fx && f.e.fx.cur !== S.currency ? f.e.fx : null;
   Object.assign(ex, { cur: fx ? fx.cur : null, rate: fx ? fx.rate : null, rateSt: fx ? 'saved' : null, rateErr: '', fxEdit: false, rateTok: ex.rateTok + 1 });
   if (fx) ex.buf = bufOf(fx.amt);
   exCur.disabled = !ME;
+  // Reise: bestehende Zuordnung, bei neuen Ausgaben die Reise zum Datum (mit ihrer Währung)
+  const trip = f ? null : tripAt(ex.date);
+  Object.assign(ex, { trip: f ? f.e.trip || null : trip ? trip.id : null, tripMan: !!f });
+  if (trip && ME && trip.cur !== S.currency) setCur(trip.cur);
   resetRc(f ? f.e.rc : null);
   if (ME && (!f || f.e.rc)) loadAi().then(() => { if (openSheet === shExp && rc.state === 'ready') paintRc('ready', readyText()); });
   exTitle.value = f ? f.e.title : '';
   $('#shExpT').textContent = f ? 'Ausgabe' : 'Neue Ausgabe';
   exSave.textContent = f ? 'Sichern' : 'Hinzufügen';
   exDelete.hidden = !f;
-  exRepeat.classList.toggle('on', ex.rep); exRepeat.setAttribute('aria-pressed', ex.rep);
+  paintRepeat();
   exPad.classList.remove('hidden'); exAmt.classList.remove('inactive');
   openPicker(false); openCurPick(false);
-  paintCats(); paintDate(); paintExAmount();
+  paintCats(); paintDate(); paintExAmount(); renderFavs(); paintFavStar(); paintTripOpt();
   exCats.scrollLeft = 0;
   if (ex.cat) scrollChip(ex.cat, false);
   showSheet(shExp);
@@ -2416,11 +3098,13 @@ function saveExpense() {
   let rec;
   if (ex.id) {
     const f = findExpense(ex.id);
-    if (f) { f.m.expenses.splice(f.i, 1); rec = { ...f.e, amt, title, cat, date: ex.date, rep: ex.rep }; if (f.key !== key) Store.touch(f.key); }
+    if (f) { f.m.expenses.splice(f.i, 1); rec = { ...f.e, amt, title, cat, date: ex.date, rep: ex.every > 0 }; if (f.key !== key) Store.touch(f.key); }
   }
-  if (!rec) { rec = { id: uid(), amt, title, cat, date: ex.date, rep: ex.rep, ts: Date.now() }; justAdded.add(rec.id); }
+  if (!rec) { rec = { id: uid(), amt, title, cat, date: ex.date, rep: ex.every > 0, ts: Date.now() }; justAdded.add(rec.id); }
+  if (ex.every > 1) rec.every = ex.every; else delete rec.every;
   if (ex.rc) rec.rc = ex.rc; else delete rec.rc;
   if (fx) rec.fx = fx; else delete rec.fx;
+  if (ex.trip && tripOf(ex.trip)) rec.trip = ex.trip; else delete rec.trip;
   // Foto lädt noch: sobald es oben ist, an die gespeicherte Ausgabe hängen
   if (!ex.rc && rc.pending) {
     const recId = rec.id;
@@ -2578,7 +3262,7 @@ async function analyzeReceipt(tok = rc.tok) {
   if (a.merchant && !exTitle.value.trim()) { exTitle.value = a.merchant.slice(0, 40); got.push('Händler'); }
   if (a.date && !ex.manualDate && !ex.id) {
     const d = parseD(a.date), diff = (today() - d) / 864e5;
-    if (diff >= -1 && diff <= 400 && a.date !== ex.date) { ex.date = a.date; paintDate(); dateChangedFx(); got.push('Datum'); }
+    if (diff >= -1 && diff <= 400 && a.date !== ex.date) { ex.date = a.date; paintDate(); dateChangedFx(); dateChangedTrip(); got.push('Datum'); }
   }
   // Beleg in Fremdwährung: Währung übernehmen und live umrechnen
   const rcCur = a.currency && a.currency !== S.currency && FX_CODES.includes(a.currency) ? a.currency : null;
@@ -3165,7 +3849,10 @@ function renderStats() {
   const cur = data[data.length - 1].c, prev = calc(addM(view.key, -1));
   const any = data.some(d => d.spent > 0);
   const [ey, em] = kParts(view.key);
-  let h = `<div class="seg" id="stRange"><span class="thumb"></span><button type="button" data-v="6">6 Monate</button><button type="button" data-v="12">12 Monate</button></div>`;
+  const rk = addM(curKey(), -1);
+  let h = `<div class="seg" id="stRange"><span class="thumb"></span><button type="button" data-v="6">6 Monate</button><button type="button" data-v="12">12 Monate</button></div>
+    <div class="st-links">${hasReview(rk) ? `<button class="list-row lr-btn" type="button" data-st="review"><span class="cat-ic">${ic('i-chart')}</span><div class="lr-main"><div class="lr-t">Rückblick auf ${monthName(rk)}</div><div class="lr-s">Was übrig blieb und wohin das Geld ging</div></div><svg class="i"><use href="#i-chev-r"/></svg></button>` : ''}
+      <button class="list-row lr-btn" type="button" data-st="fix"><span class="cat-ic">${ic('i-repeat')}</span><div class="lr-main"><div class="lr-t">Fixkosten &amp; Abos</div><div class="lr-s">Alle wiederkehrenden Kosten, pro Monat und Jahr</div></div><svg class="i"><use href="#i-chev-r"/></svg></button></div>`;
   if (!any) {
     stBody.innerHTML = h + `<div class="st-empty"><b>Noch zu wenig Daten</b><br>Sobald du ein paar Ausgaben erfasst hast, siehst du hier, wie sich deine Monate entwickeln.</div>`;
     paintSegEl($('#stRange', stBody), String(st.n));
@@ -3218,6 +3905,8 @@ function openStats() {
 }
 if (window.ResizeObserver) { st.ro = new ResizeObserver(() => { if (shStats.classList.contains('open')) drawChart(); }); st.ro.observe(stBody); }
 stBody.addEventListener('click', e => {
+  const link = e.target.closest('[data-st]');
+  if (link) { haptic(); if (link.dataset.st === 'fix') { openFix(); shFix._back = openStats; } else { openReview(addM(curKey(), -1)); shReview._back = openStats; } return; }
   const seg = e.target.closest('#stRange button');
   if (seg) { const n = Number(seg.dataset.v); if (n !== st.n) { st.n = n; haptic(); renderStats(); } return; }
   if (e.target.closest('#stTable')) { st.table = !st.table; haptic(); renderStats(); return; }
@@ -3471,6 +4160,7 @@ function paintAiLimit() {
 }
 function paintAiCfg(c) {
   aiUI.cfg = c; aiUI.limit = c.limit; paintAiLimit();
+  chatCfg.model = c.chatModel || null; chatCfg.limit = c.chatLimit ?? 30; paintChatCfg(); $('#chatModels').hidden = true;
   $('#aiState').textContent = c.hasKey ? `Eingerichtet · Schlüssel ${c.keyHint}` : 'Nicht eingerichtet';
   $('#aiStateS').textContent = c.hasKey
     ? `${c.fromEnv ? 'Schlüssel aus der Umgebungsvariable · ' : ''}Modell ${c.model}`
@@ -3512,14 +4202,14 @@ aiModels.addEventListener('click', e => {
   $$('button', aiModels).forEach(x => x.classList.toggle('on', x === b));
 });
 $('#aiSave').addEventListener('click', async () => {
-  const body = { limit: aiUI.limit }, key = aiKey.value.trim();
+  const body = { limit: aiUI.limit, chatModel: chatCfg.model, chatLimit: chatCfg.limit }, key = aiKey.value.trim();
   if (key) body.key = key;
   if (!aiUI.cfg.modelFromEnv) body.model = aiModel.value.trim() || null;
   if (!key && !aiUI.cfg.hasKey) { setErr(aiErr, 'Gib zuerst deinen OpenRouter-Schlüssel ein.'); haptic('heavy'); aiKey.focus(); return; }
   const b = $('#aiSave'); b.disabled = true;
   try {
     paintAiCfg(await api('PUT', '/api/admin/ai', body));
-    aiModels.hidden = true; haptic('success'); toast('KI-Belegerkennung gespeichert');
+    aiModels.hidden = true; haptic('success'); toast('KI-Einstellungen gespeichert');
     loadAi();
   } catch (e) { if (e.status === 401) return toLogin(); setErr(aiErr, e.message); haptic('heavy'); }
   finally { b.disabled = false; }
@@ -3619,8 +4309,17 @@ $('#pkList').addEventListener('click', async e => {
 
 /* ---------- Neuigkeiten ----------
    Öffnet sich beim ersten Start nach einem Update von selbst (gemerkt pro Gerät), danach über die Einstellungen. */
-const APP_VERSION = '3.3';
+const APP_VERSION = '4.0';
 const CHANGELOG = [
+  { v: '4.0', title: 'Quota 4', sub: 'Sieben Neuerungen: schneller erfassen, besser planen und Hilfe direkt in der App.', items: [
+    ['i-chat', 'Quota-Assistent', 'Frag den Chat oben rechts, wie etwas in der App geht. Auf Wunsch kennt er auch deine Zahlen. Er hilft nur bei Quota und deinen Finanzen.'],
+    ['i-star', 'Favoriten', 'Tippe beim Erfassen auf den Stern im Feld „Wofür?“. Danach genügt ein Tipp auf den Favoriten, und Betrag, Text und Kategorie sind ausgefüllt.'],
+    ['c-reisen', 'Reisebudget', 'Lege eine Reise mit Zeitraum, Währung und Budget an. Unterwegs zählen neue Ausgaben automatisch dazu, in Landeswährung.'],
+    ['i-repeat', 'Fixkosten und Abos', 'Wiederholen geht jetzt auch alle 3 Monate oder jedes Jahr. Die neue Übersicht zeigt, was dich deine Fixkosten pro Monat und Jahr kosten.'],
+    ['i-chart', 'Monatsrückblick', 'Am Anfang jeder Lohnperiode siehst du, was übrig blieb und wohin das Geld ging. Den Rest legst du mit einem Tipp aufs Sparziel.'],
+    ['i-bell', 'Mitteilungen', 'Budgetwarnung, Erinnerung am Abend, Rückblick am Lohntag und fällige Fixkosten. Einschalten unter Einstellungen → Mitteilungen.'],
+    ['i-devices', 'Angemeldete Geräte', 'Sieh, wo du angemeldet bist, und melde ein altes Handy mit einem Tipp ab. Unter Einstellungen → Konto.'],
+  ] },
   { v: '3.3', title: 'Bezahlt in Euro, Dollar oder Baht', sub: 'Wähle die Währung, in der du bezahlt hast. Quota rechnet sofort in deine Währung um.', items: [
     ['i-coins', 'Andere Währung wählen', 'Tippe beim Erfassen auf die Währung neben dem Betrag. Suche nach Namen oder Land, zum Beispiel „Thailand“. Zuletzt verwendete Währungen stehen oben.'],
     ['i-repeat', 'Live umgerechnet', 'Schon beim Eintippen siehst du den Betrag in deiner Währung, mit dem Tageskurs der EZB. Für Ausgaben in der Vergangenheit gilt der Kurs dieses Tages.'],
@@ -3694,10 +4393,257 @@ function maybeShowNews() {
     if (openSheet) newsWait = true; else openNews(false);
   }, 700);
 }
-function newsAfterSheet() { if (newsWait && !openSheet) { newsWait = false; setTimeout(maybeShowNews, 400); } }
+function newsAfterSheet() {
+  if (newsWait && !openSheet) { newsWait = false; setTimeout(maybeShowNews, 400); }
+  else if (reviewWait && !openSheet) { reviewWait = false; setTimeout(maybeShowReview, 400); }
+}
 newsBody.addEventListener('click', e => { if (e.target.closest('[data-news-ok]')) { haptic(); hideSheet(shNews); } });
 $('#btnNews').addEventListener('click', () => { haptic(); openNews(true); });
 $('#newsNote').textContent = `Version ${APP_VERSION} · Was ist neu?`;
+
+/* ---------- Push-Mitteilungen ----------
+   Pro Gerät ein Abo beim Push-Dienst des Browsers; welche Mitteilungen kommen, gilt für alle Geräte der Person.
+   Auf dem iPhone nur als Web-App vom Home-Bildschirm (iOS 16.4+), überall nur über HTTPS. */
+const pushUI = { key: null, prefs: null, devices: 0, sub: null, busy: false };
+const isIOS = () => /iPhone|iPad/.test(navigator.userAgent) || (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+function pushBlocker() {
+  if (!window.isSecureContext) return 'Nur über HTTPS möglich, genau wie Face ID.';
+  if (isIOS() && !standalone()) return 'Auf iPhone und iPad: Quota über Teilen → „Zum Home-Bildschirm“ hinzufügen und vom Icon aus öffnen.';
+  if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return `Dieser Browser kann keine Mitteilungen empfangen.${isIOS() ? ' Nötig ist iOS 16.4 oder neuer.' : ''}`;
+  if (Notification.permission === 'denied') return 'Für Quota blockiert. Erlaube Mitteilungen in den Einstellungen des Geräts oder Browsers.';
+  return null;
+}
+function paintPush() {
+  const block = pushBlocker(), on = !!pushUI.sub;
+  if (!pushUI.busy) $('#pushToggle').checked = on; // während des Umschaltens die Wahl stehen lassen
+  $('#pushToggle').disabled = !!block || pushUI.busy || !pushUI.key;
+  $('#pushNote').textContent = block || (on ? `Eingeschaltet${pushUI.devices > 1 ? ` · ${pushUI.devices} Geräte` : ''}` : pushUI.devices ? `Auf ${pushUI.devices === 1 ? 'einem anderen Gerät' : pushUI.devices + ' anderen Geräten'} eingeschaltet` : 'Budgetwarnungen, Erinnerungen und Rückblick');
+  $('#pushNote').classList.toggle('warn', !!block && Notification.permission === 'denied');
+  const pr = pushUI.prefs;
+  $('#pushPrefs').hidden = !pr || !(on || pushUI.devices);
+  if (!pr) return;
+  $$('[data-pref]').forEach(i => { i.checked = i.dataset.pref === 'remind' ? !!pr.remind : !!pr[i.dataset.pref]; });
+  $('#remindRow').hidden = !pr.remind;
+  $('#remVal').textContent = pr.remind || '20:00';
+  $('#pushTest').hidden = !on;
+}
+async function loadPush() {
+  $('#grpPush').hidden = !ME;
+  if (!ME) return;
+  try {
+    const r = await api('GET', '/api/push');
+    Object.assign(pushUI, { key: r.key, prefs: r.prefs, devices: r.devices });
+    if (!pushBlocker()) {
+      const reg = await navigator.serviceWorker.getRegistration();
+      pushUI.sub = reg ? await reg.pushManager.getSubscription() : null;
+    }
+  } catch (e) { if (e.status === 401) return toLogin(); }
+  paintPush();
+}
+async function pushOn() {
+  // Die Nachfrage muss direkt auf den Tipp folgen (iOS), deshalb zuerst
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') { toast(perm === 'denied' ? 'Mitteilungen wurden abgelehnt.' : 'Keine Erlaubnis für Mitteilungen.'); return; }
+  const reg = (await navigator.serviceWorker.getRegistration()) || (await navigator.serviceWorker.register('/sw.js'));
+  await navigator.serviceWorker.ready;
+  const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: unb64u(pushUI.key) });
+  const j = sub.toJSON();
+  const r = await api('POST', '/api/push/subscribe', { endpoint: j.endpoint, keys: j.keys });
+  Object.assign(pushUI, { sub, prefs: r.prefs, devices: r.devices });
+  haptic('success'); toast('Mitteilungen eingeschaltet');
+}
+async function pushOff() {
+  const sub = pushUI.sub;
+  if (sub) { try { await sub.unsubscribe(); } catch (e) { /* egal */ } }
+  const r = await api('POST', '/api/push/unsubscribe', { endpoint: sub ? sub.endpoint : '' });
+  Object.assign(pushUI, { sub: null, devices: r.devices });
+  haptic(); toast('Mitteilungen auf diesem Gerät aus');
+}
+$('#pushToggle').addEventListener('change', async e => {
+  if (pushUI.busy) return;
+  const want = e.target.checked;
+  pushUI.busy = true; paintPush();
+  try { if (want) await pushOn(); else await pushOff(); }
+  catch (x) { if (x.status === 401) return toLogin(); toast(x.status ? x.message : 'Mitteilungen liessen sich nicht einschalten. Ist der Browser aktuell?'); }
+  finally { pushUI.busy = false; paintPush(); }
+});
+async function savePushPrefs(change) {
+  const before = pushUI.prefs;
+  pushUI.prefs = { ...before, ...change }; paintPush();
+  try { pushUI.prefs = (await api('PUT', '/api/push/prefs', change)).prefs; }
+  catch (e) { if (e.status === 401) return toLogin(); pushUI.prefs = before; toast(e.message); }
+  paintPush();
+}
+$('#pushPrefs').addEventListener('change', e => {
+  const k = e.target.dataset.pref; if (!k) return;
+  haptic();
+  savePushPrefs({ [k]: k === 'remind' ? (e.target.checked ? $('#remVal').textContent || '20:00' : null) : e.target.checked });
+});
+// Erinnerungszeit in halben Stunden zwischen 17:00 und 23:30
+function stepRemind(d) {
+  const [h, m] = (pushUI.prefs.remind || '20:00').split(':').map(Number);
+  const t = Math.min(23 * 60 + 30, Math.max(17 * 60, h * 60 + m + d * 30));
+  haptic(); savePushPrefs({ remind: `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}` });
+}
+$('#remDown').addEventListener('click', () => stepRemind(-1));
+$('#remUp').addEventListener('click', () => stepRemind(1));
+$('#pushTest').addEventListener('click', async () => {
+  const b = $('#pushTest'); b.disabled = true; haptic();
+  try { await api('POST', '/api/push/test'); toast('Test-Mitteilung geschickt'); }
+  catch (e) { if (e.status === 401) return toLogin(); toast(e.message); }
+  finally { b.disabled = false; }
+});
+
+// Links aus Mitteilungen: /?review=2026-09 öffnet den Rückblick, /?add=1 eine neue Ausgabe
+function openUrlAction(href) {
+  const q = new URL(href, location.href).searchParams, key = q.get('review');
+  if (key && /^\d{4}-\d\d$/.test(key) && hasReview(key)) { if (openSheet) hideSheet(openSheet, true); openReview(key); return; }
+  if (q.get('add')) { if (openSheet) hideSheet(openSheet, true); openExpense(null); }
+}
+let urlDone = false;
+function openFromUrl() {
+  if (urlDone) return;
+  urlDone = true;
+  if (!/[?&](review|add)=/.test(location.search)) return;
+  const href = location.href;
+  history.replaceState(null, '', location.pathname);
+  setTimeout(() => openUrlAction(href), 300);
+}
+if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'open') openUrlAction(e.data.url); });
+
+/* ---------- Quota-Assistent ----------
+   Chat mit einem kostenlosen Modell über den eigenen Server. Er beantwortet nur Fragen zur App und, wenn
+   eingeschaltet, zu den eigenen Zahlen. Der Verlauf bleibt nur in diesem Tab. */
+const shChat = $('#shChat'), chatBody = $('#chatBody'), chatQ = $('#chatQ'), chatSend = $('#chatSend');
+const chat = { msgs: [], busy: false, status: null, ctrl: null };
+try { const saved = JSON.parse(sessionStorage.getItem('mb.chat')); if (Array.isArray(saved)) chat.msgs = saved.slice(-30); } catch (e) { /* egal */ }
+const saveChat = () => { try { sessionStorage.setItem('mb.chat', JSON.stringify(chat.msgs.slice(-30))); } catch (e) { /* egal */ } };
+// Kleines, sicheres Markdown: **fett**, Listen mit „- “, Absätze
+function mdLite(t) {
+  const blocks = String(t).trim().split(/\n{2,}/);
+  return blocks.map(b => {
+    const lines = b.split('\n');
+    const inline = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+    if (lines.every(l => /^\s*[-*•] /.test(l))) return `<ul>${lines.map(l => `<li>${inline(l.replace(/^\s*[-*•] /, ''))}</li>`).join('')}</ul>`;
+    return `<p>${lines.map(inline).join('<br>')}</p>`;
+  }).join('');
+}
+const CHAT_SUGS = ['Wie erfasse ich eine Ausgabe in Euro?', 'Wie lege ich ein Reisebudget an?', 'Wie schalte ich Mitteilungen ein?', 'Was bedeutet „Frei verfügbar“?'];
+function renderChat() {
+  const st = chat.status;
+  let h = '';
+  if (!chat.msgs.length) {
+    const sugs = $('#chatData').checked ? ['Wie viel habe ich diesen Monat noch?', 'Wofür gebe ich am meisten aus?', ...CHAT_SUGS.slice(0, 2)] : CHAT_SUGS;
+    h = `<div class="chat-hello"><span class="ch-ic">${ic('i-chat')}</span><b>Hallo${ME ? ' ' + esc(ME.username) : ''}!</b>
+      <p>Ich bin der Quota-Assistent und helfe dir mit der App und deinen Finanzen darin. Frag mich zum Beispiel:</p>
+      <div class="chat-sugs">${sugs.map(q => `<button type="button" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div></div>`;
+  }
+  h += chat.msgs.map(m => m.role === 'user' ? `<div class="chat-msg me">${esc(m.content)}</div>`
+    : `<div class="chat-msg bot${m.err ? ' err' : ''}">${m.content ? mdLite(m.content) : '<span class="chat-typing" aria-label="schreibt"><i></i><i></i><i></i></span>'}</div>`).join('');
+  if (st && !st.enabled) h += `<div class="chat-msg bot err">Der Assistent ist noch nicht eingerichtet. ${ME && ME.admin ? 'Trage unter Einstellungen → KI einen OpenRouter-Schlüssel ein.' : 'Ein Admin muss dafür einen OpenRouter-Schlüssel eintragen.'}</div>`;
+  chatBody.innerHTML = h;
+  chatBody.scrollTop = chatBody.scrollHeight;
+  paintChatFoot();
+}
+function paintChatFoot() {
+  const st = chat.status;
+  $('#chatNote').textContent = !st ? '' : st.remaining == null ? 'Gratis-Modell über OpenRouter' : `noch ${st.remaining} ${st.remaining === 1 ? 'Nachricht' : 'Nachrichten'} heute`;
+  chatSend.disabled = chat.busy || !chatQ.value.trim() || !(st && st.enabled) || st.remaining === 0;
+  $('#chatNew').style.visibility = chat.msgs.length ? '' : 'hidden'; // Platz behalten, sonst rutscht der Titel
+}
+async function openChat() {
+  $('#chatData').checked = (() => { try { return localStorage.getItem('mb.chatData') === '1'; } catch (e) { return false; } })();
+  renderChat();
+  showSheet(shChat);
+  if (!coarse.matches) setTimeout(() => chatQ.focus({ preventScroll: true }), 80);
+  try { chat.status = await api('GET', '/api/assistant'); } catch (e) { if (e.status === 401) return toLogin(); }
+  renderChat();
+}
+function growQ() { chatQ.style.height = 'auto'; chatQ.style.height = Math.min(120, chatQ.scrollHeight) + 'px'; }
+async function askChat(text) {
+  const q = text.trim().slice(0, 2000);
+  if (!q || chat.busy) return;
+  chat.msgs.push({ role: 'user', content: q });
+  const answer = { role: 'assistant', content: '' };
+  chat.msgs.push(answer);
+  chat.busy = true; chatQ.value = ''; growQ(); haptic(); renderChat();
+  const ctrl = chat.ctrl = new AbortController();
+  const history = chat.msgs.filter(m => !m.err && m !== answer && (m.role === 'user' || m.content)).slice(-12).map(m => ({ role: m.role, content: m.content }));
+  let res;
+  try {
+    res = await fetch('/api/assistant', {
+      method: 'POST', credentials: 'same-origin', cache: 'no-store', signal: ctrl.signal,
+      headers: { 'X-Requested-With': 'monatsbudget', 'X-Client-Id': CID, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: history, withData: $('#chatData').checked }),
+    });
+    if (res.status === 401) return toLogin();
+    if (!res.ok) { const d = await res.json().catch(() => null); throw new Error((d && d.error) || 'Der Assistent hat nicht geantwortet.'); }
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = '', last = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i); buf = buf.slice(i + 1);
+        if (!line.trim()) continue;
+        let j; try { j = JSON.parse(line); } catch (x) { continue; }
+        if (j.d) answer.content += j.d;
+        if (j.error) { answer.content += (answer.content ? '\n\n' : '') + j.error; answer.err = !answer.content || answer.content === j.error; }
+        if (j.done) chat.status = { ...chat.status, enabled: j.enabled, limit: j.limit, used: j.used, remaining: j.remaining };
+      }
+      if (Date.now() - last > 60) { last = Date.now(); renderChat(); }
+    }
+    if (!answer.content) { answer.content = 'Keine Antwort erhalten. Bitte nochmals versuchen.'; answer.err = true; }
+  } catch (e) {
+    if (e.name === 'AbortError') { if (!answer.content) chat.msgs.splice(chat.msgs.indexOf(answer), 1); }
+    else { answer.content = e.message === 'Failed to fetch' ? 'Keine Verbindung zum Server.' : e.message; answer.err = true; }
+  } finally {
+    chat.busy = false; chat.ctrl = null; saveChat(); renderChat();
+    if (!coarse.matches && openSheet === shChat) chatQ.focus({ preventScroll: true });
+  }
+}
+$('#chatForm').addEventListener('submit', e => { e.preventDefault(); askChat(chatQ.value); });
+chatQ.addEventListener('input', () => { growQ(); paintChatFoot(); });
+chatQ.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); e.stopPropagation(); askChat(chatQ.value); } });
+chatBody.addEventListener('click', e => { const b = e.target.closest('[data-q]'); if (b) askChat(b.dataset.q); });
+$('#chatNew').addEventListener('click', () => { if (chat.ctrl) chat.ctrl.abort(); chat.msgs = []; saveChat(); haptic(); renderChat(); });
+$('#chatData').addEventListener('change', e => {
+  try { localStorage.setItem('mb.chatData', e.target.checked ? '1' : '0'); } catch (x) { /* egal */ }
+  haptic(); if (!chat.msgs.length) renderChat();
+  if (e.target.checked) toast('Deine Budgetzahlen gehen mit jeder Frage an das KI-Modell.');
+});
+$('#btnChat').addEventListener('click', () => { haptic(); openChat(); });
+$('#btnChatSet').addEventListener('click', () => { haptic(); openChat(); shChat._back = openSettings; });
+
+// Admin: Modell und Tageslimit des Assistenten (gespeichert mit „Sichern“ bei der KI)
+const chatCfg = { model: null, limit: 30 };
+function paintChatCfg() {
+  $('#chatModelLbl').textContent = chatCfg.model ? chatCfg.model : 'Automatisch: bestes Gratis-Modell';
+  $('#chatLimit').textContent = chatCfg.limit;
+  $('#chatDown').disabled = chatCfg.limit <= 0; $('#chatUp').disabled = chatCfg.limit >= 500;
+}
+$('#chatDown').addEventListener('click', () => { chatCfg.limit = Math.max(0, chatCfg.limit - (chatCfg.limit > 50 ? 10 : 5)); haptic(); paintChatCfg(); });
+$('#chatUp').addEventListener('click', () => { chatCfg.limit = Math.min(500, chatCfg.limit + (chatCfg.limit >= 50 ? 10 : 5)); haptic(); paintChatCfg(); });
+$('#chatModelLoad').addEventListener('click', async () => {
+  const b = $('#chatModelLoad'), list = $('#chatModels');
+  if (!list.hidden) { list.hidden = true; return; }
+  b.disabled = true; b.innerHTML = '<span class="spin"></span>';
+  try {
+    const { models } = await api('GET', '/api/admin/ai/free-models');
+    list.innerHTML = `<button type="button" class="${!chatCfg.model ? 'on' : ''}" data-cmodel=""><b>Automatisch</b><span>Nimmt das beste verfügbare Gratis-Modell und weicht bei Überlastung aus</span></button>`
+      + models.slice(0, 40).map(m => `<button type="button" class="${m.id === chatCfg.model ? 'on' : ''}" data-cmodel="${esc(m.id)}"><b>${esc(m.name)}</b><span>${esc(m.id)}</span></button>`).join('');
+    list.hidden = false;
+  } catch (e) { if (e.status === 401) return toLogin(); setErr(aiErr, e.message); }
+  finally { b.disabled = false; b.textContent = 'Wählen'; }
+});
+$('#chatModels').addEventListener('click', e => {
+  const b = e.target.closest('[data-cmodel]'); if (!b) return;
+  chatCfg.model = b.dataset.cmodel || null; haptic(); paintChatCfg();
+  $$('button', $('#chatModels')).forEach(x => x.classList.toggle('on', x === b));
+});
 
 /* ---------- Konto & Benutzerverwaltung ---------- */
 const grpAcc = $('#grpAcc'), grpUsers = $('#grpUsers'), pwForm = $('#pwForm'), btnPw = $('#btnPw'), btnLogout = $('#btnLogout');
@@ -3713,7 +4659,56 @@ function paintAccount() {
   btnLogout.disabled = false;
   if (ME.admin) { usersUI.reset = null; usersUI.armed = null; setErr($('#nuErr')); loadUsers(); }
   loadPasskeys();
+  $('#devList').hidden = true; $('#btnDevs').setAttribute('aria-expanded', 'false');
+  loadDevices();
 }
+/* Angemeldete Geräte */
+const devUI = { list: [], armed: null, armT: 0 };
+function agoTs(ts) {
+  if (!ts) return 'unbekannt';
+  const min = (Date.now() - ts) / 6e4, d = new Date(ts), t = today();
+  if (min < 5) return 'gerade eben';
+  if (min < 60) return `vor ${Math.round(min)} Min.`;
+  const hm = `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  if (dkey(d) === dkey(t)) return `heute ${hm}`;
+  if (dkey(d) === dkey(new Date(t.getFullYear(), t.getMonth(), t.getDate() - 1))) return `gestern ${hm}`;
+  return `am ${fmtTs(ts)}`;
+}
+function renderDevices() {
+  const n = devUI.list.length, others = devUI.list.filter(x => !x.current).length;
+  $('#devNote').textContent = !n ? 'Wo du gerade angemeldet bist' : n === 1 ? 'Nur dieses Gerät' : `${n} Geräte, davon ${others === 1 ? '1 anderes' : others + ' andere'}`;
+  $('#devList').innerHTML = devUI.list.map(x => `<div class="list-row"><span class="cat-ic">${ic(/iPhone|Android-Handy/.test(x.device) ? 'c-handy' : 'c-technik')}</span>
+    <div class="lr-main"><div class="lr-t">${esc(x.device || 'Unbekanntes Gerät')}${x.current ? '<span class="tag">Dieses Gerät</span>' : ''}</div>
+      <div class="lr-s num">${x.current ? 'Jetzt aktiv' : 'Zuletzt ' + agoTs(x.lastSeen || x.createdAt)}${x.createdAt ? ` · angemeldet ${fmtTs(x.createdAt)}` : ''}</div></div>
+    ${x.current ? '' : `<button class="pill-btn danger" type="button" data-dev="${esc(x.id)}">${devUI.armed === x.id ? 'Sicher?' : 'Abmelden'}</button>`}</div>`).join('')
+    + (others > 1 ? `<button class="btn-danger" type="button" data-dev="all">${devUI.armed === 'all' ? 'Wirklich alle anderen abmelden?' : 'Alle anderen Geräte abmelden'}</button>` : '');
+}
+async function loadDevices() {
+  if (!ME) return;
+  try { devUI.list = (await api('GET', '/api/sessions')).sessions; devUI.armed = null; renderDevices(); }
+  catch (e) { if (e.status === 401) toLogin(); }
+}
+$('#btnDevs').addEventListener('click', () => {
+  const list = $('#devList'), open = list.hidden;
+  list.hidden = !open; $('#btnDevs').setAttribute('aria-expanded', String(open)); haptic();
+  if (open) loadDevices();
+});
+$('#devList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-dev]'); if (!b) return;
+  const id = b.dataset.dev;
+  clearTimeout(devUI.armT);
+  if (devUI.armed !== id) {
+    devUI.armed = id; haptic('heavy'); renderDevices();
+    devUI.armT = setTimeout(() => { devUI.armed = null; renderDevices(); }, 4000);
+    return;
+  }
+  devUI.armed = null; b.disabled = true;
+  try {
+    await api('DELETE', id === 'all' ? '/api/sessions' : `/api/sessions/${id}`);
+    haptic('success'); toast(id === 'all' ? 'Alle anderen Geräte abgemeldet' : 'Gerät abgemeldet');
+    loadDevices();
+  } catch (x) { if (x.status === 401) return toLogin(); toast(x.message); renderDevices(); }
+});
 btnPw.addEventListener('click', () => {
   const open = pwForm.hidden;
   pwForm.hidden = !open; btnPw.setAttribute('aria-expanded', String(open)); haptic();
@@ -3824,6 +4819,8 @@ function openSettings() {
   paintSeg(); paintSegEl(segTheme, getTheme()); paintStart(); updateStoreInfo(); paintAccount();
   $('#catsNote').textContent = `${CATS.length} Kategorien${S.categories ? ' · angepasst' : ''}`;
   $('#grpData').hidden = !ME;
+  renderFavList(); loadPush();
+  $('#btnChatSet').hidden = !ME;
   btnReset.textContent = 'Alle Daten löschen';
   loadAiCfg();
   showSheet(shSet);
@@ -3848,11 +4845,15 @@ function carryOver(from) {
   const pm = getM(from), m = ensureM(view.key), touched = new Set([view.key]);
   if (m.income == null) m.income = pm.income;
   if (m.budget == null) m.budget = pm.budget;
-  periodExpenses(from).filter(e => e.rep).forEach((e, i) => {
-    const date = dateInPeriod(view.key, parseInt(e.date.slice(8), 10)), b = date.slice(0, 7);
-    const rec = { id: uid(), amt: e.amt, title: e.title, cat: e.cat, date, rep: true, ts: Date.now() + i };
+  const add = (e, date, i) => {
+    const b = date.slice(0, 7), rec = { id: uid(), amt: e.amt, title: e.title, cat: e.cat, date, rep: true, ts: Date.now() + i };
+    if (e.every > 1) rec.every = e.every;
+    if (e.fx) rec.fx = { ...e.fx };
     ensureM(b).expenses.push(rec); justAdded.add(rec.id); touched.add(b);
-  });
+  };
+  const due = dueInPeriod(view.key);
+  periodExpenses(from).filter(e => e.rep && !(e.every > 1)).forEach((e, i) => add(e, dateInPeriod(view.key, parseInt(e.date.slice(8), 10)), i));
+  due.forEach((d, i) => add(d.x.e, d.date, 100 + i));
   touched.forEach(k => Store.touch(k));
   haptic('success');
   render({ anim: 'swap' });
@@ -3872,11 +4873,14 @@ content.addEventListener('click', e => {
     case 'spent': scrollToList(true); break;
     case 'sample-start': haptic(); exitSample(true); openAmount('income'); break;
     case 'carry': carryOver(b.dataset.from); break;
+    case 'fix': haptic(); openFix(); break;
     case 'day': view.day = view.day === b.dataset.d ? null : b.dataset.d; haptic(); render(); break;
     case 'clear-day': view.day = null; haptic(); render(); break;
     case 'search': haptic(); openSearch(!view.qopen); break;
     case 'goal': haptic(); openGoal(b.dataset.id); break;
     case 'goal-new': haptic(); openGoalEd(null); break;
+    case 'trip': haptic(); openTrip(b.dataset.id); break;
+    case 'trip-new': haptic(); openTripEd(null); break;
     case 'qclear': view.q = ''; haptic(); updateList(); { const q = $('#q', content); if (q) { q.value = ''; q.focus(); } } break;
     case 'qcat': view.qcat = b.dataset.cat && view.qcat !== b.dataset.cat ? b.dataset.cat : null; haptic(); updateList(); break;
     case 'row': if (openRow) { closeRows(); break; } if (S.sample) { exitSample(); break; } haptic(); openExpense(b.dataset.id); break;
@@ -4068,6 +5072,7 @@ $$('.sheet-body').forEach(el => Scrollbars.add(el, { layer: 'top' }));
 
 /* ---------- Start ---------- */
 function boot() {
+  $('#btnChat').hidden = !ME;
   const loc = Store.readLocal();
   if (loc && loc.months && typeof loc.months === 'object') {
     Object.entries(loc.months).forEach(([k, m]) => { if (/^\d{4}-\d\d$/.test(k)) { const cm = cleanMonth(m); if (!isEmptyM(cm)) S.months[k] = cm; } });
@@ -4075,6 +5080,8 @@ function boot() {
     if (okStart(loc.startDay)) S.startDay = loc.startDay;
     if (Array.isArray(loc.categories)) { S.categories = loc.categories; setCats(loc.categories); buildCatChips(); }
     if (Array.isArray(loc.goals)) S.goals = loc.goals;
+    if (Array.isArray(loc.trips)) S.trips = loc.trips;
+    if (Array.isArray(loc.favorites)) S.favorites = loc.favorites;
   }
   view.key = curKey();
   if (!hasData()) { S.sample = true; S.months = sampleData(); }

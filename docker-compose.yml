@@ -22,6 +22,7 @@ services:
       # APP_URL: "https://budget.dein-nas.ch"   # optional: feste HTTPS-Adresse (für Face ID/Passkeys hinter einem Proxy)
       # OPENROUTER_API_KEY: ""  # optional: Schlüssel für die KI-Belegerkennung (sonst in der App unter Einstellungen eintragen)
       # OPENROUTER_MODEL: ""    # optional: anderes Modell, Standard google/gemini-2.5-flash
+      # PUSH_CONTACT: "mailto:du@example.ch"   # optional: Kontakt für die Push-Dienste (Standard: APP_URL)
     # Härtung: Dateisystem schreibgeschützt (ausser /data), keine unnötigen Rechte
     read_only: true
     tmpfs:

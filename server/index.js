@@ -23,6 +23,7 @@ try {
     appUrl: env.APP_URL || null,
     aiKey: env.OPENROUTER_API_KEY || null,
     aiModel: env.OPENROUTER_MODEL || null,
+    pushContact: env.PUSH_CONTACT || null,
     log,
   });
 } catch (e) {

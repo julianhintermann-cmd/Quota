@@ -34,6 +34,43 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
 
+### Neu in Version 4.0
+
+- **Favoriten**: Beim Erfassen den Stern im Feld „Wofür?“ antippen; Favoriten und Vorschläge (häufige Ausgaben)
+  erscheinen danach als Chips, ein Tipp füllt Betrag, Text, Kategorie und Währung aus. Verwalten unter Einstellungen → Favoriten.
+- **Fixkosten alle 3 Monate oder jährlich**: Der Knopf „Wiederholen“ wechselt zwischen jeden Monat, alle 3 Monate und jedes Jahr.
+  Beim Übernehmen eines neuen Monats kommen vierteljährliche und jährliche Fixkosten nur dazu, wenn sie fällig sind.
+  Neue Übersicht **Fixkosten & Abos** (Statistik oder „Fixkosten“ unter dem Kalender) mit Kosten pro Monat und Jahr.
+- **Monatsrückblick**: öffnet sich zu Beginn einer neuen Lohnperiode einmal; zeigt, was übrig blieb, Kategorien, Vergleich
+  zum Vormonat. Ein Überschuss lässt sich direkt auf ein Sparziel buchen. Später über die Statistik.
+- **Reisebudget**: Reise mit Zeitraum, Währung und Budget anlegen. Neue Ausgaben im Reisezeitraum werden ihr zugeordnet
+  und die Reisewährung ist vorausgewählt; Fortschritt in Reisewährung und Franken.
+- **Push-Mitteilungen** (Einstellungen → Mitteilungen): Budgetwarnung bei 80 % und 100 %, Erinnerung am Abend (nur wenn
+  noch nichts erfasst ist), Monatsrückblick am Lohntag, jährliche/vierteljährliche Fixkosten am Vortag. Siehe unten.
+- **Angemeldete Geräte** (Einstellungen → Konto): alle Sitzungen mit Gerät und letzter Aktivität, einzeln oder alle
+  anderen abmelden.
+- **Quota-Assistent**: Chat (Sprechblase oben rechts) mit einem kostenlosen OpenRouter-Modell. Er beantwortet nur Fragen
+  zur App und, wenn „Meine Zahlen einbeziehen“ an ist, zu den eigenen Zahlen. Alles andere lehnt er ab.
+
+### Push-Mitteilungen
+
+- Braucht **HTTPS mit einem Hostnamen** (wie Face ID). Auf dem **iPhone/iPad** funktionieren sie nur, wenn Quota über
+  *Teilen → Zum Home-Bildschirm* hinzugefügt und vom Icon aus geöffnet wird (iOS 16.4 oder neuer). Android und
+  Computer-Browser brauchen das nicht.
+- Kein Apple-Entwicklerkonto nötig: Der Server erzeugt beim ersten Start ein eigenes Schlüsselpaar (VAPID) und schickt
+  die verschlüsselten Mitteilungen über den Push-Dienst des jeweiligen Browsers (Apple, Google, Mozilla, Microsoft).
+  Der Container braucht dafür Internetzugang. Mitteilungen gehen nur an diese bekannten Push-Dienste.
+- Die Zeiten richten sich nach der Zeitzone des Containers (`TZ`).
+
+### Quota-Assistent
+
+- Nutzt denselben OpenRouter-Schlüssel wie die Belegerkennung, aber **nur kostenlose Modelle** (Name endet auf `:free`).
+  Standard ist „Automatisch“: das beste verfügbare Gratis-Modell, bei Überlastung das nächste.
+- Admins wählen das Modell und das Tageslimit (Standard 30 Nachrichten pro Person ohne Admin-Rechte) unter
+  Einstellungen → KI.
+- Kostenlose Modelle haben bei OpenRouter eigene Tageslimits und die Anbieter können Eingaben speichern. Budgetzahlen
+  gehen deshalb nur mit, wenn im Chat „Meine Zahlen einbeziehen“ eingeschaltet ist.
+
 ### Neu in Version 3.3
 
 - **Fremdwährungen**: Beim Erfassen auf die Währung neben dem Betrag tippen und z.B. EUR, USD oder THB wählen
@@ -149,6 +186,7 @@ Die Datenbank im Datenordner bleibt dabei erhalten.
 | `APP_URL` | – | Optional: feste Adresse der App (z. B. `https://budget.dein-nas.ch`), falls Passkeys hinter einem Proxy nicht klappen |
 | `OPENROUTER_API_KEY` | – | Optional: OpenRouter-Schlüssel (sonst in der App eintragen) |
 | `OPENROUTER_MODEL` | `google/gemini-2.5-flash` | Optional: Modell für die Belegerkennung (muss Bilder verstehen) |
+| `PUSH_CONTACT` | `APP_URL` | Optional: Kontakt für die Push-Dienste (`mailto:…` oder `https://…`) |
 
 ### Rechte des Datenordners
 
@@ -179,7 +217,8 @@ data/
 ```
 
 - Tabellen: `users`, `sessions`, `settings`, `months` (Einkommen/Budget pro Monat),
-  `expenses` (jede Ausgabe als eigene Zeile, bei Fremdwährung mit Originalbetrag und Kurs), `goals` und `goal_entries` (Sparziele), `receipts`
+  `expenses` (jede Ausgabe als eigene Zeile, bei Fremdwährung mit Originalbetrag und Kurs), `trips` (Reisen),
+  `push_subs`/`push_prefs`/`push_sent` (Mitteilungen), `chat_usage` (Tageszähler des Assistenten), `goals` und `goal_entries` (Sparziele), `receipts`
   (Belegfotos), `ai_usage` (Tageszähler der KI) und `passkeys`. Beträge werden in Rappen/Cent gespeichert.
 - Ältere Datenbanken werden beim Start automatisch auf den neuen Stand gebracht.
 - Belegfotos, die zu keiner Ausgabe mehr gehören, werden nach drei Tagen gelöscht.

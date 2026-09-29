@@ -102,6 +102,47 @@ CREATE TABLE IF NOT EXISTS passkeys (
   last_used  INTEGER
 );
 CREATE INDEX IF NOT EXISTS passkeys_user ON passkeys(user_id);
+-- Reisen mit eigenem Budget (Betrag in Rappen/Cent der Reisewährung)
+CREATE TABLE IF NOT EXISTS trips (
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id         TEXT    NOT NULL,
+  name       TEXT    NOT NULL,
+  start      TEXT    NOT NULL,
+  end        TEXT    NOT NULL,
+  budget     INTEGER,
+  currency   TEXT    NOT NULL,
+  rate       REAL,
+  icon       TEXT    NOT NULL DEFAULT 'reisen',
+  created_at INTEGER NOT NULL,
+  PRIMARY KEY (user_id, id)
+);
+-- Push-Mitteilungen: ein Abo pro Gerät, Einstellungen pro Person, Gesendetes gegen Doppelte
+CREATE TABLE IF NOT EXISTS push_subs (
+  endpoint   TEXT    PRIMARY KEY,
+  user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  p256dh     TEXT    NOT NULL,
+  auth       TEXT    NOT NULL,
+  device     TEXT    NOT NULL DEFAULT '',
+  created_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS push_subs_user ON push_subs(user_id);
+CREATE TABLE IF NOT EXISTS push_prefs (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  data    TEXT    NOT NULL
+);
+CREATE TABLE IF NOT EXISTS push_sent (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  key     TEXT    NOT NULL,
+  at      INTEGER NOT NULL,
+  PRIMARY KEY (user_id, key)
+);
+-- Nachrichten an den Quota-Assistenten pro Tag
+CREATE TABLE IF NOT EXISTS chat_usage (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  day     TEXT    NOT NULL,
+  count   INTEGER NOT NULL,
+  PRIMARY KEY (user_id, day)
+);
 `;
 
 const toCents = v => (v == null ? null : Math.round(v * 100));
@@ -118,6 +159,9 @@ export function openDatabase(dataDir) {
   if (!cols('settings').includes('categories')) db.exec('ALTER TABLE settings ADD COLUMN categories TEXT');
   if (!cols('expenses').includes('receipt')) db.exec('ALTER TABLE expenses ADD COLUMN receipt TEXT');
   if (!cols('expenses').includes('fx_cur')) db.exec('ALTER TABLE expenses ADD COLUMN fx_cur TEXT; ALTER TABLE expenses ADD COLUMN fx_amount INTEGER; ALTER TABLE expenses ADD COLUMN fx_rate REAL;');
+  if (!cols('expenses').includes('trip')) db.exec('ALTER TABLE expenses ADD COLUMN trip TEXT');
+  if (!cols('settings').includes('favorites')) db.exec('ALTER TABLE settings ADD COLUMN favorites TEXT');
+  if (!cols('sessions').includes('device')) db.exec('ALTER TABLE sessions ADD COLUMN device TEXT; ALTER TABLE sessions ADD COLUMN created_at INTEGER; ALTER TABLE sessions ADD COLUMN last_seen INTEGER;');
 
   const q = {
     countUsers: db.prepare('SELECT COUNT(*) AS n FROM users'),
@@ -130,24 +174,27 @@ export function openDatabase(dataDir) {
     deleteUser: db.prepare('DELETE FROM users WHERE id = ?'),
     setPassword: db.prepare('UPDATE users SET pw_hash = ? WHERE id = ?'),
 
-    insertSession: db.prepare('INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)'),
-    sessionUser: db.prepare(`SELECT s.expires_at, u.id, u.username, u.is_admin
+    insertSession: db.prepare('INSERT INTO sessions (token_hash, user_id, expires_at, device, created_at, last_seen) VALUES (?, ?, ?, ?, ?, ?)'),
+    sessionUser: db.prepare(`SELECT s.expires_at, s.last_seen, u.id, u.username, u.is_admin
       FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token_hash = ?`),
+    seenSession: db.prepare('UPDATE sessions SET last_seen = ?, device = COALESCE(?, device) WHERE token_hash = ?'),
+    userSessions: db.prepare('SELECT token_hash, device, created_at, last_seen, expires_at FROM sessions WHERE user_id = ? AND expires_at > ? ORDER BY COALESCE(last_seen, created_at, 0) DESC'),
+    deleteSessionPrefix: db.prepare("DELETE FROM sessions WHERE user_id = ? AND substr(token_hash, 1, 16) = ? RETURNING token_hash"),
     extendSession: db.prepare('UPDATE sessions SET expires_at = ? WHERE token_hash = ?'),
     deleteSession: db.prepare('DELETE FROM sessions WHERE token_hash = ?'),
     deleteOtherSessions: db.prepare('DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?'),
     deleteUserSessions: db.prepare('DELETE FROM sessions WHERE user_id = ?'),
     purgeSessions: db.prepare('DELETE FROM sessions WHERE expires_at < ?'),
 
-    getSettings: db.prepare('SELECT currency, start_day, categories FROM settings WHERE user_id = ?'),
-    putSettings: db.prepare(`INSERT INTO settings (user_id, currency, start_day, categories, updated_at) VALUES (?, ?, ?, ?, ?)
+    getSettings: db.prepare('SELECT currency, start_day, categories, favorites FROM settings WHERE user_id = ?'),
+    putSettings: db.prepare(`INSERT INTO settings (user_id, currency, start_day, categories, favorites, updated_at) VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(user_id) DO UPDATE SET currency = excluded.currency, start_day = excluded.start_day,
-        categories = excluded.categories, updated_at = excluded.updated_at`),
+        categories = excluded.categories, favorites = excluded.favorites, updated_at = excluded.updated_at`),
 
     months: db.prepare('SELECT month, income, budget FROM months WHERE user_id = ? ORDER BY month'),
     month: db.prepare('SELECT month, income, budget FROM months WHERE user_id = ? AND month = ?'),
-    expenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate FROM expenses WHERE user_id = ? ORDER BY month, ts, id'),
-    monthExpenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate FROM expenses WHERE user_id = ? AND month = ? ORDER BY ts, id'),
+    expenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate, trip FROM expenses WHERE user_id = ? ORDER BY month, ts, id'),
+    monthExpenses: db.prepare('SELECT id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate, trip FROM expenses WHERE user_id = ? AND month = ? ORDER BY ts, id'),
     upsertMonth: db.prepare(`INSERT INTO months (user_id, month, income, budget, updated_at) VALUES (?, ?, ?, ?, ?)
       ON CONFLICT(user_id, month) DO UPDATE SET income = excluded.income, budget = excluded.budget, updated_at = excluded.updated_at`),
     movedFrom: db.prepare(`SELECT DISTINCT month FROM expenses
@@ -155,8 +202,9 @@ export function openDatabase(dataDir) {
     deleteMoved: db.prepare(`DELETE FROM expenses
       WHERE user_id = ? AND month <> ? AND id IN (SELECT value FROM json_each(?))`),
     deleteMonthExpenses: db.prepare('DELETE FROM expenses WHERE user_id = ? AND month = ?'),
-    insertExpense: db.prepare(`INSERT INTO expenses (user_id, id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`),
+    insertExpense: db.prepare(`INSERT INTO expenses (user_id, id, month, date, amount, title, category, monthly, ts, receipt, fx_cur, fx_amount, fx_rate, trip)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`),
+    todayExpenses: db.prepare('SELECT COUNT(*) AS n FROM expenses WHERE user_id = ? AND ts >= ?'),
     deleteMonth: db.prepare('DELETE FROM months WHERE user_id = ? AND month = ?'),
 
     getConfig: db.prepare('SELECT value FROM config WHERE key = ?'),
@@ -185,6 +233,30 @@ export function openDatabase(dataDir) {
       ON CONFLICT(user_id, day) DO UPDATE SET count = count + 1`),
     aiPurge: db.prepare('DELETE FROM ai_usage WHERE day < ?'),
 
+    trips: db.prepare('SELECT id, name, start, end, budget, currency, rate, icon FROM trips WHERE user_id = ? ORDER BY start DESC, id'),
+    trip: db.prepare('SELECT id FROM trips WHERE user_id = ? AND id = ?'),
+    upsertTrip: db.prepare(`INSERT INTO trips (user_id, id, name, start, end, budget, currency, rate, icon, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id, id) DO UPDATE SET name = excluded.name, start = excluded.start, end = excluded.end, budget = excluded.budget,
+        currency = excluded.currency, rate = excluded.rate, icon = excluded.icon`),
+    deleteTrip: db.prepare('DELETE FROM trips WHERE user_id = ? AND id = ?'),
+    untagTrip: db.prepare('UPDATE expenses SET trip = NULL WHERE user_id = ? AND trip = ? RETURNING month'),
+
+    pushSubs: db.prepare('SELECT endpoint, p256dh, auth, device, created_at FROM push_subs WHERE user_id = ?'),
+    pushUsers: db.prepare('SELECT DISTINCT user_id FROM push_subs'),
+    upsertPushSub: db.prepare(`INSERT INTO push_subs (endpoint, user_id, p256dh, auth, device, created_at) VALUES (?, ?, ?, ?, ?, ?)
+      ON CONFLICT(endpoint) DO UPDATE SET user_id = excluded.user_id, p256dh = excluded.p256dh, auth = excluded.auth, device = excluded.device`),
+    deletePushSub: db.prepare('DELETE FROM push_subs WHERE endpoint = ?'),
+    deleteUserPushSub: db.prepare('DELETE FROM push_subs WHERE user_id = ? AND endpoint = ?'),
+    getPushPrefs: db.prepare('SELECT data FROM push_prefs WHERE user_id = ?'),
+    putPushPrefs: db.prepare('INSERT INTO push_prefs (user_id, data) VALUES (?, ?) ON CONFLICT(user_id) DO UPDATE SET data = excluded.data'),
+    markSent: db.prepare('INSERT OR IGNORE INTO push_sent (user_id, key, at) VALUES (?, ?, ?)'),
+    purgeSent: db.prepare('DELETE FROM push_sent WHERE at < ?'),
+
+    chatUsage: db.prepare('SELECT count FROM chat_usage WHERE user_id = ? AND day = ?'),
+    chatInc: db.prepare(`INSERT INTO chat_usage (user_id, day, count) VALUES (?, ?, 1)
+      ON CONFLICT(user_id, day) DO UPDATE SET count = count + 1`),
+    chatPurge: db.prepare('DELETE FROM chat_usage WHERE day < ?'),
+
     insertPasskey: db.prepare(`INSERT INTO passkeys (id, user_id, public_key, alg, sign_count, name, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`),
     passkey: db.prepare(`SELECT p.id, p.public_key, p.alg, p.sign_count, u.id AS user_id, u.username, u.is_admin
       FROM passkeys p JOIN users u ON u.id = p.user_id WHERE p.id = ?`),
@@ -201,6 +273,8 @@ export function openDatabase(dataDir) {
 
   const expenseOut = e => {
     const o = { id: e.id, amt: fromCents(e.amount), title: e.title, cat: e.category, date: e.date, rep: !!e.monthly, ts: e.ts };
+    if (e.monthly > 1) o.every = e.monthly; // 3 = vierteljährlich, 12 = jährlich
+    if (e.trip) o.trip = e.trip;
     if (e.receipt) o.rc = e.receipt;
     if (e.fx_cur) o.fx = { cur: e.fx_cur, amt: fromCents(e.fx_amount), rate: e.fx_rate };
     return o;
@@ -225,8 +299,13 @@ export function openDatabase(dataDir) {
     setPassword: (id, pwHash) => q.setPassword.run(pwHash, id).changes > 0,
 
     /* ---------- Sitzungen ---------- */
-    createSession: (tokenHash, userId, expiresAt) => q.insertSession.run(tokenHash, userId, expiresAt),
+    createSession: (tokenHash, userId, expiresAt, device = null) => q.insertSession.run(tokenHash, userId, expiresAt, device, Date.now(), Date.now()),
     sessionUser: tokenHash => q.sessionUser.get(tokenHash),
+    seenSession: (tokenHash, device = null) => q.seenSession.run(Date.now(), device, tokenHash),
+    listSessions: userId => q.userSessions.all(userId, Date.now()).map(s => ({
+      id: s.token_hash.slice(0, 16), hash: s.token_hash, device: s.device || '', createdAt: s.created_at, lastSeen: s.last_seen,
+    })),
+    deleteSessionById: (userId, id) => q.deleteSessionPrefix.all(userId, id).map(r => r.token_hash),
     extendSession: (tokenHash, expiresAt) => q.extendSession.run(expiresAt, tokenHash),
     deleteSession: tokenHash => q.deleteSession.run(tokenHash),
     deleteOtherSessions: (userId, keepHash) => q.deleteOtherSessions.run(userId, keepHash),
@@ -240,13 +319,15 @@ export function openDatabase(dataDir) {
       const out = { currency: s.currency, startDay: s.start_day };
       const cats = parseJson(s.categories);
       if (Array.isArray(cats)) out.categories = cats;
+      const favs = parseJson(s.favorites);
+      if (Array.isArray(favs)) out.favorites = favs;
       return out;
     },
-    // categories: undefined = unverändert lassen, null = Standard, Array = eigene Liste
+    // categories/favorites: undefined = unverändert lassen, null = Standard/keine, Array = eigene Liste
     putSettings(userId, s) {
       const old = q.getSettings.get(userId);
-      const cats = s.categories === undefined ? (old ? old.categories : null) : (s.categories ? JSON.stringify(s.categories) : null);
-      q.putSettings.run(userId, s.currency, s.startDay, cats, Date.now());
+      const keep = (v, prev) => (v === undefined ? (old ? prev : null) : (v ? JSON.stringify(v) : null));
+      q.putSettings.run(userId, s.currency, s.startDay, keep(s.categories, old && old.categories), keep(s.favorites, old && old.favorites), Date.now());
     },
 
     /* ---------- Monate und Ausgaben ---------- */
@@ -258,7 +339,7 @@ export function openDatabase(dataDir) {
         const out = monthOut(m, byMonth[m.month] || []);
         if (!isEmpty(out)) months[m.month] = out;
       }
-      return { settings: this.getSettings(userId), months, goals: this.listGoals(userId) };
+      return { settings: this.getSettings(userId), months, goals: this.listGoals(userId), trips: this.listTrips(userId) };
     },
     getMonth(userId, key) {
       const m = q.month.get(userId, key);
@@ -276,8 +357,8 @@ export function openDatabase(dataDir) {
         q.upsertMonth.run(userId, key, toCents(doc.income), toCents(doc.budget), now);
         q.deleteMonthExpenses.run(userId, key);
         for (const e of doc.expenses) {
-          q.insertExpense.run(userId, e.id, key, e.date, toCents(e.amt), e.title, e.cat, e.rep ? 1 : 0, e.ts, e.rc || null,
-            e.fx ? e.fx.cur : null, e.fx ? toCents(e.fx.amt) : null, e.fx ? e.fx.rate : null);
+          q.insertExpense.run(userId, e.id, key, e.date, toCents(e.amt), e.title, e.cat, e.rep ? (e.every || 1) : 0, e.ts, e.rc || null,
+            e.fx ? e.fx.cur : null, e.fx ? toCents(e.fx.amt) : null, e.fx ? e.fx.rate : null, e.trip || null);
         }
         return moved;
       });
@@ -305,6 +386,37 @@ export function openDatabase(dataDir) {
     deleteGoal: (userId, id) => q.deleteGoal.run(userId, id).changes > 0,
     addGoalEntry: (userId, goalId, e) => q.insertGoalEntry.run(userId, goalId, e.id, toCents(e.amt), e.date, e.note || '', Date.now()),
     deleteGoalEntry: (userId, goalId, id) => q.deleteGoalEntry.run(userId, goalId, id).changes > 0,
+
+    /* ---------- Reisen ---------- */
+    listTrips: userId => q.trips.all(userId).map(t => ({
+      id: t.id, name: t.name, start: t.start, end: t.end, budget: fromCents(t.budget), cur: t.currency, rate: t.rate, icon: t.icon,
+    })),
+    hasTrip: (userId, id) => !!q.trip.get(userId, id),
+    putTrip: (userId, t) => q.upsertTrip.run(userId, t.id, t.name, t.start, t.end, toCents(t.budget), t.cur, t.rate ?? null, t.icon, Date.now()),
+    // Reise löschen; die Ausgaben bleiben, verlieren nur die Zuordnung. Gibt die betroffenen Monate zurück.
+    deleteTrip: (userId, id) => tx(() => {
+      const months = [...new Set(q.untagTrip.all(userId, id).map(r => r.month))];
+      q.deleteTrip.run(userId, id);
+      return months;
+    }),
+    expensesSince: (userId, ts) => q.todayExpenses.get(userId, ts).n,
+
+    /* ---------- Push-Mitteilungen ---------- */
+    pushSubs: userId => q.pushSubs.all(userId),
+    pushUsers: () => q.pushUsers.all().map(r => r.user_id),
+    addPushSub: (userId, s) => q.upsertPushSub.run(s.endpoint, userId, s.p256dh, s.auth, s.device || '', Date.now()),
+    deletePushSub: endpoint => q.deletePushSub.run(endpoint),
+    deleteUserPushSub: (userId, endpoint) => q.deleteUserPushSub.run(userId, endpoint).changes > 0,
+    getPushPrefs: userId => parseJson((q.getPushPrefs.get(userId) || {}).data, null),
+    putPushPrefs: (userId, prefs) => q.putPushPrefs.run(userId, JSON.stringify(prefs)),
+    // true, wenn diese Mitteilung noch nie verschickt wurde (und merkt sie sich)
+    markSent: (userId, key) => q.markSent.run(userId, key, Date.now()).changes > 0,
+    purgeSent: olderThan => q.purgeSent.run(olderThan),
+
+    /* ---------- Quota-Assistent ---------- */
+    chatUsage: (userId, day) => { const r = q.chatUsage.get(userId, day); return r ? r.count : 0; },
+    chatCount: (userId, day) => q.chatInc.run(userId, day),
+    chatPurge: beforeDay => q.chatPurge.run(beforeDay),
 
     /* ---------- Belege ---------- */
     addReceipt: (userId, id, mime, size) => q.insertReceipt.run(id, userId, mime, size, Date.now()),

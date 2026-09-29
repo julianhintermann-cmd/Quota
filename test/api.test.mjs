@@ -92,7 +92,7 @@ test('Login: falsches Passwort, richtiges Passwort, Abmelden', async () => {
 
 test('Daten: Monat speichern, laden, Beträge exakt, löschen', async () => {
   let r = await admin('GET', '/api/data');
-  assert.deepEqual(r.data, { settings: null, months: {}, goals: [] });
+  assert.deepEqual(r.data, { settings: null, months: {}, goals: [], trips: [] });
   const doc = month([exp('a1', '2026-09-28', 42.5, { title: 'Migros', rep: true, ts: 1790585035135 }), exp('a2', '2026-09-30', 0.1)]);
   r = await admin('PUT', '/api/months/2026-09', doc);
   assert.equal(r.status, 200);
@@ -189,7 +189,7 @@ test('Registrierung: standardmässig zu, Admin kann sie öffnen; Daten sind getr
   r = await client()('POST', '/api/auth/register', { username: 'ANNA', password: 'annas-passwort' });
   assert.equal(r.status, 409, 'Name schon vergeben');
   r = await anna('GET', '/api/data');
-  assert.deepEqual(r.data, { settings: null, months: {}, goals: [] }, 'Anna sieht Julians Daten nicht');
+  assert.deepEqual(r.data, { settings: null, months: {}, goals: [], trips: [] }, 'Anna sieht Julians Daten nicht');
   r = await anna('PUT', '/api/months/2026-09', month([exp('a1', '2026-09-01', 99)]));
   assert.equal(r.status, 200, 'gleiche Ausgaben-ID bei anderem Benutzer ist erlaubt');
   r = await admin('GET', '/api/data');
