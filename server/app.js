@@ -13,7 +13,7 @@ import { createFx, FxError, FX_SOURCES } from './fx.js';
 import { loadVapid, sendPush, okEndpoint } from './push.js';
 import { createNotifier, parsePrefs, DEFAULT_PREFS } from './notify.js';
 import { periodKeyOf, periodStats, addMonths, money as fmtMoney, monthName, dayLabel } from './period.js';
-import { systemPrompt, listFreeModels, openChat, parseMessages } from './assistant.js';
+import { systemPrompt, listChatModels, openChat, parseMessages, CHAT_MODELS } from './assistant.js';
 
 const DAY = 864e5;
 const SESSION_DAYS = 90;
@@ -308,18 +308,13 @@ export function createApp({
   }
   const notifier = createNotifier({ db, sendToUser, log });
 
-  /* Quota-Assistent: Gratis-Modelle von OpenRouter, Liste 6 Stunden zwischengespeichert */
+  /* Quota-Assistent: günstiges Bezahlmodell über OpenRouter, bei Ausfall die nächsten aus CHAT_MODELS */
   const chat = {
     model: () => db.getConfig('chat_model', ''),
     limit: () => Number(db.getConfig('chat_daily_limit', '30')),
-    cache: { at: 0, list: null },
-    async models() {
-      if (!this.cache.list || Date.now() - this.cache.at > 6 * 3600e3) {
-        try { this.cache = { at: Date.now(), list: (await listFreeModels({ baseUrl: openrouterUrl })).map(m => m.id) }; }
-        catch (e) { if (!this.cache.list) throw e; }
-      }
+    models() {
       const pick = this.model();
-      return pick ? [pick, ...this.cache.list.filter(id => id !== pick)] : this.cache.list;
+      return pick ? [pick, ...CHAT_MODELS.filter(id => id !== pick)] : CHAT_MODELS;
     },
   };
   function chatStatus(user) {
@@ -695,7 +690,7 @@ export function createApp({
           currency: settings.currency || 'CHF', startDay: settings.startDay || 25, summary: body.withData === true ? financeSummary(user.id) : null,
         });
         let open;
-        try { open = await openChat({ apiKey: key, models: await chat.models(), system, messages, baseUrl: openrouterUrl, signal: abort.signal }); }
+        try { open = await openChat({ apiKey: key, models: chat.models(), system, messages, baseUrl: openrouterUrl, signal: abort.signal }); }
         catch (e) { if (e instanceof AiError) throw new HttpError(e.status === 499 ? 400 : e.status, e.message); throw e; }
         db.chatCount(user.id, localDay());
         res.writeHead(200, { 'Content-Type': 'application/x-ndjson; charset=utf-8', 'Cache-Control': 'no-store', 'X-Accel-Buffering': 'no' });
@@ -902,8 +897,8 @@ export function createApp({
           }
           if ('chatModel' in body) {
             if (!body.chatModel) db.delConfig('chat_model');
-            else if (typeof body.chatModel === 'string' && /^[A-Za-z0-9._\-\/:]{3,120}:free$/.test(body.chatModel.trim())) db.setConfig('chat_model', body.chatModel.trim());
-            else throw new HttpError(400, 'Für den Assistenten gehen nur Gratis-Modelle (Name endet auf „:free“).');
+            else if (typeof body.chatModel === 'string' && /^[A-Za-z0-9._\-\/:]{3,120}$/.test(body.chatModel.trim())) db.setConfig('chat_model', body.chatModel.trim());
+            else throw new HttpError(400, 'Ungültiger Modellname.');
           }
           if ('chatLimit' in body) {
             if (!Number.isInteger(body.chatLimit) || body.chatLimit < 0 || body.chatLimit > 500) throw new HttpError(400, 'Das Tageslimit muss zwischen 0 und 500 liegen.');
@@ -914,11 +909,11 @@ export function createApp({
         return sendJson(res, 200, {
           hasKey: !!key, keyHint: key ? `…${key.slice(-4)}` : null, fromEnv: !!aiKey,
           model: ai.model(), modelFromEnv: !!aiModel, defaultModel: DEFAULT_MODEL, limit: ai.limit(),
-          chatModel: chat.model() || null, chatLimit: chat.limit(),
+          chatModel: chat.model() || null, chatDefault: CHAT_MODELS[0], chatLimit: chat.limit(),
         });
       }
-      if (p === '/api/admin/ai/free-models' && m === 'GET') {
-        try { return sendJson(res, 200, { models: await listFreeModels({ baseUrl: openrouterUrl }) }); }
+      if (p === '/api/admin/ai/chat-models' && m === 'GET') {
+        try { return sendJson(res, 200, { models: await listChatModels({ baseUrl: openrouterUrl }) }); }
         catch (e) { if (e instanceof AiError) throw new HttpError(e.status, e.message); throw e; }
       }
       if (p === '/api/admin/ai/models' && m === 'GET') {

@@ -49,7 +49,7 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   noch nichts erfasst ist), Monatsrückblick am Lohntag, jährliche/vierteljährliche Fixkosten am Vortag. Siehe unten.
 - **Angemeldete Geräte** (Einstellungen → Konto): alle Sitzungen mit Gerät und letzter Aktivität, einzeln oder alle
   anderen abmelden.
-- **Quota-Assistent**: Chat (Sprechblase oben rechts) mit einem kostenlosen OpenRouter-Modell. Er beantwortet nur Fragen
+- **Quota-Assistent**: Chat (Sprechblase oben rechts) mit einem sehr günstigen OpenRouter-Modell. Er beantwortet nur Fragen
   zur App und, wenn „Meine Zahlen einbeziehen“ an ist, zu den eigenen Zahlen. Alles andere lehnt er ab.
 
 ### Push-Mitteilungen
@@ -64,12 +64,12 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
 
 ### Quota-Assistent
 
-- Nutzt denselben OpenRouter-Schlüssel wie die Belegerkennung, aber **nur kostenlose Modelle** (Name endet auf `:free`).
-  Standard ist „Automatisch“: das beste verfügbare Gratis-Modell, bei Überlastung das nächste.
+- Nutzt denselben OpenRouter-Schlüssel wie die Belegerkennung und ein **sehr günstiges Modell**: Standard ist
+  `google/gemini-2.5-flash-lite`; antwortet es nicht, springen `openai/gpt-4o-mini` und `google/gemini-2.5-flash` ein.
+  Eine Frage kostet Bruchteile eines Rappens (rund 5'000 Tokens Eingabe inkl. Anleitung, einige hundert Tokens Antwort).
 - Admins wählen das Modell und das Tageslimit (Standard 30 Nachrichten pro Person ohne Admin-Rechte) unter
   Einstellungen → KI.
-- Kostenlose Modelle haben bei OpenRouter eigene Tageslimits und die Anbieter können Eingaben speichern. Budgetzahlen
-  gehen deshalb nur mit, wenn im Chat „Meine Zahlen einbeziehen“ eingeschaltet ist.
+- Budgetzahlen gehen nur mit, wenn im Chat „Meine Zahlen einbeziehen“ eingeschaltet ist.
 
 ### Neu in Version 3.3
 

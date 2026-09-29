@@ -1,5 +1,5 @@
 // Quota-Assistent: beantwortet Fragen zur App (und auf Wunsch zu den eigenen Zahlen) mit einem
-// kostenlosen Modell über OpenRouter. Alles andere lehnt er mit einem festen Satz ab.
+// sehr günstigen Modell über OpenRouter. Alles andere lehnt er mit einem festen Satz ab.
 import { AiError } from './ai.js';
 
 export const REFUSAL = 'Dabei kann ich nicht helfen, da ich der Quota-Chatbot bin und dafür da bin, dir mit deinen Finanzen zu helfen.';
@@ -117,10 +117,12 @@ ANLEITUNG ZUR APP
 ${GUIDE}`;
 }
 
-// Kostenlose Textmodelle bei OpenRouter, die bevorzugten zuerst (gut auf Deutsch)
-const PREFER = [/gemini.*flash/i, /deepseek.*(chat|v3)/i, /llama-3\.3-70b/i, /mistral-small/i, /qwen3/i, /gpt-oss/i, /llama-4/i, /gemma/i];
-const rank = id => { const i = PREFER.findIndex(r => r.test(id)); return i < 0 ? PREFER.length : i; };
-export async function listFreeModels({ baseUrl = 'https://openrouter.ai/api/v1', fetchImpl = fetch, timeoutMs = 15_000 } = {}) {
+// Günstige, zuverlässige Bezahlmodelle (gut auf Deutsch): das erste ist der Standard,
+// die anderen springen ein, falls es gerade nicht antwortet. Eine Frage kostet Bruchteile eines Rappens.
+export const CHAT_MODELS = ['google/gemini-2.5-flash-lite', 'openai/gpt-4o-mini', 'google/gemini-2.5-flash'];
+
+// Textmodelle zur Auswahl für Admins, günstigste zuerst (ohne Gratis-Varianten, die oft ausgelastet sind)
+export async function listChatModels({ baseUrl = 'https://openrouter.ai/api/v1', fetchImpl = fetch, timeoutMs = 15_000 } = {}) {
   let res;
   try { res = await fetchImpl(`${baseUrl}/models`, { signal: AbortSignal.timeout(timeoutMs) }); }
   catch { throw new AiError(504, 'OpenRouter ist nicht erreichbar.'); }
@@ -129,14 +131,18 @@ export async function listFreeModels({ baseUrl = 'https://openrouter.ai/api/v1',
   return (data.data || [])
     .filter(m => {
       const a = m.architecture || {}, p = m.pricing || {};
-      return /:free$/.test(m.id) && Number(p.prompt || 0) === 0 && Number(p.completion || 0) === 0
+      return !/:free$/.test(m.id) && Number(p.prompt || 0) > 0
         && (a.input_modalities || ['text']).includes('text') && (a.output_modalities || ['text']).includes('text');
     })
-    .map(m => ({ id: m.id, name: m.name || m.id, context: m.context_length || 0 }))
-    .sort((a, b) => rank(a.id) - rank(b.id) || b.context - a.context || a.id.localeCompare(b.id));
+    .map(m => {
+      const p = m.pricing || {};
+      return { id: m.id, name: m.name || m.id, price: Number(p.prompt || 0) * 1e6, priceOut: Number(p.completion || 0) * 1e6 };
+    })
+    .sort((a, b) => (a.price + a.priceOut) - (b.price + b.priceOut) || a.id.localeCompare(b.id))
+    .slice(0, 200);
 }
 
-// Antwort als Strom: probiert bis zu drei Gratis-Modelle, falls eines überlastet ist
+// Antwort als Strom: probiert bis zu drei Modelle, falls eines gerade nicht antwortet
 export async function openChat({ apiKey, models, system, messages, baseUrl = 'https://openrouter.ai/api/v1', fetchImpl = fetch, signal, maxTokens = 700 }) {
   let lastErr = null;
   for (const model of models.slice(0, 3)) {
@@ -160,12 +166,12 @@ export async function openChat({ apiKey, models, system, messages, baseUrl = 'ht
     const data = await res.json().catch(() => null);
     const detail = data && data.error && data.error.message ? String(data.error.message).slice(0, 160) : '';
     if (res.status === 401) throw new AiError(502, 'Der OpenRouter-Schlüssel ist ungültig.');
-    if (res.status === 402) throw new AiError(502, 'OpenRouter verlangt Guthaben auf dem Konto, auch für Gratis-Modelle ab einer gewissen Nutzung.');
+    if (res.status === 402) throw new AiError(502, 'Kein Guthaben mehr bei OpenRouter. Ein Admin kann es auf openrouter.ai aufladen.');
     lastErr = new AiError(res.status === 429 ? 429 : 502, res.status === 429
-      ? 'Die Gratis-Modelle sind gerade ausgelastet. Bitte in einer Minute nochmals versuchen.'
+      ? 'Die KI ist gerade ausgelastet. Bitte in einer Minute nochmals versuchen.'
       : `Das Modell hat nicht geantwortet${detail ? ` (${detail})` : ''}.`);
   }
-  throw lastErr || new AiError(502, 'Kein Gratis-Modell verfügbar.');
+  throw lastErr || new AiError(502, 'Kein Modell verfügbar.');
 }
 
 // OpenRouter schickt Server-Sent Events: "data: {...}" pro Stück, am Ende "data: [DONE]"

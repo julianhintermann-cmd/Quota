@@ -1111,7 +1111,7 @@ a.list-row{color:inherit;text-decoration:none}
         <div class="model-list" id="aiModels" hidden></div>
         <div class="list-row"><div class="lr-main"><div class="lr-t">Analysen pro Tag</div><div class="lr-s">für Personen ohne Admin-Rechte</div></div>
           <div class="stepper"><button type="button" id="aiDown" aria-label="Weniger">−</button><span id="aiLimit" class="num">3</span><button type="button" id="aiUp" aria-label="Mehr">+</button></div></div>
-        <div class="list-row"><div class="lr-main"><div class="lr-t">Modell für den Assistenten</div><div class="lr-s" id="chatModelLbl">Automatisch: bestes Gratis-Modell</div></div>
+        <div class="list-row"><div class="lr-main"><div class="lr-t">Modell für den Assistenten</div><div class="lr-s" id="chatModelLbl">Automatisch: Gemini 2.5 Flash Lite</div></div>
           <button class="pill-btn" id="chatModelLoad" type="button">Wählen</button></div>
         <div class="model-list" id="chatModels" hidden></div>
         <div class="list-row"><div class="lr-main"><div class="lr-t">Assistent: Nachrichten pro Tag</div><div class="lr-s">für Personen ohne Admin-Rechte</div></div>
@@ -1120,7 +1120,7 @@ a.list-row{color:inherit;text-decoration:none}
         <button class="btn-primary" id="aiSave" type="button">Sichern</button>
         <button class="btn-danger" id="aiRemove" type="button" hidden>Schlüssel entfernen</button>
       </div>
-      <p class="set-note">Den Schlüssel erstellst du auf openrouter.ai unter <b>Keys</b>. Er bleibt auf deinem Server; Belegfotos werden nur zum Auslesen an OpenRouter geschickt. Der Assistent nutzt nur kostenlose Modelle.</p>
+      <p class="set-note">Den Schlüssel erstellst du auf openrouter.ai unter <b>Keys</b>. Er bleibt auf deinem Server; Belegfotos werden nur zum Auslesen an OpenRouter geschickt. Der Assistent nutzt ein sehr günstiges Modell, eine Frage kostet Bruchteile eines Rappens.</p>
     </div>
     <div class="set-group" id="grpUsers" hidden>
       <div class="set-label">Benutzer</div>
@@ -4160,7 +4160,7 @@ function paintAiLimit() {
 }
 function paintAiCfg(c) {
   aiUI.cfg = c; aiUI.limit = c.limit; paintAiLimit();
-  chatCfg.model = c.chatModel || null; chatCfg.limit = c.chatLimit ?? 30; paintChatCfg(); $('#chatModels').hidden = true;
+  chatCfg.model = c.chatModel || null; chatCfg.def = c.chatDefault || chatCfg.def; chatCfg.limit = c.chatLimit ?? 30; paintChatCfg(); $('#chatModels').hidden = true;
   $('#aiState').textContent = c.hasKey ? `Eingerichtet · Schlüssel ${c.keyHint}` : 'Nicht eingerichtet';
   $('#aiStateS').textContent = c.hasKey
     ? `${c.fromEnv ? 'Schlüssel aus der Umgebungsvariable · ' : ''}Modell ${c.model}`
@@ -4513,7 +4513,7 @@ function openFromUrl() {
 if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'open') openUrlAction(e.data.url); });
 
 /* ---------- Quota-Assistent ----------
-   Chat mit einem kostenlosen Modell über den eigenen Server. Er beantwortet nur Fragen zur App und, wenn
+   Chat mit einem günstigen Modell über den eigenen Server. Er beantwortet nur Fragen zur App und, wenn
    eingeschaltet, zu den eigenen Zahlen. Der Verlauf bleibt nur in diesem Tab. */
 const shChat = $('#shChat'), chatBody = $('#chatBody'), chatQ = $('#chatQ'), chatSend = $('#chatSend');
 const chat = { msgs: [], busy: false, status: null, ctrl: null };
@@ -4548,7 +4548,7 @@ function renderChat() {
 }
 function paintChatFoot() {
   const st = chat.status;
-  $('#chatNote').textContent = !st ? '' : st.remaining == null ? 'Gratis-Modell über OpenRouter' : `noch ${st.remaining} ${st.remaining === 1 ? 'Nachricht' : 'Nachrichten'} heute`;
+  $('#chatNote').textContent = !st ? '' : st.remaining == null ? 'KI über OpenRouter' : `noch ${st.remaining} ${st.remaining === 1 ? 'Nachricht' : 'Nachrichten'} heute`;
   chatSend.disabled = chat.busy || !chatQ.value.trim() || !(st && st.enabled) || st.remaining === 0;
   $('#chatNew').style.visibility = chat.msgs.length ? '' : 'hidden'; // Platz behalten, sonst rutscht der Titel
 }
@@ -4619,9 +4619,9 @@ $('#btnChat').addEventListener('click', () => { haptic(); openChat(); });
 $('#btnChatSet').addEventListener('click', () => { haptic(); openChat(); shChat._back = openSettings; });
 
 // Admin: Modell und Tageslimit des Assistenten (gespeichert mit „Sichern“ bei der KI)
-const chatCfg = { model: null, limit: 30 };
+const chatCfg = { model: null, def: 'google/gemini-2.5-flash-lite', limit: 30 };
 function paintChatCfg() {
-  $('#chatModelLbl').textContent = chatCfg.model ? chatCfg.model : 'Automatisch: bestes Gratis-Modell';
+  $('#chatModelLbl').textContent = chatCfg.model ? chatCfg.model : `Automatisch: ${chatCfg.def}`;
   $('#chatLimit').textContent = chatCfg.limit;
   $('#chatDown').disabled = chatCfg.limit <= 0; $('#chatUp').disabled = chatCfg.limit >= 500;
 }
@@ -4632,9 +4632,10 @@ $('#chatModelLoad').addEventListener('click', async () => {
   if (!list.hidden) { list.hidden = true; return; }
   b.disabled = true; b.innerHTML = '<span class="spin"></span>';
   try {
-    const { models } = await api('GET', '/api/admin/ai/free-models');
-    list.innerHTML = `<button type="button" class="${!chatCfg.model ? 'on' : ''}" data-cmodel=""><b>Automatisch</b><span>Nimmt das beste verfügbare Gratis-Modell und weicht bei Überlastung aus</span></button>`
-      + models.slice(0, 40).map(m => `<button type="button" class="${m.id === chatCfg.model ? 'on' : ''}" data-cmodel="${esc(m.id)}"><b>${esc(m.name)}</b><span>${esc(m.id)}</span></button>`).join('');
+    const { models } = await api('GET', '/api/admin/ai/chat-models');
+    const usd = v => `$${v < 1 ? v.toFixed(2) : v.toFixed(1)}`;
+    list.innerHTML = `<button type="button" class="${!chatCfg.model ? 'on' : ''}" data-cmodel=""><b>Automatisch (empfohlen)</b><span>${esc(chatCfg.def)}, springt bei Ausfall auf ein anderes günstiges Modell</span></button>`
+      + models.slice(0, 60).map(m => `<button type="button" class="${m.id === chatCfg.model ? 'on' : ''}" data-cmodel="${esc(m.id)}"><b>${esc(m.name)}</b><span>${esc(m.id)} · ${usd(m.price)} / ${usd(m.priceOut)} pro 1 Mio. Tokens</span></button>`).join('');
     list.hidden = false;
   } catch (e) { if (e.status === 401) return toLogin(); setErr(aiErr, e.message); }
   finally { b.disabled = false; b.textContent = 'Wählen'; }

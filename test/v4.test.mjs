@@ -23,7 +23,7 @@ const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebK
 const MAC_CHROME = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36';
 
 before(async () => {
-  // Nachgebauter OpenRouter mit Gratis-Modellen und Antwort als Datenstrom
+  // Nachgebauter OpenRouter mit Modellliste und Antwort als Datenstrom
   orFake = http.createServer((req, res) => {
     let body = '';
     req.on('data', c => { body += c; });
@@ -31,7 +31,9 @@ before(async () => {
       if (req.url === '/models') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ data: [
-          { id: 'teuer/modell', pricing: { prompt: '0.000001', completion: '0.000002' }, architecture: { input_modalities: ['text'], output_modalities: ['text'] } },
+          { id: 'teuer/modell', name: 'Teuer', pricing: { prompt: '0.00001', completion: '0.00003' }, architecture: { input_modalities: ['text'], output_modalities: ['text'] } },
+          { id: 'google/gemini-2.5-flash-lite', name: 'Gemini Lite', pricing: { prompt: '0.0000001', completion: '0.0000004' }, architecture: { input_modalities: ['text', 'image'], output_modalities: ['text'] } },
+          { id: 'openai/gpt-4o-mini', name: 'GPT-4o mini', pricing: { prompt: '0.00000015', completion: '0.0000006' }, architecture: { input_modalities: ['text', 'image'], output_modalities: ['text'] } },
           { id: 'meta-llama/llama-3.3-70b-instruct:free', name: 'Llama', context_length: 131072, pricing: { prompt: '0', completion: '0' }, architecture: { input_modalities: ['text'], output_modalities: ['text'] } },
           { id: 'irgendwas/klein:free', name: 'Klein', context_length: 8000, pricing: { prompt: '0', completion: '0' }, architecture: { input_modalities: ['text'], output_modalities: ['text'] } },
           { id: 'google/gemini-2.0-flash-exp:free', name: 'Gemini', context_length: 1000000, pricing: { prompt: '0', completion: '0' }, architecture: { input_modalities: ['text', 'image'], output_modalities: ['text'] } },
@@ -319,20 +321,22 @@ async function ask(c, messages, extra = {}) {
   return { status: 200, lines, text: lines.filter(l => l.d).map(l => l.d).join(''), done: lines[lines.length - 1] };
 }
 
-test('Assistent: ohne Schlüssel aus, nur Gratis-Modelle, Antwort als Strom', async () => {
+test('Assistent: ohne Schlüssel aus, günstiges Modell, Antwort als Strom', async () => {
   let r = await anna('GET', '/api/assistant');
   assert.deepEqual(r.data, { enabled: false, limit: 30, used: 0, remaining: 30 });
   assert.equal((await ask(anna, [{ role: 'user', content: 'Hallo' }])).status, 409);
   await admin('PUT', '/api/admin/ai', { key: 'sk-or-v1-testschluessel1234' });
-  assert.equal((await admin('PUT', '/api/admin/ai', { chatModel: 'teuer/modell' })).status, 400, 'nur :free');
-  r = await admin('GET', '/api/admin/ai/free-models');
-  assert.deepEqual(r.data.models.map(m => m.id), ['google/gemini-2.0-flash-exp:free', 'meta-llama/llama-3.3-70b-instruct:free', 'irgendwas/klein:free']);
-  assert.equal((await anna('GET', '/api/admin/ai/free-models')).status, 403);
+  assert.equal((await admin('PUT', '/api/admin/ai', { chatModel: 'kein gültiger name' })).status, 400);
+  r = await admin('GET', '/api/admin/ai/chat-models');
+  assert.deepEqual(r.data.models.map(m => m.id), ['google/gemini-2.5-flash-lite', 'openai/gpt-4o-mini', 'teuer/modell'], 'günstigste zuerst, ohne Gratis- und Bildmodelle');
+  assert.deepEqual([r.data.models[0].price, r.data.models[0].priceOut].map(v => Math.round(v * 100) / 100), [0.1, 0.4], 'Preise pro 1 Mio. Tokens');
+  assert.equal((await anna('GET', '/api/admin/ai/chat-models')).status, 403);
+  assert.equal((await admin('GET', '/api/admin/ai')).data.chatDefault, 'google/gemini-2.5-flash-lite');
 
   orState.chatCalls = [];
   r = await ask(anna, [{ role: 'user', content: 'Wie erfasse ich eine Ausgabe?' }]);
   assert.equal(r.status, 200);
-  assert.equal(r.lines[0].model, 'google/gemini-2.0-flash-exp:free');
+  assert.equal(r.lines[0].model, 'google/gemini-2.5-flash-lite');
   assert.equal(r.text, 'Tippe auf **Plus** unten rechts.');
   assert.equal(r.done.done, true);
   assert.equal(r.done.remaining, 29);
@@ -352,15 +356,15 @@ test('Assistent: eigene Zahlen nur auf Wunsch, Ausweichmodell, Tageslimit, Prüf
   assert.match(orState.chatCalls[0].messages[0].content, /Laufende Periode .+Budget: CHF 1’000\.00/s);
   orState.chatCalls = []; orState.failFirst = 1;
   r = await ask(anna, [{ role: 'user', content: 'a' }, { role: 'assistant', content: 'b' }, { role: 'user', content: 'c' }]);
-  assert.equal(r.lines[0].model, 'meta-llama/llama-3.3-70b-instruct:free', 'nächstes Gratis-Modell');
-  assert.deepEqual(orState.chatCalls.map(c => c.model), ['google/gemini-2.0-flash-exp:free', 'meta-llama/llama-3.3-70b-instruct:free']);
+  assert.equal(r.lines[0].model, 'openai/gpt-4o-mini', 'springt aufs nächste Modell');
+  assert.deepEqual(orState.chatCalls.map(c => c.model), ['google/gemini-2.5-flash-lite', 'openai/gpt-4o-mini']);
   assert.equal(orState.chatCalls[1].messages.length, 4);
   assert.equal((await ask(anna, [{ role: 'assistant', content: 'b' }])).status, 400, 'zuletzt muss die Person schreiben');
   assert.equal((await ask(anna, [])).status, 400);
-  await admin('PUT', '/api/admin/ai', { chatLimit: 3, chatModel: 'irgendwas/klein:free' });
+  await admin('PUT', '/api/admin/ai', { chatLimit: 3, chatModel: 'teuer/modell' });
   orState.chatCalls = [];
   r = await ask(admin, [{ role: 'user', content: 'x' }]);
-  assert.equal(orState.chatCalls[0].model, 'irgendwas/klein:free', 'vom Admin gewählt');
+  assert.equal(orState.chatCalls[0].model, 'teuer/modell', 'vom Admin gewählt');
   assert.equal(r.done.remaining, null, 'Admin ohne Limit');
   assert.equal((await ask(anna, [{ role: 'user', content: 'x' }])).status, 429, 'Anna hat 3 von 3 gebraucht');
   assert.equal((await admin('GET', '/api/admin/ai')).data.chatLimit, 3);
