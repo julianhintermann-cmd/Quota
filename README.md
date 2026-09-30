@@ -34,6 +34,19 @@ SQLite-Datenbank auf deinem Server gespeichert und täglich gesichert.
   *App installieren* (Android/Chrome) legt die App mit Icon an, sie startet danach ohne Browserleiste.
   Die Icons liegen in `public/icons/` und werden mit `node tools/build-icons.mjs` (Playwright) neu erzeugt.
 
+### Neu in Version 4.0.1
+
+- **Mehrere Produkte pro Ausgabe**: Beim Erfassen „Mehrere Produkte“ antippen und jedes Produkt mit Preis eintragen
+  (z. B. Apfel 2, Bananen 4, Wasser 3). Abgezogen wird die Summe (hier 9), Rabatte werden mit Minus eingetragen.
+  Die Liste steht später in der Ausgabe, fliesst in die Suche ein und steht im CSV-Export in der Spalte „Produkte“.
+- **Belegscanner**: Beim Fotografieren eines Belegs erkennt Quota das Papier wie eine Scanner-App, bestimmt die vier
+  Ecken und schneidet den Beleg perspektivisch gerade aus (läuft ganz im Browser, `public/js/scan.js`, ohne Bibliothek).
+  Am besten gelingt es auf dunklem Untergrund. Ist kein Beleg klar erkennbar, bleibt das ganze Foto; mit
+  „Original verwenden“ / „Beleg zuschneiden“ lässt sich umschalten.
+- **KI erkennt Produkte**: Stehen mehrere Produkte auf dem Beleg, trägt „Mit KI auslesen“ sie direkt als
+  Produktliste ein (Zeilenpreise, Rabatte negativ). Geht die Summe nicht ganz auf (z. B. Pfand oder Rundung),
+  kommt die Differenz als eigene Zeile dazu, damit der Betrag dem Beleg entspricht.
+
 ### Neu in Version 4.0
 
 - **Favoriten**: Beim Erfassen den Stern im Feld „Wofür?“ antippen; Favoriten und Vorschläge (häufige Ausgaben)

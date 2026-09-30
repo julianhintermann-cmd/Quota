@@ -36,7 +36,7 @@ const DEFAULT_CATS = [
   { id: 'freizeit', n: 'Freizeit', ic: 'freizeit' }, { id: 'gesund', n: 'Gesundheit', ic: 'gesund' },
   { id: 'abos', n: 'Abos', ic: 'abos' }, { id: 'sonst', n: 'Sonstiges', ic: 'sonst' },
 ];
-export const APP_VERSION = '4.0';
+export const APP_VERSION = '4.0.1';
 export const ICONS = [
   ...CATEGORIES, 'geschenk', 'reisen', 'auto', 'kind', 'tier', 'sport', 'bildung', 'technik', 'kleidung', 'haushalt',
   'versicherung', 'steuern', 'spende', 'sparen', 'handy', 'musik', 'pflanze', 'bar', 'werkzeug', 'arbeit', 'ziel',
@@ -93,9 +93,22 @@ function parseMonthDoc(body) {
       fx: parseFx(e.fx),
       every: e.rep && (e.every === 3 || e.every === 12) ? e.every : undefined,
       trip: typeof e.trip === 'string' && GOAL_ID_RE.test(e.trip) ? e.trip : null,
+      items: parseItems(e.items),
     });
   }
   return { income, budget, expenses: [...byId.values()] };
+}
+// Mehrere Produkte in einer Ausgabe: Name und Betrag je Position (Rabatte negativ), Beträge in der bezahlten Währung
+function parseItems(list) {
+  if (!Array.isArray(list) || !list.length) return null;
+  const out = [];
+  for (const it of list.slice(0, 60)) {
+    if (!it || typeof it !== 'object') continue;
+    const t = typeof it.t === 'string' ? it.t.trim().slice(0, 40) : '';
+    const a = typeof it.a === 'number' && Number.isFinite(it.a) && it.a !== 0 && Math.abs(it.a) <= MAX_AMOUNT ? Math.round(it.a * 100) / 100 : null;
+    if (a != null) out.push({ t, a });
+  }
+  return out.length ? out : null;
 }
 // Bezahlt in Fremdwährung: Originalbetrag und Kurs (amt ist bereits umgerechnet)
 function parseFx(fx) {
@@ -782,8 +795,9 @@ export function createApp({
       const rows = Object.values(data.months).flatMap(mo => mo.expenses)
         .sort((a, b) => a.date.localeCompare(b.date) || a.ts - b.ts)
         .map(e => [e.date, e.title, names[e.cat] || names.sonst || 'Sonstiges', e.amt.toFixed(2), currency, e.rep ? 'ja' : 'nein',
-          e.fx ? e.fx.amt.toFixed(2) : '', e.fx ? e.fx.cur : '', e.fx ? String(e.fx.rate) : ''].map(csvCell).join(';'));
-      const csv = '\ufeff' + ['Datum;Titel;Kategorie;Betrag;Währung;Monatlich;Originalbetrag;Originalwährung;Kurs', ...rows].join('\r\n') + '\r\n';
+          e.fx ? e.fx.amt.toFixed(2) : '', e.fx ? e.fx.cur : '', e.fx ? String(e.fx.rate) : '',
+          e.items ? e.items.map(it => `${it.t || 'Produkt'} ${it.a.toFixed(2)}`).join(', ') : ''].map(csvCell).join(';'));
+      const csv = '\ufeff' + ['Datum;Titel;Kategorie;Betrag;Währung;Monatlich;Originalbetrag;Originalwährung;Kurs;Produkte', ...rows].join('\r\n') + '\r\n';
       res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Cache-Control': 'no-store',
         'Content-Disposition': `attachment; filename="quota-ausgaben-${day}.csv"` });
       return res.end(csv);

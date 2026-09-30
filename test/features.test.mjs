@@ -205,7 +205,7 @@ test('KI: ohne Schlüssel aus, Admin trägt ihn ein, Ergebnis wird geprüft übe
   fakeState.content = 'Hier: ```json\n{"amount": "23,45", "currency": "chf", "date": "2026-09-27", "merchant": "Coop Pronto Basel Bahnhof", "category": "essen"}\n```';
   r = await anna('POST', `/api/receipts/${up.data.id}/analyze`);
   assert.equal(r.status, 200);
-  assert.deepEqual(r.data.result, { amount: 23.45, currency: 'CHF', date: '2026-09-27', merchant: 'Coop Pronto Basel Bahnhof', category: 'essen', model: 'guenstig/vision' });
+  assert.deepEqual(r.data.result, { amount: 23.45, currency: 'CHF', date: '2026-09-27', merchant: 'Coop Pronto Basel Bahnhof', category: 'essen', items: null, model: 'guenstig/vision' });
   assert.equal(r.data.remaining, 2);
   assert.equal(fakeState.lastAuth, 'Bearer sk-or-v1-testschluessel1234');
   assert.equal(fakeState.lastBody.model, 'guenstig/vision');
@@ -215,6 +215,21 @@ test('KI: ohne Schlüssel aus, Admin trägt ihn ein, Ergebnis wird geprüft übe
   r = await anna('POST', `/api/receipts/${up.data.id}/analyze`);
   assert.equal(r.data.remaining, 2);
   assert.equal(fakeState.calls, calls);
+});
+
+test('KI: Produkte vom Beleg werden geprüft übernommen', async () => {
+  fakeState.content = JSON.stringify({ amount: 9, currency: 'CHF', date: '2026-09-28', merchant: 'Markt', category: 'einkauf', items: [
+    { name: '  Äpfel   Gala ', amount: 2 }, { name: 'Bananen', amount: '4,00' }, { name: 'Wasser 6x1.5l', amount: 3.5 },
+    { name: 'Aktion Wasser', amount: -0.5 }, { name: 'Leer', amount: 0 }, { name: 'Kaputt', amount: 'viel' }, 'Unsinn',
+  ] });
+  const id = (await admin('POST', '/api/receipts', undefined, { raw: jpeg(70) })).data.id;
+  const r = await admin('POST', `/api/receipts/${id}/analyze`);
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.data.result.items, [{ t: 'Äpfel Gala', a: 2 }, { t: 'Bananen', a: 4 }, { t: 'Wasser 6x1.5l', a: 3.5 }, { t: 'Aktion Wasser', a: -0.5 }]);
+  assert.match(fakeState.lastBody.messages[0].content[0].text, /"items"/, 'Auftrag fragt nach Produkten');
+  fakeState.content = JSON.stringify({ amount: 5, currency: 'CHF', date: null, merchant: 'Kiosk', category: null, items: [{ name: 'Zeitung', amount: 5 }] });
+  const id2 = (await admin('POST', '/api/receipts', undefined, { raw: jpeg(71) })).data.id;
+  assert.equal((await admin('POST', `/api/receipts/${id2}/analyze`)).data.result.items, null, 'ein Produkt ist keine Liste');
 });
 
 test('KI: 3 Analysen pro Tag für Benutzer, Admin unbegrenzt, Fehler zählen nicht', async () => {
@@ -306,12 +321,17 @@ test('Ausgaben in Fremdwährung: Originalbetrag und Kurs bleiben erhalten', asyn
   const r = await admin('PUT', '/api/months/2026-08', { income: null, budget: null, expenses: [
     { id: 'fx1', amt: 42.3, title: 'Paris', cat: 'essen', date: '2026-08-10', rep: false, ts: 1, fx: { cur: 'EUR', amt: 45, rate: 0.94 } },
     { id: 'fx2', amt: 5, title: 'Kaputt', cat: 'essen', date: '2026-08-11', rep: false, ts: 2, fx: { cur: 'euro', amt: 5, rate: -1 } },
+    { id: 'it1', amt: 9, title: 'Markt', cat: 'einkauf', date: '2026-08-12', rep: false, ts: 3,
+      items: [{ t: 'Apfel', a: 2 }, { t: ' Bananen ', a: 4 }, { t: 'Wasser', a: 3.004 }, { t: 'leer', a: 0 }, 'Unsinn', { t: 'x'.repeat(60), a: 'viel' }] },
+    { id: 'it2', amt: 1, title: 'Ohne', cat: 'einkauf', date: '2026-08-12', rep: false, ts: 4, items: [] },
   ] });
   assert.equal(r.status, 200);
   const list = (await admin('GET', '/api/data')).data.months['2026-08'].expenses;
   assert.deepEqual(list.find(e => e.id === 'fx1').fx, { cur: 'EUR', amt: 45, rate: 0.94 });
   assert.equal(list.find(e => e.id === 'fx1').amt, 42.3);
   assert.equal(list.find(e => e.id === 'fx2').fx, undefined, 'ungültige Angaben werden verworfen');
+  assert.deepEqual(list.find(e => e.id === 'it1').items, [{ t: 'Apfel', a: 2 }, { t: 'Bananen', a: 4 }, { t: 'Wasser', a: 3 }], 'Produkte bereinigt');
+  assert.equal(list.find(e => e.id === 'it2').items, undefined);
 });
 
 test('Export: CSV für Excel und JSON-Sicherung', async () => {
@@ -321,9 +341,10 @@ test('Export: CSV für Excel und JSON-Sicherung', async () => {
   const text = r.buf.toString('utf8');
   assert.equal(text.charCodeAt(0), 0xfeff, 'BOM für Excel');
   const lines = text.slice(1).trim().split('\r\n');
-  assert.equal(lines[0], 'Datum;Titel;Kategorie;Betrag;Währung;Monatlich;Originalbetrag;Originalwährung;Kurs');
-  assert.ok(lines.includes('2026-09-27;Mit Beleg;Essen;12.00;CHF;nein;;;'), lines.join('\n'));
-  assert.ok(lines.some(l => /^2026-08-10;Paris;[^;]+;42\.30;CHF;nein;45\.00;EUR;0\.94$/.test(l)), lines.join('\n'));
+  assert.equal(lines[0], 'Datum;Titel;Kategorie;Betrag;Währung;Monatlich;Originalbetrag;Originalwährung;Kurs;Produkte');
+  assert.ok(lines.includes('2026-09-27;Mit Beleg;Essen;12.00;CHF;nein;;;;'), lines.join('\n'));
+  assert.ok(lines.some(l => /^2026-08-10;Paris;[^;]+;42\.30;CHF;nein;45\.00;EUR;0\.94;$/.test(l)), lines.join('\n'));
+  assert.ok(lines.some(l => /^2026-08-12;Markt;[^;]+;9\.00;CHF;nein;;;;Apfel 2\.00, Bananen 4\.00, Wasser 3\.00$/.test(l)), lines.join('\n'));
   r = await admin('GET', '/api/export.json');
   assert.equal(r.data.app, 'Quota');
   assert.equal(r.data.months['2026-09'].income, 5000);

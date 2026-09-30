@@ -13,8 +13,12 @@ function prompt(categories) {
 Antworte ausschliesslich mit einem JSON-Objekt, ohne weiteren Text:
 {"amount": Gesamtbetrag der bezahlt wurde als Zahl (z.B. 23.45), "currency": Währung als ISO-Code (z.B. "CHF"),
  "date": Datum des Einkaufs als "YYYY-MM-DD", "merchant": kurzer Name des Geschäfts (max. 40 Zeichen),
- "category": passendste Kategorie-ID aus dieser Liste: ${list}}
-Wenn ein Wert nicht lesbar ist, setze null. Ist es kein Beleg, setze alle Werte auf null.`;
+ "category": passendste Kategorie-ID aus dieser Liste: ${list},
+ "items": gekaufte Produkte als Liste [{"name": kurzer Produktname (max. 40 Zeichen), "amount": Betrag dieser Zeile als Zahl}]}
+Wenn ein Wert nicht lesbar ist, setze null. Ist es kein Beleg, setze alle Werte auf null.
+Zu "items": nur echte Produktzeilen in der Reihenfolge des Belegs, mit dem Zeilenbetrag (Menge × Preis bereits gerechnet).
+Rabatte und Aktionen als eigene Zeile mit negativem Betrag. Nicht aufnehmen: Zwischentotal, Total, MwSt, Rundung,
+Zahlungsart (Bar, Karte, TWINT), Rückgeld, Punkte. Ist nur ein Produkt erkennbar oder die Liste unleserlich, setze "items": null.`;
 }
 
 // Nimmt die Antwort des Modells und macht daraus geprüfte Werte
@@ -29,7 +33,22 @@ export function parseAnswer(text, categories) {
   const date = typeof j.date === 'string' && DATE_RE.test(j.date) ? j.date : null;
   const merchant = typeof j.merchant === 'string' && j.merchant.trim() ? j.merchant.trim().slice(0, 40) : null;
   const category = categories.some(c => c.id === j.category) ? j.category : null;
-  return { amount, currency, date, merchant, category };
+  const items = parseItems(j.items);
+  return { amount, currency, date, merchant, category, items };
+}
+
+// Produktzeilen prüfen: Name und Betrag, höchstens 60; unter zwei Zeilen lohnt sich keine Liste
+function parseItems(list) {
+  if (!Array.isArray(list)) return null;
+  const out = [];
+  for (const it of list.slice(0, 60)) {
+    if (!it || typeof it !== 'object') continue;
+    const raw = typeof it.amount === 'string' ? Number(it.amount.replace(/['’\s]/g, '').replace(',', '.')) : it.amount;
+    if (typeof raw !== 'number' || !Number.isFinite(raw) || raw === 0 || Math.abs(raw) >= 1e7) continue;
+    const name = typeof it.name === 'string' ? it.name.replace(/\s+/g, ' ').trim().slice(0, 40) : '';
+    out.push({ t: name, a: Math.round(raw * 100) / 100 });
+  }
+  return out.length >= 2 ? out : null;
 }
 
 const ERRORS = {
@@ -53,7 +72,7 @@ export async function analyzeReceipt({ apiKey, model, image, mime, categories, b
       body: JSON.stringify({
         model: model || DEFAULT_MODEL,
         temperature: 0,
-        max_tokens: 300,
+        max_tokens: 2000,
         messages: [{
           role: 'user',
           content: [

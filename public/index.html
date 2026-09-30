@@ -500,6 +500,26 @@ button.tile:active{transform:scale(.965)}
 .fix-a{font-size:16px;font-weight:600;flex:none;letter-spacing:-.01em}
 .st-links{display:flex;flex-direction:column;gap:8px}
 
+/* ---------- Mehrere Produkte ---------- */
+.it-open{align-self:center;display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--text-2);padding:6px 12px;border-radius:15px;margin-top:-6px;transition:background-color .2s,transform .3s var(--spring)}
+.it-open svg.i{width:16px;height:16px}
+.it-open:active{transform:scale(.95)}
+@media (hover:hover){.it-open:hover{background:var(--fill)}}
+.it-card{background:var(--fill);border-radius:16px;padding:10px 10px 4px;display:flex;flex-direction:column;gap:6px}
+.it-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 4px;font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em}
+.it-head .num{text-transform:none;letter-spacing:0;color:var(--text)}
+.it-list{display:flex;flex-direction:column;gap:6px}
+.it-row{display:grid;grid-template-columns:minmax(0,1fr) 96px 30px;gap:6px;align-items:center}
+.it-row input{height:42px;border:0;outline:0;border-radius:11px;background:var(--surface);padding:0 11px;font:inherit;font-size:16px;color:var(--text);min-width:0;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.it-row input:focus{box-shadow:inset 0 0 0 1.5px var(--text-2)}
+.it-row .it-a{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.it-row .it-x{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--text-3)}
+.it-row .it-x svg.i{width:15px;height:15px}
+.it-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.it-foot .txt-btn{font-size:14px;padding:8px 4px}
+.it-foot .txt-btn.left{font-weight:600;color:var(--text)}
+.keypad.it-hide{display:none}
+
 /* ---------- Favoriten ---------- */
 .fav-star{width:36px;height:36px;margin-right:-8px;border-radius:10px;display:grid;place-items:center;color:var(--text-3);flex:none;transition:color .2s,transform .3s var(--spring)}
 .fav-star:active{transform:scale(.85)}
@@ -612,6 +632,10 @@ a.list-row{color:inherit;text-decoration:none}
 .rc-ai:disabled svg.i{display:none}
 .rc-ai-n{font-weight:500;opacity:.6}
 .rc-x svg.i{width:15px;height:15px}
+.rc-crop{display:flex;align-items:center;gap:8px;padding:0 4px 0 8px;font-size:13px;color:var(--text-2)}
+.rc-crop svg.i{width:16px;height:16px;stroke-width:2}
+.rc-crop span{flex:1;min-width:0}
+.rc-crop .txt-btn{font-size:13px;font-weight:600;color:var(--text);padding:6px 4px;white-space:nowrap}
 .row-s .clip{width:12px;height:12px}
 .model-list{display:flex;flex-direction:column;max-height:300px;overflow-y:auto;background:var(--fill);border-radius:14px;padding:4px}
 .model-list button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:9px 10px;border-radius:10px;min-width:0}
@@ -897,6 +921,8 @@ a.list-row{color:inherit;text-decoration:none}
     <symbol id="i-clip" viewBox="0 0 24 24"><path d="m16.5 9-6.8 6.8a2 2 0 0 1-2.8-2.8l7.4-7.4a3.5 3.5 0 0 1 5 5L11.5 18.4a5 5 0 0 1-7-7L11 5"/></symbol>
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A8 8 0 1 1 9.4 4.5a6.5 6.5 0 0 0 10.1 10.1z"/></symbol>
     <symbol id="i-offline" viewBox="0 0 24 24"><path d="M8.5 18.5H17a4 4 0 0 0 1.9-7.5M15.3 7.1A6 6 0 0 0 6.2 10 4.3 4.3 0 0 0 5 18.2"/><path d="M4 4l16 16"/></symbol>
+    <symbol id="i-crop" viewBox="0 0 24 24"><path d="M6.5 3v12.5a2 2 0 0 0 2 2H21"/><path d="M3 6.5h12.5a2 2 0 0 1 2 2V21"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9.5 6.5h10M9.5 12h10M9.5 17.5h10"/><circle cx="5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="5" cy="17.5" r="1.1" fill="currentColor" stroke="none"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.8 2.5 5.2 5.6.7-4.1 3.9 1 5.6L12 16.5l-5 2.7 1-5.6-4.1-3.9 5.6-.7z"/></symbol>
     <symbol id="i-star-f" viewBox="0 0 24 24"><path fill="currentColor" d="m12 3.8 2.5 5.2 5.6.7-4.1 3.9 1 5.6L12 16.5l-5 2.7 1-5.6-4.1-3.9 5.6-.7z"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.5 16.5V11a5.5 5.5 0 0 1 11 0v5.5l1.5 2h-14z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></symbol>
@@ -961,16 +987,23 @@ a.list-row{color:inherit;text-decoration:none}
   <div class="sheet-body">
     <div class="amount" id="exAmt" tabindex="0" role="textbox" aria-label="Betrag"><button class="cur cur-btn" id="exCur" type="button" aria-expanded="false" aria-controls="exCurPick" aria-label="Währung wählen"><span id="exCurL">CHF</span><svg class="i"><use href="#i-chev-d"/></svg></button><span class="val num ph">0</span><span class="caret"></span></div>
     <div class="fx-line" id="exFx" aria-live="polite" hidden></div>
-    <div class="kbd-hint">Betrag eintippen · Enter speichert</div>
+    <button class="it-open" id="exItOpen" type="button"><svg class="i"><use href="#i-list"/></svg>Mehrere Produkte</button>
+    <div class="kbd-hint" id="exHint">Betrag eintippen · Enter speichert</div>
     <label class="field"><svg class="i"><use href="#i-pen"/></svg><input id="exTitle" type="text" placeholder="Wofür?" maxlength="40" autocomplete="off" autocapitalize="sentences" enterkeyhint="done">
       <button class="fav-star" id="exStar" type="button" aria-pressed="false" aria-label="Als Favorit merken" hidden><svg class="i"><use href="#i-star"/></svg></button></label>
     <div class="chips fav-chips" id="exFavs" aria-label="Favoriten und Vorschläge" hidden></div>
+    <div class="it-card" id="exItems" role="group" aria-label="Produkte" hidden>
+      <div class="it-head"><span>Produkte</span><span class="num" id="exItSum"></span></div>
+      <div class="it-list" id="exItList"></div>
+      <div class="it-foot"><button class="txt-btn left" id="exItAdd" type="button">+ Produkt</button><button class="txt-btn" id="exItClose" type="button">Zu einem Betrag zusammenfassen</button></div>
+    </div>
     <div class="rc-card" id="exRc" hidden>
       <div class="rc-strip">
         <button class="rc-open" id="exRcOpen" type="button" title="Beleg ansehen"><span class="rc-thumb"><img id="exRcImg" alt=""></span>
           <span class="rc-main"><span class="rc-t" id="exRcT">Beleg</span><span class="rc-s" id="exRcS" aria-live="polite"></span></span></button>
         <button class="icon-btn rc-x" id="exRcDel" type="button" aria-label="Beleg entfernen"><svg class="i"><use href="#i-x"/></svg></button>
       </div>
+      <div class="rc-crop" id="exRcCrop" hidden><svg class="i"><use href="#i-crop"/></svg><span id="exRcCropT"></span><button class="txt-btn" id="exRcCropB" type="button"></button></div>
       <button class="rc-ai" id="exRcAi" type="button" hidden><svg class="i"><use href="#i-spark"/></svg><span id="exRcAiL">Mit KI auslesen</span><span class="rc-ai-n" id="exRcAiN"></span></button>
     </div>
     <div class="chips" id="exCats" role="radiogroup" aria-label="Kategorie"></div>
@@ -1279,6 +1312,7 @@ a.list-row{color:inherit;text-decoration:none}
 <div class="toast" id="toast" role="status" aria-live="polite"><span id="toastT"></span><button id="toastB" type="button" hidden>Rückgängig</button></div>
 <label id="haptic" aria-hidden="true"><input type="checkbox" switch tabindex="-1"></label>
 <script src="/js/bankcsv.js" defer></script>
+<script src="/js/scan.js" defer></script>
 <script id="me" type="application/json">null</script>
 <script>
 (() => {
@@ -1389,6 +1423,7 @@ function cleanMonth(d) {
         const o = { id: String(e.id || uid()), amt: r2(e.amt), title: String(e.title || '').slice(0, 40), cat: CAT_ID_RE.test(e.cat) ? e.cat : 'sonst', date: e.date, rep: !!e.rep, ts: Number(e.ts) || 0 };
         if (o.rep && (e.every === 3 || e.every === 12)) o.every = e.every;
         if (typeof e.trip === 'string' && TRIP_ID_RE.test(e.trip)) o.trip = e.trip;
+        if (Array.isArray(e.items) && e.items.length) o.items = e.items.filter(it => it && typeof it.a === 'number' && isFinite(it.a)).map(it => ({ t: String(it.t || '').slice(0, 40), a: r2(it.a) }));
         if (RC_RE.test(e.rc)) o.rc = e.rc;
         const fx = e.fx;
         if (fx && CUR_RE.test(fx.cur) && fx.amt > 0 && fx.rate > 0 && isFinite(fx.amt) && isFinite(fx.rate)) o.fx = { cur: fx.cur, amt: r2(fx.amt), rate: fx.rate };
@@ -1402,6 +1437,7 @@ const toDoc = m => ({ income: m.income, budget: m.budget, expenses: m.expenses.m
   if (e.fx) o.fx = { cur: e.fx.cur, amt: e.fx.amt, rate: e.fx.rate };
   if (e.every) o.every = e.every;
   if (e.trip) o.trip = e.trip;
+  if (e.items) o.items = e.items.map(it => ({ t: it.t, a: it.a }));
   return o;
 }) });
 
@@ -1912,7 +1948,7 @@ function rowHTML(e) {
     <button class="row-in" type="button" data-act="row" data-id="${e.id}">
       <span class="row-ic">${ic('c-' + cat.ic)}</span>
       <span class="row-mid"><span class="row-t">${esc(e.title || cat.n)}</span>
-      <span class="row-s">${[e.title ? cn : '', e.rep ? ic('i-repeat') + EVERY_LBL[e.every || 1] : '', e.rc ? ic('i-clip', 'i clip') + 'Beleg' : '',
+      <span class="row-s">${[e.title ? cn : '', e.rep ? ic('i-repeat') + EVERY_LBL[e.every || 1] : '', e.items ? ic('i-list') + `${e.items.length} Produkte` : '', e.rc ? ic('i-clip', 'i clip') + 'Beleg' : '',
         e.trip && tripOf(e.trip) ? ic('c-reisen') + esc(tripOf(e.trip).name) : ''].filter(Boolean).join(' · ')}</span></span>
       <span class="row-a num">${money(e.amt)}${e.fx ? `<small>${fmtCur(e.fx.amt, e.fx.cur)}</small>` : ''}</span>
     </button></div>`;
@@ -1927,7 +1963,7 @@ function searchHits() {
     if (view.qcat && catKey(e.cat) !== view.qcat) return;
     if (toks.length) {
       const d = parseD(e.date);
-      const hay = norm(`${e.title} ${catOf(e.cat).n} ${fmt(e.amt)} ${e.amt.toFixed(2)} ${e.amt.toFixed(2).replace('.', ',')} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${e.rep ? 'fixkosten ' + EVERY_LBL[e.every || 1] : ''} ${e.rc ? 'beleg' : ''} ${e.trip && tripOf(e.trip) ? 'reise ' + tripOf(e.trip).name : ''} ${e.fx ? `${e.fx.cur} ${curName(e.fx.cur)} ${e.fx.amt.toFixed(2)} ${e.fx.amt.toFixed(2).replace('.', ',')}` : ''}`);
+      const hay = norm(`${e.title} ${catOf(e.cat).n} ${fmt(e.amt)} ${e.amt.toFixed(2)} ${e.amt.toFixed(2).replace('.', ',')} ${MONTHS[d.getMonth()]} ${d.getFullYear()} ${e.rep ? 'fixkosten ' + EVERY_LBL[e.every || 1] : ''} ${e.rc ? 'beleg' : ''} ${e.trip && tripOf(e.trip) ? 'reise ' + tripOf(e.trip).name : ''} ${e.items ? e.items.map(it => it.t).join(' ') : ''} ${e.fx ? `${e.fx.cur} ${curName(e.fx.cur)} ${e.fx.amt.toFixed(2)} ${e.fx.amt.toFixed(2).replace('.', ',')}` : ''}`);
       if (!toks.every(t => hay.includes(t))) return;
     }
     out.push(e);
@@ -2253,7 +2289,7 @@ function shake(el) { el.classList.remove('shake'); void el.offsetWidth; el.class
 /* ---------- Ausgabe erfassen / bearbeiten ---------- */
 const KW = [
   ['mobil', /sbb|tram|\bbus\b|zvv|tnw|bvb|halbtax|\bga\b|benzin|tank|parking|parkhaus|taxi|uber|velo|garage|flug|zug|bahn/i],
-  ['einkauf', /migros|coop|denner|aldi|lidl|volg|spar|manor|einkauf|supermarkt|ikea|zalando|galaxus|digitec|kleider|schuhe/i],
+  ['einkauf', /migros|coop|denner|aldi|lidl|volg|spar|manor|einkauf|supermarkt|ikea|zalando|galaxus|digitec|kleider|schuhe|lebensmittel|apfel|äpfel|banane|milch|brot|käse|gemüse|obst|früchte|fleisch|poulet|joghurt|jogurt|butter|pasta|mehl|zucker/i],
   ['essen', /kaffee|caf[eé]|coffee|starbucks|confiserie|sprüngli|bakery|restaurant|ristorante|trattoria|osteria|pizza|mensa|kantine|mittag|znacht|zmittag|burger|sushi|\bbar\b|bier|glace|bäck|beck|take ?away|döner|kebab|essen|lunch|brunch|mc ?donald|grill/i],
   ['wohnen', /miete|strom|nebenkosten|serafe|internet|swisscom|salt|sunrise|möbel|wohnung|putz/i],
   ['abos', /netflix|spotify|\babo\b|disney|youtube|icloud|prime|chatgpt|claude|adobe|mitglied|fitness|gym/i],
@@ -2272,7 +2308,7 @@ function guessCat(title) {
 
 const shExp = $('#shExp'), exAmt = $('#exAmt'), exTitle = $('#exTitle'), exCats = $('#exCats'), exPad = $('#exPad');
 const exDateOpt = $('#exDateOpt'), exDateLbl = $('#exDateLbl'), exRepeat = $('#exRepeat'), exSave = $('#exSave'), exDelete = $('#exDelete');
-const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, every: 0, rc: null,
+const ex = { id: null, origKey: null, buf: '', cat: null, manualCat: false, manualDate: false, date: null, every: 0, rc: null, items: null,
   cur: null, rate: null, rateSt: null, rateDate: null, rateSrc: null, rateErr: '', rateTok: 0, fxEdit: false, fxK: 1, fxPrev: null };
 
 function buildCatChips() {
@@ -2672,6 +2708,92 @@ fixBody.addEventListener('click', e => {
   haptic(); openExpense(b.dataset.fix); shExp._back = openFix;
 });
 
+/* ---------- Mehrere Produkte ----------
+   Eine Ausgabe kann aus Positionen bestehen (Apfel 2, Bananen 4, Wasser 3); abgezogen wird die Summe.
+   Beträge in der gewählten Währung, Rabatte negativ. Im Produkt-Modus ersetzen Eingabefelder die Zifferntasten. */
+const exItems = $('#exItems'), exItList = $('#exItList'), exItOpen = $('#exItOpen');
+const itemAmt = v => { const n = parseFloat(String(v).replace(/[’'\s]/g, '').replace(',', '.')); return isFinite(n) ? r2(n) : 0; };
+const itemsSum = list => r2(list.reduce((a, it) => a + it.a, 0));
+const cleanItems = () => (ex.items || []).map(it => ({ t: it.t.trim().slice(0, 40), a: itemAmt(it.a) })).filter(it => it.a !== 0);
+function itemRow(it, i) {
+  return `<div class="it-row" data-i="${i}"><input class="it-t" type="text" maxlength="40" placeholder="Produkt ${i + 1}" value="${esc(it.t)}" autocomplete="off" enterkeyhint="next" aria-label="Produkt ${i + 1}">
+    <input class="it-a num" type="text" inputmode="decimal" placeholder="0.00" value="${esc(it.a)}" autocomplete="off" enterkeyhint="next" aria-label="Betrag Produkt ${i + 1}">
+    <button class="it-x" type="button" aria-label="Produkt ${i + 1} entfernen">${ic('i-x')}</button></div>`;
+}
+function paintItemsSum() {
+  const list = cleanItems(), sum = itemsSum(list);
+  ex.buf = list.length && sum > 0 ? bufOf(sum) : '';
+  $('#exItSum').textContent = list.length ? `${list.length} · ${fxOn() ? fmtCur(sum, ex.cur) : money(sum)}` : '';
+  paintExAmount();
+}
+function renderItems() {
+  const on = !!ex.items;
+  exItems.hidden = !on;
+  exItOpen.hidden = on || S.sample;
+  exPad.classList.toggle('it-hide', on);
+  exAmt.classList.toggle('inactive', on);
+  $('#exHint').textContent = on ? 'Summe der Produkte · Enter springt zum nächsten Feld' : 'Betrag eintippen · Enter speichert';
+  if (!on) return;
+  exItList.innerHTML = ex.items.map(itemRow).join('');
+  paintItemsSum();
+}
+function focusItem(i, part) {
+  const row = $(`.it-row[data-i="${i}"]`, exItList);
+  if (row) { const inp = $(part === 'a' ? '.it-a' : '.it-t', row); inp.focus(); inp.select(); }
+}
+function addItem(focus = true) {
+  ex.items.push({ t: '', a: '' });
+  exItList.insertAdjacentHTML('beforeend', itemRow(ex.items[ex.items.length - 1], ex.items.length - 1));
+  if (focus) focusItem(ex.items.length - 1, 't');
+}
+function setItems(list) {
+  ex.items = list.map(it => ({ t: it.t || '', a: typeof it.a === 'number' ? it.a.toFixed(2) : String(it.a || '') }));
+  if (ex.items.length < 2) ex.items.push({ t: '', a: '' });
+  renderItems();
+}
+exItOpen.addEventListener('click', () => {
+  haptic();
+  if (pk.open) openPicker(false);
+  if (cp.open) openCurPick(false);
+  // Bisheriger Betrag wird das erste Produkt
+  setItems(parseFloat(ex.buf) > 0 ? [{ t: '', a: parseFloat(ex.buf) }, { t: '', a: '' }] : [{ t: '', a: '' }, { t: '', a: '' }]);
+  focusItem(0, 't');
+});
+$('#exItAdd').addEventListener('click', () => { haptic(); addItem(); });
+$('#exItClose').addEventListener('click', () => {
+  haptic();
+  const list = cleanItems(), sum = itemsSum(list);
+  if (!exTitle.value.trim() && list.length === 1 && list[0].t) exTitle.value = list[0].t;
+  ex.items = null; ex.buf = sum > 0 ? bufOf(sum) : '';
+  renderItems(); paintExAmount(); paintFavStar();
+});
+exItList.addEventListener('input', e => {
+  const row = e.target.closest('.it-row'); if (!row) return;
+  const it = ex.items[Number(row.dataset.i)]; if (!it) return;
+  if (e.target.classList.contains('it-t')) it.t = e.target.value;
+  else { it.a = e.target.value.replace(/[^\d.,'’\s-]/g, ''); if (it.a !== e.target.value) e.target.value = it.a; paintItemsSum(); }
+});
+exItList.addEventListener('click', e => {
+  const x = e.target.closest('.it-x'); if (!x) return;
+  const i = Number(x.closest('.it-row').dataset.i);
+  haptic();
+  ex.items.splice(i, 1);
+  if (!ex.items.length) ex.items.push({ t: '', a: '' });
+  renderItems();
+  focusItem(Math.min(i, ex.items.length - 1), 't');
+});
+// Enter: vom Namen zum Betrag, vom Betrag zum nächsten Produkt; in einer leeren letzten Zeile speichern
+exItList.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.isComposing) return;
+  const row = e.target.closest('.it-row'); if (!row) return;
+  e.preventDefault(); e.stopPropagation();
+  const i = Number(row.dataset.i), it = ex.items[i];
+  if (e.target.classList.contains('it-t')) { if (!it.t.trim() && !String(it.a).trim() && i === ex.items.length - 1 && i > 0) { saveExpense(); return; } focusItem(i, 'a'); return; }
+  if (i < ex.items.length - 1) focusItem(i + 1, 't');
+  else if (it.t.trim() || String(it.a).trim()) addItem();
+  else saveExpense();
+});
+
 /* ---------- Favoriten ----------
    Angeheftete Favoriten (Stern im Feld „Wofür?“) und Vorschläge aus häufigen Ausgaben der letzten 4 Monate.
    Ein Tipp füllt Betrag, Text, Kategorie und Währung aus. */
@@ -2704,6 +2826,7 @@ function renderFavs() {
 }
 function useFav(f) {
   haptic();
+  if (ex.items) { ex.items = null; renderItems(); }
   ex.buf = bufOf(f.a);
   exTitle.value = f.t;
   ex.cat = CAT[f.c] ? f.c : 'sonst'; ex.manualCat = true;
@@ -2818,6 +2941,7 @@ function setCur(code) {
   if (c === ex.cur) return;
   Object.assign(ex, { cur: c, rate: null, rateSt: null, fxEdit: false });
   if (c) loadRate(); else { ex.rateTok++; paintExAmount(); }
+  if (ex.items) paintItemsSum();
 }
 // Neues Datum: gespeicherte oder selbst eingetragene Kurse bleiben, sonst Kurs dieses Tages holen
 function dateChangedFx() { if (fxOn() && ex.rateSt !== 'saved' && ex.rateSt !== 'man') loadRate(); }
@@ -3031,7 +3155,7 @@ exTitle.addEventListener('input', () => {
   if (g !== ex.cat) { ex.cat = g; paintCats(); if (g) scrollChip(g, true); }
 });
 exTitle.addEventListener('focus', () => { if (pk.open) openPicker(false); if (cp.open) openCurPick(false); if (coarse.matches) exPad.classList.add('hidden'); exAmt.classList.add('inactive'); });
-exTitle.addEventListener('blur', () => { exPad.classList.remove('hidden'); exAmt.classList.remove('inactive'); });
+exTitle.addEventListener('blur', () => { exPad.classList.remove('hidden'); exAmt.classList.toggle('inactive', !!ex.items); });
 // stopPropagation: sonst verarbeitet der Dialog dieselbe Enter-Taste nochmals und speichert doppelt
 exTitle.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (parseFloat(ex.buf) > 0) saveExpense(); else exTitle.blur(); } });
 exAmt.addEventListener('click', () => { if (document.activeElement === exTitle) exTitle.blur(); });
@@ -3042,6 +3166,7 @@ shExp.addEventListener('keydown', e => {
   let k = null;
   if (/^[0-9]$/.test(e.key)) k = e.key; else if (e.key === '.' || e.key === ',') k = '.'; else if (e.key === 'Backspace') k = 'back';
   else if (e.key === 'Enter' && !e.target.closest('button')) { e.preventDefault(); saveExpense(); return; }
+  if (k && ex.items) { e.preventDefault(); focusItem(ex.items.length - 1, 'a'); return; }
   if (k) { e.preventDefault(); const nb = applyKey(ex.buf, k); if (nb === null) shake(exAmt); else { ex.buf = nb; paintExAmount(); } }
 });
 
@@ -3063,6 +3188,7 @@ function openExpense(id) {
   const fx = f && f.e.fx && f.e.fx.cur !== S.currency ? f.e.fx : null;
   Object.assign(ex, { cur: fx ? fx.cur : null, rate: fx ? fx.rate : null, rateSt: fx ? 'saved' : null, rateErr: '', fxEdit: false, rateTok: ex.rateTok + 1 });
   if (fx) ex.buf = bufOf(fx.amt);
+  ex.items = f && Array.isArray(f.e.items) && f.e.items.length ? f.e.items.map(it => ({ t: it.t || '', a: String(it.a) })) : null;
   exCur.disabled = !ME;
   // Reise: bestehende Zuordnung, bei neuen Ausgaben die Reise zum Datum (mit ihrer Währung)
   const trip = f ? null : tripAt(ex.date);
@@ -3077,14 +3203,16 @@ function openExpense(id) {
   paintRepeat();
   exPad.classList.remove('hidden'); exAmt.classList.remove('inactive');
   openPicker(false); openCurPick(false);
-  paintCats(); paintDate(); paintExAmount(); renderFavs(); paintFavStar(); paintTripOpt();
+  paintCats(); paintDate(); paintExAmount(); renderFavs(); paintFavStar(); paintTripOpt(); renderItems();
   exCats.scrollLeft = 0;
   if (ex.cat) scrollChip(ex.cat, false);
   showSheet(shExp);
 }
 function saveExpense() {
+  const items = cleanItems();
+  if (ex.items) ex.buf = items.length ? bufOf(itemsSum(items)) : '';
   const typed = r2(parseFloat(ex.buf));
-  if (!(typed > 0)) { shake(exAmt); return; }
+  if (!(typed > 0)) { shake(ex.items ? exItems : exAmt); return; }
   // Fremdwährung: gespeichert wird der umgerechnete Betrag, dazu Originalbetrag und Kurs
   let amt = typed, fx = null;
   if (fxOn()) {
@@ -3092,8 +3220,9 @@ function saveExpense() {
     amt = Math.max(0.01, r2(typed * ex.rate));
     fx = { cur: ex.cur, amt: typed, rate: ex.rate };
   }
-  const title = exTitle.value.trim().slice(0, 40);
-  const cat = ex.cat || guessCat(title) || 'sonst';
+  // Ohne Titel: die Produkte nennen; Kategorie auch aus den Produkten erraten
+  const title = (exTitle.value.trim() || (items.length > 1 ? items.map(it => it.t).filter(Boolean).join(', ') : '')).slice(0, 40);
+  const cat = ex.cat || guessCat(title) || (items.length > 1 ? items.map(it => guessCat(it.t)).find(Boolean) : null) || 'sonst';
   const key = ex.date.slice(0, 7);
   let rec;
   if (ex.id) {
@@ -3105,6 +3234,7 @@ function saveExpense() {
   if (ex.rc) rec.rc = ex.rc; else delete rec.rc;
   if (fx) rec.fx = fx; else delete rec.fx;
   if (ex.trip && tripOf(ex.trip)) rec.trip = ex.trip; else delete rec.trip;
+  if (items.length > 1) rec.items = items; else delete rec.items;
   // Foto lädt noch: sobald es oben ist, an die gespeicherte Ausgabe hängen
   if (!ex.rc && rc.pending) {
     const recId = rec.id;
@@ -3143,8 +3273,10 @@ function deleteExpense(id) {
    und geht allein zum Auslesen an den Server, wenn man auf „Mit KI auslesen“ tippt. */
 const exRc = $('#exRc'), exRcFile = $('#exRcFile'), exRcImg = $('#exRcImg'), exRcT = $('#exRcT'), exRcS = $('#exRcS');
 const exRcAi = $('#exRcAi'), exRcAiL = $('#exRcAiL'), exRcAiN = $('#exRcAiN'), exRcOpen = $('#exRcOpen');
+const exRcCrop = $('#exRcCrop'), exRcCropT = $('#exRcCropT'), exRcCropB = $('#exRcCropB');
 const AI = { enabled: false, limit: 3, used: 0, remaining: 3 };
-const rc = { tok: 0, url: null, state: null, pending: null, sharp: null, saved: false };
+// crop: true = Beleg erkannt und zugeschnitten, false = Original gewählt (Zuschnitt möglich), null = kein Zuschnitt
+const rc = { tok: 0, url: null, state: null, pending: null, sharp: null, saved: false, file: null, crop: null };
 const RC_SHARP = [1600, 0.85], RC_STORE = [1024, 0.72]; // längste Seite in px, JPEG-Qualität
 const FINE = matchMedia('(hover: hover) and (pointer: fine)');
 async function loadAi() {
@@ -3168,6 +3300,10 @@ function paintRc(state, msg, title) {
   exRcAi.classList.toggle('soft', rc.saved); // bei abgelegten Belegen nur Nebensache
   exRcAiL.innerHTML = busy ? '<span class="spin"></span>KI liest den Beleg …' : 'Mit KI auslesen';
   exRcAiN.textContent = busy || AI.remaining == null ? '' : ` · noch ${AI.remaining} heute`;
+  // Zuschnitt umschalten, solange der Beleg neu und noch nicht ausgelesen ist
+  exRcCrop.hidden = rc.crop == null || rc.saved || !rc.file || state !== 'ready';
+  exRcCropT.textContent = rc.crop ? 'Beleg zugeschnitten' : 'Ganzes Foto';
+  exRcCropB.textContent = rc.crop ? 'Original verwenden' : 'Beleg zuschneiden';
 }
 function readyText() {
   const base = rc.saved ? `Abgelegt · zum Ansehen ${FINE.matches ? 'anklicken' : 'antippen'}` : 'Wird mit der Ausgabe abgelegt';
@@ -3175,33 +3311,53 @@ function readyText() {
   if (AI.remaining === 0) return `${base} · heute keine KI-Analysen mehr (${AI.limit} pro Tag)`;
   return base;
 }
-// Foto in den gewünschten Grössen als JPEG (Ausrichtung aus dem Foto, weisser Hintergrund für PNG)
-async function shrinkImage(file, sizes) {
-  let src = null, url = null;
-  try { src = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+// Foto laden (Ausrichtung aus dem Foto)
+async function decodeImage(file) {
+  try { return { src: await createImageBitmap(file, { imageOrientation: 'from-image' }) }; }
   catch (e) {
-    url = URL.createObjectURL(file);
-    src = await new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = url; });
+    const url = URL.createObjectURL(file);
+    try { return { src: await new Promise((res, rej) => { const img = new Image(); img.onload = () => res(img); img.onerror = rej; img.src = url; }), url }; }
+    catch (err) { URL.revokeObjectURL(url); throw err; }
   }
+}
+function freeImage(img) { if (img.src.close) img.src.close(); if (img.url) URL.revokeObjectURL(img.url); }
+// Bild auf höchstens max px (längste Seite) verkleinert auf eine Canvas zeichnen, weisser Hintergrund für PNG
+function canvasOf(src, max, read) {
+  const w = src.width, h = src.height, k = Math.min(1, max / Math.max(w, h));
+  const c = document.createElement('canvas');
+  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  const g = c.getContext('2d', read ? { willReadFrequently: true } : undefined);
+  g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.imageSmoothingQuality = 'high';
+  g.drawImage(src, 0, 0, c.width, c.height);
+  return c;
+}
+// Bild in den gewünschten Grössen als JPEG
+async function jpegSizes(src, sizes) {
+  const out = [];
+  for (const [max, q] of sizes) {
+    const blob = await new Promise(res => canvasOf(src, max).toBlob(res, 'image/jpeg', q));
+    if (!blob) throw new Error('Bild konnte nicht verarbeitet werden.');
+    out.push(blob);
+  }
+  return out;
+}
+// Belegscanner: Beleg im Foto finden und perspektivisch gerade ausschneiden; null, wenn keiner klar erkennbar ist
+function scanReceipt(src) {
+  if (!window.DocScan) return null;
   try {
-    const out = [];
-    for (const [max, q] of sizes) {
-      const w = src.width, h = src.height, k = Math.min(1, max / Math.max(w, h));
-      const c = document.createElement('canvas');
-      c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
-      const g = c.getContext('2d');
-      g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
-      g.imageSmoothingQuality = 'high';
-      g.drawImage(src, 0, 0, c.width, c.height);
-      const blob = await new Promise(res => c.toBlob(res, 'image/jpeg', q));
-      if (!blob) throw new Error('Bild konnte nicht verarbeitet werden.');
-      out.push(blob);
-    }
+    const small = canvasOf(src, 360, true), sw = small.width, sh = small.height;
+    const q = DocScan.findQuad(small.getContext('2d').getImageData(0, 0, sw, sh).data, sw, sh);
+    if (!q) return null;
+    const work = canvasOf(src, 2400, true), kx = work.width / sw, ky = work.height / sh;
+    const wq = q.map(p => ({ x: p.x * kx, y: p.y * ky }));
+    const { w, h } = DocScan.outSize(wq, RC_SHARP[0]);
+    const px = DocScan.warp(work.getContext('2d').getImageData(0, 0, work.width, work.height).data, work.width, work.height, wq, w, h);
+    const out = document.createElement('canvas');
+    out.width = w; out.height = h;
+    out.getContext('2d').putImageData(new ImageData(px, w, h), 0, 0);
     return out;
-  } finally {
-    if (src.close) src.close();
-    if (url) URL.revokeObjectURL(url);
-  }
+  } catch (e) { return null; } // im Zweifel das ganze Foto verwenden
 }
 async function postImage(url, blob, fail) {
   let res;
@@ -3214,17 +3370,25 @@ async function postImage(url, blob, fail) {
   return data;
 }
 const uploadReceipt = async blob => (await postImage('/api/receipts', blob, 'Hochladen fehlgeschlagen.')).id;
-async function pickReceipt(file) {
+async function pickReceipt(file, crop = true) {
   if (!file) return;
   const tok = ++rc.tok;
-  ex.rc = null; rc.sharp = null; rc.saved = false;
+  ex.rc = null; rc.sharp = null; rc.saved = false; rc.file = file; rc.crop = null;
   setRcPreview(URL.createObjectURL(file));
-  paintRc('upload', 'Beleg wird abgelegt …');
+  paintRc('upload', crop ? 'Beleg wird erkannt …' : 'Beleg wird abgelegt …');
   haptic();
-  let store = file, sharp = null;
-  try { [sharp, store] = await shrinkImage(file, [RC_SHARP, RC_STORE]); }
-  catch (e) { if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { if (tok === rc.tok) paintRc('error', 'Dieses Bildformat wird nicht unterstützt. Bitte ein Foto (JPEG oder PNG) wählen.'); return; } }
+  let store = file, sharp = null, cut = null;
+  try {
+    const img = await decodeImage(file);
+    try {
+      if (crop) { await new Promise(r => requestAnimationFrame(() => setTimeout(r))); cut = scanReceipt(img.src); } // Hinweis erst zeichnen lassen
+      [sharp, store] = await jpegSizes(cut || img.src, [RC_SHARP, RC_STORE]);
+    } finally { freeImage(img); }
+  }
+  catch (e) { cut = null; if (!/^image\/(jpeg|png|webp)$/.test(file.type)) { if (tok === rc.tok) paintRc('error', 'Dieses Bildformat wird nicht unterstützt. Bitte ein Foto (JPEG oder PNG) wählen.'); return; } }
   if (tok !== rc.tok) return;
+  rc.crop = cut ? true : crop ? null : false;
+  if (cut) paintRc('upload', 'Beleg erkannt · wird abgelegt …');
   setRcPreview(URL.createObjectURL(store));
   const up = rc.pending = uploadReceipt(store);
   let id;
@@ -3267,6 +3431,15 @@ async function analyzeReceipt(tok = rc.tok) {
   // Beleg in Fremdwährung: Währung übernehmen und live umrechnen
   const rcCur = a.currency && a.currency !== S.currency && FX_CODES.includes(a.currency) ? a.currency : null;
   if (filled && rcCur && ex.cur !== rcCur && ME) { setCur(rcCur); got.push('Währung'); }
+  // Mehrere Produkte auf dem Beleg: als Positionen eintragen; was nicht aufgeht (z.B. Pfand, Rundung), als eigene Zeile
+  if (filled && a.items && a.items.length > 1) {
+    const list = a.items.map(it => ({ t: it.t, a: it.a })), diff = r2(a.amount - itemsSum(list));
+    if (Math.abs(diff) >= 0.01) list.push({ t: diff > 0 ? 'Übriges laut Beleg' : 'Rabatt laut Beleg', a: diff });
+    if (pk.open) openPicker(false);
+    if (cp.open) openCurPick(false);
+    setItems(list);
+    got.push(`${a.items.length} Produkte`);
+  } else if (filled && ex.items) setItems([{ t: '', a: a.amount }]); // Produktliste war offen, aber leer
   const cat = a.category && CAT[a.category] ? a.category : a.merchant ? guessCat(a.merchant) : null;
   if (cat && !ex.manualCat) { ex.cat = cat; paintCats(); scrollChip(cat, true); got.push('Kategorie'); }
   let msg = got.length ? `Ausgefüllt: ${got.join(', ')}` : (a.amount || a.merchant ? 'Schon ausgefüllt, nichts überschrieben' : 'Auf dem Foto war kein Beleg zu erkennen');
@@ -3277,10 +3450,11 @@ async function analyzeReceipt(tok = rc.tok) {
 }
 exRcFile.addEventListener('change', () => { const f = exRcFile.files[0]; exRcFile.value = ''; pickReceipt(f); });
 exRcAi.addEventListener('click', () => { haptic(); analyzeReceipt(); });
-$('#exRcDel').addEventListener('click', () => { rc.tok++; rc.pending = null; rc.sharp = null; ex.rc = null; setRcPreview(null); paintRc(null); haptic(); });
+$('#exRcDel').addEventListener('click', () => { rc.tok++; rc.pending = null; rc.sharp = null; rc.file = null; rc.crop = null; ex.rc = null; setRcPreview(null); paintRc(null); haptic(); });
+exRcCropB.addEventListener('click', () => { if (rc.file) pickReceipt(rc.file, !rc.crop); });
 exRcOpen.addEventListener('click', () => { if (rc.url) openViewer(rc.url); });
 function resetRc(id) {
-  rc.tok++; rc.pending = null; rc.sharp = null; rc.saved = !!id;
+  rc.tok++; rc.pending = null; rc.sharp = null; rc.saved = !!id; rc.file = null; rc.crop = null;
   $('#exRcBtn').hidden = !ME;
   if (id) { ex.rc = id; setRcPreview(`/api/receipts/${id}`); paintRc('ready', readyText()); }
   else { ex.rc = null; setRcPreview(null); paintRc(null); }
@@ -4309,8 +4483,13 @@ $('#pkList').addEventListener('click', async e => {
 
 /* ---------- Neuigkeiten ----------
    Öffnet sich beim ersten Start nach einem Update von selbst (gemerkt pro Gerät), danach über die Einstellungen. */
-const APP_VERSION = '4.0';
+const APP_VERSION = '4.0.1';
 const CHANGELOG = [
+  { v: '4.0.1', title: 'Ein Einkauf, mehrere Produkte', sub: 'Erfasse Apfel, Bananen und Wasser in einer Ausgabe. Abgezogen wird die Summe.', items: [
+    ['i-list', 'Mehrere Produkte', 'Tippe beim Erfassen auf „Mehrere Produkte“ und trage jedes Produkt mit seinem Preis ein. Quota rechnet die Summe aus und zeigt die Liste, wenn du die Ausgabe später öffnest.'],
+    ['i-crop', 'Belegscanner', 'Fotografierst du einen Beleg, erkennt Quota ihn wie eine Scanner-App und schneidet ihn gerade aus. Passt es nicht, tippe auf „Original verwenden“.'],
+    ['i-spark', 'KI erkennt die Produkte', 'Stehen mehrere Produkte auf dem Beleg, trägt die KI sie beim Auslesen direkt als Liste ein, mit Preis und Rabatten.'],
+  ] },
   { v: '4.0', title: 'Quota 4', sub: 'Sieben Neuerungen: schneller erfassen, besser planen und Hilfe direkt in der App.', items: [
     ['i-chat', 'Quota-Assistent', 'Frag den Chat oben rechts, wie etwas in der App geht. Auf Wunsch kennt er auch deine Zahlen. Er hilft nur bei Quota und deinen Finanzen.'],
     ['i-star', 'Favoriten', 'Tippe beim Erfassen auf den Stern im Feld „Wofür?“. Danach genügt ein Tipp auf den Favoriten, und Betrag, Text und Kategorie sind ausgefüllt.'],

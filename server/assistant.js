@@ -25,6 +25,7 @@ export const GUIDE = `
 - Betrag über die Zifferntasten (Computer: Tastatur), „Wofür?“ eintragen, Kategorie wählen (wird aus dem Text erraten), Datum (Heute, Gestern, Kalender) und Wiederholung.
 - Wiederholung: Einmalig, Jeden Monat, Alle 3 Monate oder Jedes Jahr (Knopf mit den Pfeilen im Erfassen-Dialog, antippen wechselt).
 - „Hinzufügen“ speichert, am Computer auch Enter.
+- Mehrere Produkte in einer Ausgabe (z. B. Apfel 2, Bananen 4, Wasser 3): beim Erfassen „Mehrere Produkte“ unter dem Betrag antippen, je Zeile Produkt und Preis, „+ Produkt“ für weitere. Abgezogen wird die Summe; Rabatte mit Minus eintragen. „Zu einem Betrag zusammenfassen“ macht wieder einen einzelnen Betrag daraus. Die Liste steht später in der Ausgabe und im CSV-Export (Spalte „Produkte“).
 - Bearbeiten: Ausgabe in der Liste antippen. Löschen: im Dialog „Ausgabe löschen“, auf dem Handy nach links wischen, am Computer Mülleimer beim Überfahren. Danach gibt es „Rückgängig“.
 
 ## Favoriten
@@ -40,7 +41,8 @@ export const GUIDE = `
 
 ## Belege und KI
 - Im Erfassen-Dialog oben rechts auf die Kamera tippen, Foto aufnehmen oder Bild wählen (Computer: Bild auf das Fenster ziehen).
-- Das Foto wird platzsparend bei der Ausgabe abgelegt. „Mit KI auslesen“ füllt Betrag, Händler, Datum, Kategorie und Währung aus.
+- Belegscanner: Quota erkennt den Beleg auf dem Foto und schneidet ihn gerade aus (am besten auf dunklem Untergrund fotografieren). Passt der Zuschnitt nicht: „Original verwenden“, zurück mit „Beleg zuschneiden“.
+- Das Foto wird platzsparend bei der Ausgabe abgelegt. „Mit KI auslesen“ füllt Betrag, Händler, Datum, Kategorie und Währung aus. Stehen mehrere Produkte auf dem Beleg, trägt die KI sie als Produktliste ein.
 - Personen ohne Admin-Rechte haben ein Tageslimit (Standard 3 Analysen), Admins keines. Die KI richtet ein Admin unter Einstellungen → KI ein (OpenRouter-Schlüssel).
 - Beleg später ansehen: Ausgabe antippen, dann den Beleg antippen; im Vollbild vergrössert ein weiteres Tippen.
 
@@ -80,6 +82,9 @@ export const GUIDE = `
 - Face ID/Passkeys, Push-Mitteilungen und die Offline-Seite brauchen HTTPS mit einem Hostnamen (z. B. über den Reverse Proxy des NAS), nicht nur eine IP-Adresse.
 - Push auf dem iPhone: iOS 16.4 oder neuer, Quota vom Home-Bildschirm-Icon öffnen, dann in den Einstellungen „Mitteilungen“ einschalten.
 - Ohne Verbindung bleiben Änderungen gespeichert und werden nachgereicht.
+
+## Neu in Version 4.0.1
+- Mehrere Produkte pro Ausgabe, Belegscanner (Beleg erkennen und zuschneiden), KI trägt die Produkte vom Beleg ein.
 
 ## Neu in Version 4.0
 - Favoriten beim Erfassen, Fixkosten alle 3 Monate oder jährlich mit Übersicht „Fixkosten & Abos“, Monatsrückblick mit „Rest aufs Sparziel“,
